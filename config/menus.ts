@@ -1,4 +1,4 @@
-import { DashBoard } from '@/components/svg';
+import { Cart, ClipBoard, DashBoard, Graph, Grid } from '@/components/svg';
 
 export interface MenuItemProps {
   title: string;
@@ -14,17 +14,49 @@ export interface MenuItemProps {
 export const menusConfig = {
   mainNav: [
     {
-      title: 'blank',
+      title: 'Dashboard',
       icon: DashBoard,
-      href: '/blank',
+      child: [
+        {
+          title: 'Analytics',
+          href: '/dashboard',
+          icon: Graph,
+        },
+        {
+          title: 'Ecommerce',
+          href: '/ecommerce',
+          icon: Cart,
+        },
+        {
+          title: 'project ',
+          href: '/project',
+          icon: ClipBoard,
+        },
+      ],
     },
   ],
   sidebarNav: {
     modern: [
       {
-        title: 'blank',
+        title: 'Dashboard',
         icon: DashBoard,
-        href: '/blank',
+        child: [
+          {
+            title: 'Analytics',
+            href: '/dashboard',
+            icon: Graph,
+          },
+          {
+            title: 'Ecommerce',
+            href: '/ecommerce',
+            icon: Cart,
+          },
+          {
+            title: 'project ',
+            href: '/project',
+            icon: ClipBoard,
+          },
+        ],
       },
     ],
     classic: [
@@ -32,10 +64,21 @@ export const menusConfig = {
         isHeader: true,
         title: 'menu',
       },
+
       {
-        title: 'blank',
-        icon: DashBoard,
-        href: '/blank',
+        title: 'Dashboard',
+        href: '/dashboard',
+        icon: Grid,
+      },
+      {
+        title: 'Analytics',
+        href: '/analytics',
+        icon: Graph,
+      },
+      {
+        title: 'project ',
+        href: '/project',
+        icon: ClipBoard,
       },
     ],
   },
