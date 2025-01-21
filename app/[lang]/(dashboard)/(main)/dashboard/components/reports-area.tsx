@@ -1,8 +1,8 @@
 'use client';
+import { Eye, Session } from '@/components/svg';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Icon } from '@iconify/react';
-import { Cup, Eye, Increase, Session } from '@/components/svg';
 
 const ReportsArea = () => {
   const reports = [
@@ -24,29 +24,11 @@ const ReportsArea = () => {
       icon: <Eye className='h-4 w-4' />,
       color: 'info',
     },
-    {
-      id: 3,
-      name: 'Avg. Duration',
-      count: '46s',
-      rate: '22',
-      isUp: true,
-      icon: <Increase className='h-4 w-4' />,
-      color: 'warning',
-    },
-    {
-      id: 4,
-      name: 'Bounce Rate',
-      count: '46s',
-      rate: '30',
-      isUp: false,
-      icon: <Cup className='h-4 w-4' />,
-      color: 'destructive',
-    },
   ];
   return (
     <>
       {reports.map((item, index) => (
-        <Card key={`report-card-${index}`}>
+        <Card key={`report-card-${index} `} className=''>
           <CardHeader className='mb-0 flex-col-reverse flex-wrap gap-2 border-none pb-0 sm:flex-row'>
             <span className='flex-1 text-sm font-medium text-default-900'>
               {item.name}
