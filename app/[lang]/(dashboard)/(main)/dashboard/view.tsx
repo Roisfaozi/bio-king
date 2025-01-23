@@ -1,5 +1,6 @@
 'use client';
 
+import RecentActivity from './components/recent-activity';
 import ReportsArea from './components/reports-area';
 import ReportsSnapshot from './components/reports-snapshot';
 import ShortLinksForm from './components/short-links-form';
@@ -30,7 +31,7 @@ const DashboardPageView = ({ trans }: DashboardPageViewProps) => {
           <ShortLinksForm />
         </div>
         <div className='col-span-12 lg:col-span-6 xl:col-span-6'>
-          <ShortLinksForm />
+          <RecentActivity />
         </div>
       </div>
     </div>
