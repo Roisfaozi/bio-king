@@ -1,6 +1,7 @@
 import { Card, CardHeader } from '@/components/ui/card';
 import CardSnippet from '@/components/ui/card-snippet';
 import InputFormLink from './link-forms';
+import RecentLink from './recent-links';
 
 const ShortLinksForm = () => {
   return (
@@ -20,6 +21,7 @@ const ShortLinksForm = () => {
       <CardSnippet>
         <InputFormLink />
       </CardSnippet>
+      <RecentLink />
     </div>
   );
 };

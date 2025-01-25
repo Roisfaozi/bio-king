@@ -43,12 +43,12 @@ const InputFormLink = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 pt-6'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='flex gap-4 pt-6'>
         <FormField
           control={form.control}
           name='username'
           render={({ field }) => (
-            <FormItem>
+            <FormItem className='w-full'>
               <FormControl>
                 <Input
                   placeholder='DashTail'
@@ -63,7 +63,8 @@ const InputFormLink = () => {
             </FormItem>
           )}
         />
-        <Button type='submit'>Submit</Button>
+
+        <Button type='submit'>Short</Button>
       </form>
     </Form>
   );

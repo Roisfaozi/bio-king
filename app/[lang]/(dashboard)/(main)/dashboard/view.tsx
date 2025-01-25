@@ -27,7 +27,7 @@ const DashboardPageView = ({ trans }: DashboardPageViewProps) => {
       </div>
 
       <div className='grid grid-cols-12 gap-6'>
-        <div className='col-span-12 lg:col-span-6 xl:col-span-6'>
+        <div className='col-span-12 space-y-6 lg:col-span-6 xl:col-span-6'>
           <ShortLinksForm />
         </div>
         <div className='col-span-12 lg:col-span-6 xl:col-span-6'>
