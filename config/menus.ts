@@ -71,14 +71,14 @@ export const menusConfig = {
         icon: Grid,
       },
       {
+        title: 'Bio Pages ',
+        href: '/bio-pages',
+        icon: ClipBoard,
+      },
+      {
         title: 'Analytics',
         href: '/analytics',
         icon: Graph,
-      },
-      {
-        title: 'project ',
-        href: '/project',
-        icon: ClipBoard,
       },
     ],
   },
