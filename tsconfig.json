@@ -28,8 +28,12 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/components/*": ["./components/*"],
+      "@/app/*": ["./app/*"],
+      "@/lib/*": ["./lib/*"]
     }
   },
   "include": [
@@ -49,5 +53,5 @@
     "app/[lang]/(dashboard)/(chart)/(re-chart)/charts-rechart-radialbar/basic-radial-bar.jsx",
     "app/[lang]/(dashboard)/(chart)/(re-chart)/charts-rechart-bar/barchart-with-multixaxis.tsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", ".next"]
 }
