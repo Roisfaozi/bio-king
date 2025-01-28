@@ -1,9 +1,9 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import Link from 'next/link';
 import { ChangeEvent, KeyboardEvent, useRef, useState } from 'react';
 import { SiteLogo } from '../svg';
-import Link from 'next/link';
 
 const VerfiyForm = () => {
   const totalOtpField = 6;
@@ -73,7 +73,9 @@ const VerfiyForm = () => {
               onKeyDown={(event) => handleKeyDown(index, event)}
               maxLength={1}
               className='h-10 w-10 rounded border-default-300 text-center text-2xl font-medium text-default-900 sm:h-16 sm:w-[60px]'
-              ref={(ref) => (inputRefs.current[index] = ref)}
+              ref={(ref) => {
+                inputRefs.current[index] = ref; // Perbaikan di sini
+              }}
             />
           ))}
         </div>
