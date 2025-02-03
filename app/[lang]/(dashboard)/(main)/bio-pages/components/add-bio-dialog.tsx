@@ -1,6 +1,5 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogClose,
@@ -13,11 +12,60 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from 'next-themes';
-import Link from 'next/link';
-import Flatpickr from 'react-flatpickr';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { HelpCircle } from 'lucide-react';
+
+const formSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  alias: z.string().optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
 const AddBioDialog = () => {
   const { theme: mode } = useTheme();
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+  });
+
+  const onSubmit = async (data: FormData) => {
+    try {
+      const response = await fetch('/api/bio-pages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      console.log(data);
+      if (response.ok) {
+        const result = await response.json();
+        setOpen(false);
+        console.log(result.data);
+        router.push(`/bio-pages/${result.data.id}/edit`);
+      } else {
+        console.error('Failed to create bio page');
+      }
+    } catch (error) {
+      console.error('Error creating bio page:', error);
+    }
+  };
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -33,70 +81,59 @@ const AddBioDialog = () => {
       <DialogContent size='2xl'>
         <DialogHeader className='p-0'>
           <DialogTitle className='text-base font-medium text-default-700'>
-            Create a New Account
+            Create a Bio
           </DialogTitle>
         </DialogHeader>
         <div>
-          <div className='h-[290px]'>
+          <div>
             <ScrollArea className='h-full'>
-              <div className='space-y-4 sm:grid sm:grid-cols-2 sm:gap-5 sm:space-y-0'>
+              <div className='space-y-4 sm:flex sm:flex-col sm:gap-5 sm:space-y-0'>
                 <div className='flex flex-col gap-2'>
-                  <Label>First Name</Label>
-                  <Input type='text' placeholder='Enter first name' />
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Label
+                          htmlFor='name'
+                          className='flex cursor-pointer items-center gap-2 text-sm text-default-700'
+                          aria-label='A unique name will help you identify your bio page'
+                        >
+                          Name <HelpCircle className='h-3 w-3' />
+                        </Label>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        A unique name will help you identify your bio page
+                      </TooltipContent>
+                    </Tooltip>
+                    <Input
+                      type='text'
+                      placeholder='Enter first name'
+                      {...register('name')}
+                    />
+                  </TooltipProvider>
                 </div>
                 <div className='flex flex-col gap-2'>
-                  <Label>Last Name</Label>
-                  <Input type='text' placeholder='Enter last name' />
-                </div>
-                <div className='flex flex-col gap-2'>
-                  <Label>Email Address</Label>
-                  <Input type='email' placeholder='Enter email address' />
-                </div>
-                <div className='flex flex-col gap-2'>
-                  <Label>Phone Number</Label>
-                  <Input type='number' placeholder='Your phone number' />
-                </div>
-                <div className='flex flex-col gap-2'>
-                  <Label>Set Password</Label>
-                  <Input type='number' placeholder='Your phone number' />
-                </div>
-                <div className='flex flex-col gap-2'>
-                  <Label>Date of birth</Label>
-                  <Flatpickr
-                    className='h-10 w-full rounded-md border border-default-200 px-2 placeholder:text-default-600 focus:border-primary focus:outline-none'
-                    placeholder='Date of birth'
+                  <Label className='text-sm text-default-700'>Alias</Label>
+                  <Input
+                    type='text'
+                    placeholder='Enter alias'
+                    {...register('alias')}
                   />
-                </div>
-                <div className='col-span-2 flex items-center gap-2'>
-                  <Checkbox id='terms' />
-                  <Label
-                    htmlFor='terms'
-                    className='cursor-pointer text-xs text-default-700'
-                  >
-                    You agree to our Terms, Privacy Policy. You may receive SMS
-                    notifications from us and can opt out at any time.
-                  </Label>
+                  <p className='text-xs text-default-600'>
+                    Leave this field empty to generate a random alias
+                  </p>
                 </div>
               </div>
             </ScrollArea>
           </div>
-
           <div className='mt-4 flex justify-center gap-3'>
             <DialogClose asChild>
               <Button type='button' variant='outline'>
                 Cancel
               </Button>
             </DialogClose>
-            <Button type='button'>Create Account </Button>
-          </div>
-          <div className='mt-4 text-center'>
-            <p className='text-sm font-medium text-default-700'>
-              Already Have An Account?
-              <Link href='/dashboard' className='text-success'>
-                {' '}
-                Sign In{' '}
-              </Link>
-            </p>
+            <Button type='button' onClick={handleSubmit(onSubmit)}>
+              Create
+            </Button>
           </div>
         </div>
       </DialogContent>

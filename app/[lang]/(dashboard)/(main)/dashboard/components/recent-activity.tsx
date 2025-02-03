@@ -184,7 +184,7 @@ const RecentActivity = () => {
       <CardContent className='px-0'>
         <div>
           {activities.map((item, index) => (
-            <ActivityList activity={item} key={index} />
+            <ActivityList activity={item} key={`social-item-${index}`} />
           ))}
         </div>
       </CardContent>
@@ -196,15 +196,11 @@ export default RecentActivity;
 
 interface ActivityListProps {
   activity: Activity;
-  key: any;
 }
 
-function ActivityList({ activity, key }: ActivityListProps) {
+function ActivityList({ activity }: ActivityListProps) {
   return (
-    <div
-      className='space-y-3 px-4 py-[11px] hover:bg-default-50'
-      key={`social-item-${key}`}
-    >
+    <div className='space-y-3 px-4 py-[11px] hover:bg-default-50'>
       <div className='flex justify-between'>
         <div className='flex flex-wrap gap-2'>
           <div className='flex'>

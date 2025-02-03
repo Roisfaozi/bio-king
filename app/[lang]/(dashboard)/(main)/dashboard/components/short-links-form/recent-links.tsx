@@ -131,7 +131,7 @@ const RecentLink = () => {
         </div>
       </CardContent>
       {links.map((link) => (
-        <LinkList link={link} key={link.id} />
+        <LinkList link={link} key={`social-item-${link.id}`} />
       ))}
     </Card>
   );
@@ -141,15 +141,11 @@ export default RecentLink;
 
 interface LinkListProps {
   link: link;
-  key: any;
 }
 
-function LinkList({ link, key }: LinkListProps) {
+function LinkList({ link }: LinkListProps) {
   return (
-    <div
-      className='space-y-3 px-4 py-[11px] hover:bg-default-50'
-      key={`social-item-${key}`}
-    >
+    <div className='space-y-3 px-4 py-[11px] hover:bg-default-50'>
       <div className='flex justify-between'>
         <div className='flex flex-wrap gap-2'>
           <div className='flex'>
