@@ -1,6 +1,6 @@
 'use client';
 
-import ReportsChart from '@/app/[lang]/(dashboard)/(main)/dashboard/components/reports-snapshot/reports-chart';
+import AnalitycsChart from '@/app/[lang]/(dashboard)/(main)/analytics/components/analitycs/analitycs-chart';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { themes } from '@/config/thems';
 import { useThemeStore } from '@/store';
@@ -12,7 +12,7 @@ const allUsersSeries = [
   },
 ];
 
-const ReportsSnapshot = () => {
+const Analitycs = () => {
   const { theme: config, setTheme: setConfig } = useThemeStore();
   const { theme: mode } = useTheme();
   const theme = themes.find((theme) => theme.name === config);
@@ -35,7 +35,7 @@ const ReportsSnapshot = () => {
         <div className='flex flex-wrap items-center gap-2'>
           <div className='flex-1'>
             <div className='whitespace-nowrap text-xl font-semibold text-default-900'>
-              Reports Snapshot
+              Links
             </div>
           </div>
         </div>
@@ -43,7 +43,7 @@ const ReportsSnapshot = () => {
       <CardContent className='p-1 md:p-5'>
         {/* charts data */}
         {tabsContentData.map((item, index) => (
-          <ReportsChart
+          <AnalitycsChart
             key={`report-tab-${index}`}
             series={item.series}
             chartColor={item.color}
@@ -54,4 +54,4 @@ const ReportsSnapshot = () => {
   );
 };
 
-export default ReportsSnapshot;
+export default Analitycs;
