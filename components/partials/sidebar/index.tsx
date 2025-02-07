@@ -1,10 +1,6 @@
 'use client';
-import React from 'react';
-import { useSidebar, useThemeStore } from '@/store';
-import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import ModuleSidebar from './module';
-import PopoverSidebar from './popover';
+import { useSidebar, useThemeStore } from '@/store';
 import ClassicSidebar from './classic';
 import MobileSidebar from './mobile-sidebar';
 
@@ -20,13 +16,11 @@ const Sidebar = ({ trans }: { trans: string }) => {
     selectedSidebar = <MobileSidebar trans={trans} />;
   } else {
     const sidebarComponents: { [key: string]: JSX.Element } = {
-      module: <ModuleSidebar trans={trans} />,
-      popover: <PopoverSidebar trans={trans} />,
       classic: <ClassicSidebar trans={trans} />,
     };
 
     selectedSidebar = sidebarComponents[sidebarType] || (
-      <ModuleSidebar trans={trans} />
+      <ClassicSidebar trans={trans} />
     );
   }
 

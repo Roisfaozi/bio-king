@@ -1,8 +1,8 @@
-import * as React from 'react';
-import Cleave from 'cleave.js/react';
-import 'cleave.js/dist/addons/cleave-phone.us';
 import { cn } from '@/lib/utils';
+import 'cleave.js/dist/addons/cleave-phone.us';
 import { CleaveOptions } from 'cleave.js/options';
+import Cleave from 'cleave.js/react';
+import * as React from 'react';
 interface CleaveInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   options: CleaveOptions;
 }

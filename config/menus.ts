@@ -36,29 +36,6 @@ export const menusConfig = {
     },
   ],
   sidebarNav: {
-    modern: [
-      {
-        title: 'Dashboard',
-        icon: DashBoard,
-        child: [
-          {
-            title: 'Analytics',
-            href: '/dashboard',
-            icon: Graph,
-          },
-          {
-            title: 'Ecommerce',
-            href: '/ecommerce',
-            icon: Cart,
-          },
-          {
-            title: 'project ',
-            href: '/project',
-            icon: ClipBoard,
-          },
-        ],
-      },
-    ],
     classic: [
       {
         isHeader: true,
@@ -84,6 +61,5 @@ export const menusConfig = {
   },
 };
 
-export type ModernNavType = (typeof menusConfig.sidebarNav.modern)[number];
 export type ClassicNavType = (typeof menusConfig.sidebarNav.classic)[number];
 export type MainNavType = (typeof menusConfig.mainNav)[number];

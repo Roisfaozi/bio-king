@@ -1,17 +1,12 @@
 'use client';
-import React, { useState } from 'react';
-import { cn, isLocationMatch, getDynamicPath } from '@/lib/utils';
-import { useSidebar, useThemeStore } from '@/store';
-import SidebarLogo from '../common/logo';
-import { menusConfig } from '@/config/menus';
-import MenuLabel from '../common/menu-label';
-import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { menusConfig } from '@/config/menus';
+import { cn, getDynamicPath, isLocationMatch } from '@/lib/utils';
+import { useSidebar, useThemeStore } from '@/store';
 import { usePathname } from 'next/navigation';
-import SingleMenuItem from './single-menu-item';
-import SubMenuHandler from './sub-menu-handler';
-import NestedSubMenu from '../common/nested-menus';
+import React, { useState } from 'react';
 import AddBlock from '../common/add-block';
+import SidebarLogo from '../common/logo';
 const ClassicSidebar = ({ trans }: { trans: string }) => {
   const { sidebarBg } = useSidebar();
   const [activeSubmenu, setActiveSubmenu] = useState<number | null>(null);
@@ -102,22 +97,22 @@ const ClassicSidebar = ({ trans }: { trans: string }) => {
             <li key={`menu_key_${i}`}>
               {/* single menu  */}
 
-              {!item.child && !item.isHeader && (
+              {/* {!item.child && !item.isHeader && (
                 <SingleMenuItem
                   item={item}
                   collapsed={collapsed}
                   hovered={hovered}
                   trans={trans}
                 />
-              )}
+              )} */}
 
               {/* menu label */}
-              {item.isHeader && !item.child && (!collapsed || hovered) && (
+              {/* {item.isHeader && !item.child && (!collapsed || hovered) && (
                 <MenuLabel item={item} trans={trans} />
-              )}
+              )} */}
 
               {/* sub menu */}
-              {item.child && (
+              {/* {item.child && (
                 <>
                   <SubMenuHandler
                     item={item}
@@ -140,7 +135,7 @@ const ClassicSidebar = ({ trans }: { trans: string }) => {
                     />
                   )}
                 </>
-              )}
+              )} */}
             </li>
           ))}
         </ul>

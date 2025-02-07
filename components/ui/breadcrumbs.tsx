@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
+import { Icon } from '@iconify/react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import Link from 'next/link';
+import * as React from 'react';
 
 const breadcrumbItemsVariants = cva(
   ' flex items-center gap-1 underline-offset-4  transition ',
@@ -214,7 +214,7 @@ const BreadcrumbItem = React.forwardRef<HTMLSpanElement, any>(
     },
     ref,
   ) => {
-    const ariaCurrent = isCurrent ? 'page' : null;
+    const ariaCurrent = isCurrent ? 'page' : undefined;
     const dataState = isCurrent ? 'active' : null;
     const dataDisabled = disabled && !isCurrent ? 'true' : null;
 
@@ -257,4 +257,4 @@ const BreadcrumbItem = React.forwardRef<HTMLSpanElement, any>(
 
 BreadcrumbItem.displayName = 'BreadcrumbItem';
 
-export { Breadcrumbs, BreadcrumbItem };
+export { BreadcrumbItem, Breadcrumbs };

@@ -1,16 +1,11 @@
 'use client';
-import React, { useState } from 'react';
-import { cn, isLocationMatch } from '@/lib/utils';
-import { useSidebar, useThemeStore } from '@/store';
-import SidebarLogo from '../common/logo';
-import { menusConfig } from '@/config/menus';
-import MenuLabel from '../common/menu-label';
-import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { menusConfig } from '@/config/menus';
+import { cn, isLocationMatch } from '@/lib/utils';
+import { useSidebar } from '@/store';
 import { usePathname } from 'next/navigation';
-import SingleMenuItem from './single-menu-item';
-import SubMenuHandler from './sub-menu-handler';
-import NestedSubMenu from '../common/nested-menus';
+import React, { useState } from 'react';
+import SidebarLogo from '../common/logo';
 const MobileSidebar = ({
   className,
   trans,
@@ -100,17 +95,17 @@ const MobileSidebar = ({
               <li key={`menu_key_${i}`}>
                 {/* single menu  */}
 
-                {!item.child && !item.isHeader && (
+                {/* {!item.child && !item.isHeader && (
                   <SingleMenuItem item={item} collapsed={collapsed} />
-                )}
+                )} */}
 
                 {/* menu label */}
-                {item.isHeader && !item.child && !collapsed && (
+                {/* {item.isHeader && !item.child && !collapsed && (
                   <MenuLabel item={item} trans={trans} />
-                )}
+                )} */}
 
                 {/* sub menu */}
-                {item.child && (
+                {/* {item.child && (
                   <>
                     <SubMenuHandler
                       item={item}
@@ -132,7 +127,7 @@ const MobileSidebar = ({
                       />
                     )}
                   </>
-                )}
+                )} */}
               </li>
             ))}
           </ul>
