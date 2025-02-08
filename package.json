@@ -12,6 +12,7 @@
     "lint:strict": "eslint --max-warnings=0 src",
     "format": "prettier --write .",
     "format:check": "prettier -c -w .",
+    "clean": "rm -rf node_modules && rm -rf node_modules && yarn cache clean && yarn install",
     "prepare": "husky"
   },
   "lint-staged": {
