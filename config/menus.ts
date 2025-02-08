@@ -41,7 +41,6 @@ export const menusConfig = {
         isHeader: true,
         title: 'menu',
       },
-
       {
         title: 'Dashboard',
         href: '/dashboard',

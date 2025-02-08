@@ -1,4 +1,8 @@
 'use client';
+import SingleMenuItem from '@/components/partials/sidebar/classic/single-menu-item';
+import AddBlock from '@/components/partials/sidebar/common/add-block';
+import MenuLabel from '@/components/partials/sidebar/common/menu-label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { menusConfig } from '@/config/menus';
 import { cn, getDynamicPath, isLocationMatch } from '@/lib/utils';
 import { useSidebar, useThemeStore } from '@/store';
@@ -56,7 +60,6 @@ const ClassicSidebar = ({ trans }: { trans: string }) => {
     setActiveSubmenu(subMenuIndex);
     setMultiMenu(multiMenuIndex);
   }, [locationName]);
-
   return (
     <div
       onMouseEnter={() => setHovered(true)}
@@ -78,6 +81,44 @@ const ClassicSidebar = ({ trans }: { trans: string }) => {
       )}
 
       <SidebarLogo hovered={hovered} />
+      <ScrollArea
+        className={cn('sidebar-menu h-[calc(100%-80px)]', {
+          'px-4': !collapsed || hovered,
+        })}
+      >
+        <ul
+          dir={isRtl ? 'rtl' : 'ltr'}
+          className={cn('space-y-1', {
+            'space-y-2 text-center': collapsed,
+            'text-start': collapsed && hovered,
+          })}
+        >
+          {menus.map((item, i) => (
+            <li key={`menu_key_${i}`}>
+              {/* single menu  */}
+
+              {item && !item.isHeader && (
+                <SingleMenuItem
+                  item={item}
+                  collapsed={collapsed}
+                  hovered={hovered}
+                  trans={trans}
+                />
+              )}
+
+              {/* menu label */}
+              {item.isHeader && (!collapsed || hovered) && (
+                <MenuLabel item={item} trans={trans} />
+              )}
+            </li>
+          ))}
+        </ul>
+        {!collapsed && (
+          <div className='-mx-2'>
+            <AddBlock />
+          </div>
+        )}
+      </ScrollArea>
     </div>
   );
 };
