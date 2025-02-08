@@ -1,25 +1,25 @@
-import * as React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
+import { Icon } from '@iconify/react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import Link from 'next/link';
+import * as React from 'react';
 
 const breadcrumbItemsVariants = cva(
-  ' flex gap-1 items-center transition  underline-offset-4 ',
+  ' flex items-center gap-1 underline-offset-4  transition ',
   {
     variants: {
       color: {
         default:
-          'text-default-600 hover:default-600/80 data-[state=active]:text-primary aria-[current=page]:text-primary',
+          'hover:default-600/80 text-default-600 aria-[current=page]:text-primary data-[state=active]:text-primary',
         primary:
-          'text-primary/80 hover:text-primary/60 data-[state=active]:text-primary aria-[current=page]:text-primary',
+          'text-primary/80 hover:text-primary/60 aria-[current=page]:text-primary data-[state=active]:text-primary',
         success:
-          'text-success/80 hover:text-success/60 data-[state=active]:text-success aria-[current=page]:text-success',
-        info: 'text-info/80 hover:text-info/60 data-[state=active]:text-info aria-[current=page]:text-info',
+          'text-success/80 hover:text-success/60 aria-[current=page]:text-success data-[state=active]:text-success',
+        info: 'text-info/80 hover:text-info/60 aria-[current=page]:text-info data-[state=active]:text-info',
         warning:
-          'text-warning/80  hover:text-warning/60 data-[state=active]:text-warning aria-[current=page]:text-warning',
+          'text-warning/80  hover:text-warning/60 aria-[current=page]:text-warning data-[state=active]:text-warning',
         destructive:
-          'text-destructive/80  hover:text-destructive/60 data-[state=active]:text-destructive aria-[current=page]:text-destructive',
+          'text-destructive/80  hover:text-destructive/60 aria-[current=page]:text-destructive data-[state=active]:text-destructive',
       },
 
       underline: {
@@ -43,12 +43,12 @@ const breadcrumbItemsVariants = cva(
     },
   },
 );
-const breadcrumbsVariants = cva(' flex flex-wrap list-none max-w-fit ', {
+const breadcrumbsVariants = cva(' flex max-w-fit list-none flex-wrap ', {
   variants: {
     variant: {
       default: 'default-style',
-      solid: ' bg-muted p-3 rounded',
-      bordered: 'border-2 border-border rounded p-3',
+      solid: ' rounded bg-muted p-3',
+      bordered: 'rounded border-2 border-border p-3',
     },
   },
 
@@ -214,7 +214,7 @@ const BreadcrumbItem = React.forwardRef<HTMLSpanElement, any>(
     },
     ref,
   ) => {
-    const ariaCurrent = isCurrent ? 'page' : null;
+    const ariaCurrent = isCurrent ? 'page' : undefined;
     const dataState = isCurrent ? 'active' : null;
     const dataDisabled = disabled && !isCurrent ? 'true' : null;
 
@@ -257,4 +257,4 @@ const BreadcrumbItem = React.forwardRef<HTMLSpanElement, any>(
 
 BreadcrumbItem.displayName = 'BreadcrumbItem';
 
-export { Breadcrumbs, BreadcrumbItem };
+export { BreadcrumbItem, Breadcrumbs };
