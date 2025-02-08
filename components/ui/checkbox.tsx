@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Check } from 'lucide-react';
 
 const checkboxVariants = cva(
-  'group peer  shrink-0   ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:stroke-primary-foreground ',
+  'peer group  shrink-0   ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:stroke-primary-foreground ',
   {
     variants: {
       color: {
@@ -23,16 +23,16 @@ const checkboxVariants = cva(
         info: 'border  border-default-400 data-[state=checked]:border-info data-[state=checked]:bg-info ',
         success:
           'border  border-default-400 data-[state=checked]:border-success data-[state=checked]:bg-success ',
-        dark: 'border  border-default-400 data-[state=checked]:bg-slate-900 ',
+        dark: 'border  border-default-400 data-[state=checked]:bg-slate-900 data-[state=checked]:bg-slate-900 ',
       },
       variant: {
         solid: 'bg-default-600',
-        plain: ' border-none bg-transparent',
+        plain: ' bg-transparent border-none',
         faded: 'bg-card',
         filled: 'bg-default-200',
         outline: ' border border-current data-[state=checked]:bg-card',
         'filled-outline':
-          'border-current bg-default-200 data-[state=checked]:bg-card',
+          'bg-default-200 border-current data-[state=checked]:bg-card',
       },
       radius: {
         none: '',
@@ -54,37 +54,38 @@ const checkboxVariants = cva(
       {
         variant: 'outline',
         color: 'destructive',
-        className: ' border-destructive [&_svg]:stroke-destructive',
+        className:
+          ' [&_svg]:stroke-destructive border-destructive border-destructive',
       },
       {
         variant: 'outline',
         color: 'success',
-        className: ' border-success [&_svg]:stroke-success',
+        className: ' [&_svg]:stroke-success border-success',
       },
       {
         variant: 'outline',
         color: 'info',
-        className: ' border-info [&_svg]:stroke-info',
+        className: ' [&_svg]:stroke-info border-info',
       },
       {
         variant: 'outline',
         color: 'warning',
-        className: ' border-warning [&_svg]:stroke-warning',
+        className: ' [&_svg]:stroke-warning border-warning',
       },
       {
         variant: 'outline',
         color: 'dark',
-        className: ' border-foreground [&_svg]:stroke-foreground',
+        className: ' [&_svg]:stroke-foreground border-foreground',
       },
       {
         variant: 'outline',
         color: 'default',
-        className: ' border-primary [&_svg]:stroke-primary',
+        className: ' [&_svg]:stroke-primary border-primary',
       },
       {
         variant: 'filled-outline',
         color: 'default',
-        className: 'border-primary [&_svg]:stroke-primary',
+        className: '[&_svg]:stroke-primary border-primary',
       },
     ],
 

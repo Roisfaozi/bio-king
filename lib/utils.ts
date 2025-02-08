@@ -30,7 +30,7 @@ export const RGBToHex = (r: number, g: number, b: number): string => {
 
 export function hslToHex(hsl: string): string {
   // Remove "hsla(" and ")" from the HSL string
-  const hslValues = hsl.replace('hsla(', '').replace(')', '');
+  let hslValues = hsl.replace('hsla(', '').replace(')', '');
 
   // Split the HSL string into an array of H, S, and L values
   const [h, s, l] = hslValues.split(' ').map((value) => {

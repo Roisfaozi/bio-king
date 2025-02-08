@@ -34,10 +34,10 @@ const SingleMenuItem = ({
               },
             )}
           >
-            <span className='grow-0'>
+            <span className='flex-grow-0'>
               <item.icon className='h-5 w-5' />
             </span>
-            <div className='text-box grow'>{translate(title, trans)}</div>
+            <div className='text-box flex-grow'>{translate(title, trans)}</div>
             {badge && <Badge className='rounded'>{item.badge}</Badge>}
           </div>
         ) : (

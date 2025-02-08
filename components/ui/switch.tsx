@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const switchVariants = cva(
-  'group peer  relative inline-flex  shrink-0  cursor-pointer  items-center justify-start rounded-full transition-colors  focus-visible:outline-none  focus-visible:ring-2 focus-visible:ring-ring  focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=unchecked]:bg-default-300 [&_.content-box>svg]:h-4 [&_.content-box>svg]:w-4 [&_.content-box]:text-[10px] [&_.content-box]:text-primary-foreground',
+  'peer relative  inline-flex items-center  [&_.content-box>svg]:h-4  [&_.content-box>svg]:w-4  [&_.content-box]:text-primary-foreground [&_.content-box]:text-[10px] justify-start group  flex-shrink-0  cursor-pointer rounded-full  transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=unchecked]:bg-default-300',
   {
     variants: {
       color: {
@@ -18,7 +18,7 @@ const switchVariants = cva(
         dark: 'data-[state=checked]:bg-foreground ',
       },
       size: {
-        sm: 'h-4 w-[30px]  [&_.content-box>svg]:h-2.5 [&_.content-box>svg]:w-2.5  [&_.content-box]:text-[7px] ',
+        sm: 'h-4 w-[30px]  [&_.content-box]:text-[7px] [&_.content-box>svg]:h-2.5  [&_.content-box>svg]:w-2.5 ',
         md: 'h-5 w-[38px] ',
         lg: 'h-6 w-[42px]',
       },

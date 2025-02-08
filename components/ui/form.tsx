@@ -1,6 +1,6 @@
+import * as React from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
-import * as React from 'react';
 import {
   Controller,
   ControllerProps,
@@ -10,8 +10,8 @@ import {
   useFormContext,
 } from 'react-hook-form';
 
-import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 
 const Form = FormProvider;
 
@@ -150,23 +150,7 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, FormMessageProps>(
     const body = error ? String(error?.message) : children;
 
     if (!body) {
-      return (
-        <p
-          ref={ref}
-          id={formMessageId}
-          className={cn(
-            'rounded-0.5 h-3 px-1.5 text-xs leading-none text-destructive',
-            className,
-            {
-              'inline-block bg-destructive text-destructive-foreground':
-                tooltip,
-            },
-          )}
-          {...props}
-        >
-          {body}
-        </p>
-      );
+      return null;
     }
 
     return (
@@ -174,7 +158,7 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, FormMessageProps>(
         ref={ref}
         id={formMessageId}
         className={cn(
-          'rounded-0.5 px-1.5 text-xs leading-none text-destructive',
+          'rounded-0.5 px-1.5 py-2 text-xs leading-none text-destructive',
           className,
           {
             'inline-block bg-destructive text-destructive-foreground': tooltip,
@@ -190,12 +174,12 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, FormMessageProps>(
 FormMessage.displayName = 'FormMessage';
 
 export {
+  useFormField,
   Form,
-  FormControl,
-  FormDescription,
-  FormField,
   FormItem,
   FormLabel,
+  FormControl,
+  FormDescription,
   FormMessage,
-  useFormField,
+  FormField,
 };

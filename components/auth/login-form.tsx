@@ -58,7 +58,7 @@ const LogInForm = () => {
 
   const onSubmit = (data: { email: string; password: string }) => {
     startTransition(async () => {
-      const response = await signIn('credentials', {
+      let response = await signIn('credentials', {
         email: data.email,
         password: data.password,
         redirect: false,
@@ -147,7 +147,7 @@ const LogInForm = () => {
           <div className='flex flex-1 items-center gap-1.5'>
             <Checkbox
               size='sm'
-              className='mt-px border-default-300'
+              className='mt-[1px] border-default-300'
               id='isRemebered'
             />
             <Label

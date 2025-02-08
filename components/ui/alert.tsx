@@ -5,7 +5,7 @@ import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 
 const alertVariants = cva(
-  'relative flex w-full  items-start  space-x-4 rounded-lg p-4 rtl:space-x-reverse md:items-center ',
+  'relative w-full rounded-lg  p-4  flex md:items-center items-start space-x-4 rtl:space-x-reverse ',
   {
     variants: {
       color: {
@@ -19,29 +19,29 @@ const alertVariants = cva(
       },
       variant: {
         outline: 'border border-current bg-background ',
-        soft: 'border-current bg-opacity-10 text-current    ',
+        soft: 'text-current bg-opacity-10 border-current    ',
       },
     },
     compoundVariants: [
       {
         variant: 'outline',
         color: 'destructive',
-        className: ' bg-transparent  text-destructive ',
+        className: ' text-destructive  bg-transparent ',
       },
       {
         variant: 'outline',
         color: 'success',
-        className: ' bg-transparent  text-success ',
+        className: ' text-success  bg-transparent ',
       },
       {
         variant: 'outline',
         color: 'info',
-        className: ' bg-transparent  text-info ',
+        className: ' text-info  bg-transparent ',
       },
       {
         variant: 'outline',
         color: 'warning',
-        className: ' bg-transparent  text-warning ',
+        className: ' text-warning  bg-transparent ',
       },
       {
         variant: 'outline',
@@ -52,7 +52,7 @@ const alertVariants = cva(
       {
         variant: 'outline',
         color: 'secondary',
-        className: ' bg-transparent text-default-700  dark:text-default-400 ',
+        className: ' text-default-700 dark:text-default-400  bg-transparent ',
       },
       // soft
 
@@ -84,7 +84,7 @@ const alertVariants = cva(
       {
         variant: 'soft',
         color: 'secondary',
-        className: 'bg-opacity-40 text-card-foreground',
+        className: 'text-card-foreground bg-opacity-40',
       },
     ],
     defaultVariants: {

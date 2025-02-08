@@ -84,7 +84,7 @@ const Stats = () => {
               )}
             ></span>
             <div
-              className={`border- grid h-8 w-8 place-content-center rounded-full border border-dashed${item.color} dark:border-primary-foreground/60`}
+              className={`grid h-8 w-8 place-content-center rounded-full border border-dashed border-${item.color} dark:border-primary-foreground/60`}
             >
               <span
                 className={cn(
@@ -101,7 +101,7 @@ const Stats = () => {
               </span>
             </div>
             <div
-              className={`text- text-3xl font-semibold${item.color} mt-2 dark:text-primary-foreground`}
+              className={`text-3xl font-semibold text-${item.color} mt-2 dark:text-primary-foreground`}
             >
               {item.total}
             </div>

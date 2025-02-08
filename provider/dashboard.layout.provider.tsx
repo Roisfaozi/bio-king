@@ -1,18 +1,18 @@
 'use client';
-import HeaderSearch from '@/components/header-search';
-import LayoutLoader from '@/components/layout-loader';
-import ThemeCustomize from '@/components/partials/customizer/theme-customizer';
-import Footer from '@/components/partials/footer';
+import React from 'react';
 import Header from '@/components/partials/header';
 import Sidebar from '@/components/partials/sidebar';
-import MobileSidebar from '@/components/partials/sidebar/mobile-sidebar';
-import { useMediaQuery } from '@/hooks/use-media-query';
-import { useMounted } from '@/hooks/use-mounted';
 import { cn } from '@/lib/utils';
 import { useSidebar, useThemeStore } from '@/store';
-import { motion } from 'framer-motion';
-import { usePathname } from 'next/navigation';
-import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter, usePathname } from 'next/navigation';
+import Footer from '@/components/partials/footer';
+import { useMediaQuery } from '@/hooks/use-media-query';
+import ThemeCustomize from '@/components/partials/customizer/theme-customizer';
+import MobileSidebar from '@/components/partials/sidebar/mobile-sidebar';
+import HeaderSearch from '@/components/header-search';
+import { useMounted } from '@/hooks/use-mounted';
+import LayoutLoader from '@/components/layout-loader';
 const DashBoardLayoutProvider = ({
   children,
   trans,

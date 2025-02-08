@@ -1,15 +1,16 @@
 'use client';
-import ThemeButton from '@/components/partials/header/theme-button';
-import { SiteLogo } from '@/components/svg';
-import { Button } from '@/components/ui/button';
+import React from 'react';
+import { useState, useEffect } from 'react';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { cn } from '@/lib/utils';
-import { Icon } from '@iconify/react';
-import { ChevronDown, Menu } from 'lucide-react';
+import { SiteLogo } from '@/components/svg';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
-import { menus } from './../data';
+import { Button } from '@/components/ui/button';
+import ThemeButton from '@/components/partials/header/theme-button';
 import NavMenu from './nav-menu';
+import { Icon } from '@iconify/react';
+import { menus } from './../data';
+import { ChevronDown, Menu } from 'lucide-react';
+import { cn } from '@/lib/utils';
 const Header = () => {
   const [scroll, setScroll] = useState<boolean>(false);
   useEffect(() => {
@@ -66,7 +67,7 @@ const Header = () => {
                 <ul className='space-y-1.5'>
                   {menus?.map((item, i) =>
                     item.child ? (
-                      <div key={`main-item-${i}`} className='space-y-1.5'>
+                      <div className='space-y-1.5'>
                         <div
                           className='group flex cursor-pointer items-center justify-between pr-4'
                           onClick={() => setShow(!show)}
