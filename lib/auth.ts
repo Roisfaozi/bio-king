@@ -1,12 +1,11 @@
 import Credentials from 'next-auth/providers/credentials';
 
-import { User as UserType, user } from '@/app/api/user/data';
-import GoogleProvider from 'next-auth/providers/google';
+import { user } from '@/app/api/user/data';
+import { getServerSession, NextAuthOptions } from 'next-auth';
 import GithubProvider from 'next-auth/providers/github';
+import GoogleProvider from 'next-auth/providers/google';
 
-import avatar3 from '@/public/images/avatar/avatar-3.jpg';
-
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID as string,
@@ -53,4 +52,8 @@ export const authOptions = {
     strategy: 'jwt',
   },
   debug: process.env.NODE_ENV !== 'production',
+};
+
+export const getAuthSession = async () => {
+  return getServerSession(authOptions);
 };
