@@ -4,8 +4,6 @@ import { useSidebar, useThemeStore } from '@/store';
 import React from 'react';
 import HorizontalHeader from './horizontal-header';
 import HorizontalMenu from './horizontal-menu';
-import Inbox from './inbox';
-import NotificationMessage from './notification-message';
 import ProfileInfo from './profile-info';
 import ThemeButton from './theme-button';
 import VerticalHeader from './vertical-header';
@@ -31,8 +29,6 @@ const NavTools = ({
       {isDesktop && <FullScreen />}
 
       <ThemeButton />
-      <Inbox />
-      <NotificationMessage />
 
       <div className='ltr:pl-2 rtl:pr-2'>
         <ProfileInfo />

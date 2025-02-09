@@ -35,7 +35,7 @@ const ReportsSnapshot = () => {
         <div className='flex flex-wrap items-center gap-2'>
           <div className='flex-1'>
             <div className='whitespace-nowrap text-xl font-semibold text-default-900'>
-              Reports Snapshot
+              Recent Click
             </div>
           </div>
         </div>

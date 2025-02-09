@@ -8,7 +8,7 @@ const ReportsArea = () => {
   const reports = [
     {
       id: 1,
-      name: 'Sessions',
+      name: 'Links',
       count: '6,132',
       rate: '150',
       isUp: true,
@@ -17,7 +17,7 @@ const ReportsArea = () => {
     },
     {
       id: 2,
-      name: 'Page Views',
+      name: 'Clicks',
       count: '11,236',
       rate: '202',
       isUp: false,
