@@ -1,31 +1,31 @@
 'use client';
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { SiteLogo } from '@/components/svg';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Icon } from '@iconify/react';
 import { Loader2 } from 'lucide-react';
 import { signIn } from 'next-auth/react';
-import toast from 'react-hot-toast';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
 import Image from 'next/image';
-import { SiteLogo } from '@/components/svg';
-import { Icon } from '@iconify/react';
-import { Checkbox } from '@/components/ui/checkbox';
+import Link from 'next/link';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { z } from 'zod';
 
-import googleIcon from '@/public/images/auth/google.png';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import facebook from '@/public/images/auth/facebook.png';
-import twitter from '@/public/images/auth/twitter.png';
 import GithubIcon from '@/public/images/auth/github.png';
+import googleIcon from '@/public/images/auth/google.png';
+import twitter from '@/public/images/auth/twitter.png';
 
 const schema = z.object({
   email: z.string().email({ message: 'Your email is invalid.' }),
   password: z.string().min(4),
 });
-import { useMediaQuery } from '@/hooks/use-media-query';
 
 const LogInForm = () => {
   const [isPending, startTransition] = React.useTransition();
@@ -48,7 +48,7 @@ const LogInForm = () => {
     resolver: zodResolver(schema),
     mode: 'all',
     defaultValues: {
-      email: 'dashtail@codeshaper.net',
+      email: 'admin@kingbyt.com',
       password: 'password',
     },
   });
@@ -74,7 +74,7 @@ const LogInForm = () => {
   };
   return (
     <div className='w-full py-10'>
-      <Link href='/dashboard' className='inline-block'>
+      <Link href='/' className='inline-block'>
         <SiteLogo className='h-10 w-10 text-primary 2xl:h-14 2xl:w-14' />
       </Link>
       <div className='mt-6 text-2xl font-bold text-default-900 2xl:mt-8 2xl:text-3xl'>

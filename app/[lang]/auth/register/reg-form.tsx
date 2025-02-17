@@ -11,6 +11,10 @@ import apple from '@/public/images/auth/apple.png';
 import facebook from '@/public/images/auth/facebook.png';
 import googleIcon from '@/public/images/auth/google.png';
 import twitter from '@/public/images/auth/twitter.png';
+import {
+  CreateUserInput,
+  createUserSchema,
+} from '@/validation/auth-validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
 import { Loader2 } from 'lucide-react';
@@ -20,17 +24,14 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { z } from 'zod';
 
-const schema = z.object({
-  name: z.string().min(3, { message: 'Name must be at least 3 characters.' }),
-  email: z.string().email({ message: 'Your email is invalid.' }),
-  password: z.string().min(4),
-});
 const RegForm = () => {
   const [isPending, startTransition] = React.useTransition();
   const [passwordType, setPasswordType] = useState('password');
   const isDesktop2xl = useMediaQuery('(max-width: 1530px)');
+  const [confirmPasswordType, setConfirmPasswordType] =
+    useState<boolean>(false);
+
   const togglePasswordType = () => {
     if (passwordType === 'text') {
       setPasswordType('password');
@@ -44,8 +45,8 @@ const RegForm = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({
-    resolver: zodResolver(schema),
+  } = useForm<CreateUserInput>({
+    resolver: zodResolver(createUserSchema),
     mode: 'all',
   });
   const [isVisible, setIsVisible] = React.useState<boolean>(false);
@@ -55,10 +56,10 @@ const RegForm = () => {
   const onSubmit = (data: any) => {
     startTransition(async () => {
       let response = await addUser(data);
-      if (response?.status === 'success') {
+      if (response?.status === 201) {
         toast.success(response?.message);
         reset();
-        router.push('/');
+        router.push('/dashboard');
       } else {
         toast.error(response?.message);
       }
@@ -66,7 +67,7 @@ const RegForm = () => {
   };
   return (
     <div className='w-full'>
-      <Link href='/dashboard' className='inline-block'>
+      <Link href='/' className='inline-block'>
         <SiteLogo className='h-10 w-10 text-primary 2xl:h-14 2xl:w-14' />
       </Link>
       <div className='mt-6 text-2xl font-bold text-default-900 2xl:mt-8 2xl:text-3xl'>
@@ -96,11 +97,12 @@ const RegForm = () => {
             Full Name
           </Label>
         </div>
-        {errors.name && (
-          <div className='mt-2 text-destructive'>
-            {errors.name.message as string}
-          </div>
-        )}
+        <div
+          className='mt-2 h-5 text-destructive'
+          style={{ visibility: errors.password ? 'visible' : 'hidden' }}
+        >
+          {errors?.name?.message as string}
+        </div>
         <div className='relative mt-4'>
           <Input
             removeWrapper
@@ -121,11 +123,12 @@ const RegForm = () => {
             Email
           </Label>
         </div>
-        {errors.email && (
-          <div className='mt-2 text-destructive'>
-            {errors.email.message as string}
-          </div>
-        )}
+        <div
+          className='mt-2 h-5 text-destructive'
+          style={{ visibility: errors.password ? 'visible' : 'hidden' }}
+        >
+          {errors?.email?.message as string}
+        </div>
         <div className='relative mt-4'>
           <Input
             removeWrapper
@@ -159,11 +162,53 @@ const RegForm = () => {
             )}
           </div>
         </div>
-        {errors.password && (
-          <div className='mt-2 text-destructive'>
-            {errors.password.message as string}
+        <div
+          className='mt-2 h-5 text-destructive'
+          style={{ visibility: errors.password ? 'visible' : 'hidden' }}
+        >
+          {errors.password?.message as string}
+        </div>
+
+        <div className='relative mt-4'>
+          <Input
+            removeWrapper
+            type={confirmPasswordType ? 'text' : 'password'}
+            id='confirmPassword'
+            size={!isDesktop2xl ? 'xl' : 'lg'}
+            placeholder=' '
+            disabled={isPending}
+            {...register('passwordConfirm')}
+            className={cn('peer', {
+              'border-destructive': errors.passwordConfirm,
+            })}
+          />
+          <Label
+            htmlFor='confirmPassword'
+            className='absolute start-1 top-2 z-10 origin-[0] -translate-y-5 scale-75 transform bg-background px-2 text-base text-default-600 duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:px-2 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4'
+          >
+            Confirm Password
+          </Label>
+          <div
+            className='absolute top-1/2 -translate-y-1/2 cursor-pointer ltr:right-4 rtl:left-4'
+            onClick={() => setConfirmPasswordType(!confirmPasswordType)}
+          >
+            {confirmPasswordType ? (
+              <Icon icon='heroicons:eye' className='h-5 w-5 text-default-400' />
+            ) : (
+              <Icon
+                icon='heroicons:eye-slash'
+                className='h-5 w-5 text-default-400'
+              />
+            )}
           </div>
-        )}
+        </div>
+
+        <div
+          className='mt-2 h-5 text-destructive'
+          style={{ visibility: errors.passwordConfirm ? 'visible' : 'hidden' }}
+        >
+          {errors['passwordConfirm']?.message as string}
+        </div>
 
         <div className='mb-8 mt-5 flex items-center gap-3'>
           <Checkbox id='terms' className='border-default-300' />

@@ -1,20 +1,11 @@
-import Credentials from 'next-auth/providers/credentials';
-
-import { user } from '@/app/api/user/data';
+import db from '@/lib/db';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import bcrypt from 'bcrypt';
 import { getServerSession, NextAuthOptions } from 'next-auth';
-import GithubProvider from 'next-auth/providers/github';
-import GoogleProvider from 'next-auth/providers/google';
-
+import Credentials from 'next-auth/providers/credentials';
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(db),
   providers: [
-    GoogleProvider({
-      clientId: process.env.AUTH_GOOGLE_ID as string,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET as string,
-    }),
-    GithubProvider({
-      clientId: process.env.AUTH_GITHUB_ID as string,
-      clientSecret: process.env.AUTH_GITHUB_SECRET as string,
-    }),
     Credentials({
       name: 'credentials',
       credentials: {
@@ -27,27 +18,40 @@ export const authOptions: NextAuthOptions = {
           password: string;
         };
 
-        const foundUser = user.find((u) => u.email === email);
+        const user = await db.user.findUnique({
+          where: { email },
+        });
 
-        if (!foundUser) {
-          return null;
+        if (!user || !user.password) {
+          throw new Error('Invalid credentials');
         }
 
-        const valid = password === foundUser.password;
-
-        if (!valid) {
-          return null;
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+          throw new Error('Invalid password');
         }
 
-        if (foundUser) {
-          return foundUser as any;
-        }
-        return null;
+        return {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        };
       },
     }),
   ],
   secret: process.env.AUTH_SECRET,
-
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user && 'role' in user) {
+        token.role = user.role as string | null;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user = { ...session.user, role: token.role };
+      return session;
+    },
+  },
   session: {
     strategy: 'jwt',
   },
