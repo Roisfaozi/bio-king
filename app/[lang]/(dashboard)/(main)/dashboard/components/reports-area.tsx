@@ -11,6 +11,7 @@ const ReportsArea = () => {
       name: 'Links',
       count: '6,132',
       rate: '150',
+      today: '12',
       isUp: true,
       icon: <Session className='h-4 w-4' />,
       color: 'primary',
@@ -20,6 +21,7 @@ const ReportsArea = () => {
       name: 'Clicks',
       count: '11,236',
       rate: '202',
+      today: '2',
       isUp: false,
       icon: <Eye className='h-4 w-4' />,
       color: 'info',
@@ -73,8 +75,8 @@ const ReportsArea = () => {
                 </>
               )}
             </div>
-            <div className='mt-1 text-xs text-default-600'>
-              vs Previous 30 Days
+            <div className='mt-1 text-sm text-default-600'>
+              <span className='text-primary'> +{item.today}</span> Today
             </div>
           </CardContent>
         </Card>
