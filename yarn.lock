@@ -2544,6 +2544,11 @@
   resolved "https://registry.yarnpkg.com/@prisma/client/-/client-6.3.1.tgz#4e4b05b27f4541ea541a601c57a8ada10b526848"
   integrity sha512-ARAJaPs+eBkemdky/XU3cvGRl+mIPHCN2lCXsl5Vlb0E2gV+R6IN7aCI8CisRGszEZondwIsW9Iz8EJkTdykyA==
 
+"@prisma/debug@5.22.0":
+  version "5.22.0"
+  resolved "https://registry.yarnpkg.com/@prisma/debug/-/debug-5.22.0.tgz#58af56ed7f6f313df9fb1042b6224d3174bbf412"
+  integrity sha512-AUt44v3YJeggO2ZU5BkXI7M4hu9BF2zzH2iF2V5pyXT/lRTyWiElZ7It+bRH1EshoMRxHgpYg4VB6rCM+mG5jQ==
+
 "@prisma/debug@6.3.1":
   version "6.3.1"
   resolved "https://registry.yarnpkg.com/@prisma/debug/-/debug-6.3.1.tgz#08730461dab4fe147efa70637952b942dc1961b5"
@@ -2572,6 +2577,13 @@
     "@prisma/debug" "6.3.1"
     "@prisma/engines-version" "6.3.0-17.acc0b9dd43eb689cbd20c9470515d719db10d0b0"
     "@prisma/get-platform" "6.3.1"
+
+"@prisma/generator-helper@^5.0.0":
+  version "5.22.0"
+  resolved "https://registry.yarnpkg.com/@prisma/generator-helper/-/generator-helper-5.22.0.tgz#77a19593d6d9a3102ef8de86ac1c2527d7021047"
+  integrity sha512-LwqcBQ5/QsuAaLNQZAIVIAJDJBMjHwMwn16e06IYx/3Okj/xEEfw9IvrqB2cJCl3b2mCBlh3eVH0w9WGmi4aHg==
+  dependencies:
+    "@prisma/debug" "5.22.0"
 
 "@prisma/get-platform@6.3.1":
   version "6.3.1"
@@ -11171,6 +11183,13 @@ prism-react-renderer@2.1.0:
   dependencies:
     "@types/prismjs" "^1.26.0"
     clsx "^1.2.1"
+
+prisma-markdown@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/prisma-markdown/-/prisma-markdown-1.0.9.tgz#90fce43ff7b9aa3173bceef6fc09e9ee912a5e90"
+  integrity sha512-Y/aWUgDnzYt7JFjhUOmLzNs+09eoITq8ZK9CmG3L6TTKc/prYr+2EClD4jRcfEgyElfJlvH2/4QeZponu9D92Q==
+  dependencies:
+    "@prisma/generator-helper" "^5.0.0"
 
 prisma@^6.3.1:
   version "6.3.1"
