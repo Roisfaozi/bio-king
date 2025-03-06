@@ -314,3 +314,285 @@ ALTER TABLE "workspace_members" ADD CONSTRAINT "workspace_members_workspace_id_f
 
 -- AddForeignKey
 ALTER TABLE "workspaces" ADD CONSTRAINT "workspaces_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+
+-- Enable Row Level Security
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bio_pages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE links ENABLE ROW LEVEL SECURITY;
+ALTER TABLE clicks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE daily_stats ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS Policies
+CREATE POLICY "Users can read own data" ON users
+  FOR SELECT USING (id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Users can update own data" ON users
+  FOR UPDATE USING (id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Users can read own bio pages" ON bio_pages
+  FOR SELECT USING (user_id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Users can insert own bio pages" ON bio_pages
+  FOR INSERT WITH CHECK (user_id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Users can update own bio pages" ON bio_pages
+  FOR UPDATE USING (user_id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Users can delete own bio pages" ON bio_pages
+  FOR DELETE USING (user_id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Public can view public bio pages" ON "BioPage"
+FOR SELECT USING (visibility = 'public');
+
+-- Create RLS links
+
+CREATE POLICY "Users can read own links" ON links
+  FOR SELECT USING (user_id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Users can insert own links" ON links
+  FOR INSERT WITH CHECK (user_id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Users can update own links" ON links
+  FOR UPDATE USING (user_id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Users can delete own links" ON links
+  FOR DELETE USING (user_id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Public can read active links" ON links
+  FOR SELECT USING (is_active = true);
+
+CREATE POLICY "Users can read own clicks" ON clicks
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM links
+      WHERE links.id = clicks.link_id
+      AND links.user_id = current_setting('app.current_user_id')
+    )
+  );
+
+CREATE POLICY "System can insert clicks" ON clicks
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Users can read daily stats" ON daily_stats
+  FOR SELECT USING (true);
+
+
+-- Create function to update timestamps
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create triggers for updated_at
+CREATE TRIGGER update_users_updated_at
+  BEFORE UPDATE ON users
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+CREATE TRIGGER update_bio_pages_updated_at
+  BEFORE UPDATE ON bio_pages
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+CREATE TRIGGER update_links_updated_at
+  BEFORE UPDATE ON links
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+CREATE TRIGGER update_daily_stats_updated_at
+  BEFORE UPDATE ON daily_stats
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+  -- Enable RLS on new tables
+ALTER TABLE workspaces ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workspace_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE link_tags ENABLE ROW LEVEL SECURITY;
+ALTER TABLE link_tag_relations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE link_metadata ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS policies for workspaces
+CREATE POLICY "Users can view workspaces they are members of" ON workspaces
+  FOR SELECT USING (
+    current_setting('app.current_user_id') = owner_id OR
+    EXISTS (
+      SELECT 1 FROM workspace_members
+      WHERE workspace_members.workspace_id = workspaces.id
+      AND workspace_members.user_id = current_setting('app.current_user_id')
+    )
+  );
+
+CREATE POLICY "Workspace owners can update their workspaces" ON workspaces
+  FOR UPDATE USING (owner_id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Users can create workspaces" ON workspaces
+  FOR INSERT WITH CHECK (owner_id = current_setting('app.current_user_id'));
+
+CREATE POLICY "Workspace owners can delete their workspaces" ON workspaces
+  FOR DELETE USING (owner_id = current_setting('app.current_user_id'));
+
+-- Create RLS policies for workspace members
+CREATE POLICY "Workspace owners can manage members" ON workspace_members
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM workspaces
+      WHERE workspaces.id = workspace_members.workspace_id
+      AND workspaces.owner_id = current_setting('app.current_user_id')
+    )
+  );
+
+CREATE POLICY "Members can view workspace members" ON workspace_members
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM workspace_members wm
+      WHERE wm.workspace_id = workspace_members.workspace_id
+      AND wm.user_id = current_setting('app.current_user_id')
+    )
+  );
+
+-- Create RLS policies for link tags
+CREATE POLICY "Users can manage tags in their workspaces" ON link_tags
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM workspace_members
+      WHERE workspace_members.workspace_id = link_tags.workspace_id
+      AND workspace_members.user_id = current_setting('app.current_user_id')
+    )
+  );
+
+-- Create RLS policies for link metadata
+CREATE POLICY "Users can manage metadata for their links" ON link_metadata
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM links
+      WHERE links.id = link_metadata.link_id
+      AND links.user_id = current_setting('app.current_user_id')
+    )
+  );
+
+-- Create RLS policies for user settings
+CREATE POLICY "Users can manage their own settings" ON user_settings
+  FOR ALL USING (user_id = current_setting('app.current_user_id'));
+
+  -- Create functions for analytics
+CREATE OR REPLACE FUNCTION get_link_stats(
+  p_link_id UUID,
+  p_start_date TIMESTAMPTZ,
+  p_end_date TIMESTAMPTZ
+)
+RETURNS TABLE (
+  total_clicks BIGINT,
+  unique_clicks BIGINT,
+  countries JSON,
+  browsers JSON,
+  devices JSON,
+  referrers JSON
+) LANGUAGE plpgsql AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    COUNT(*)::BIGINT as total_clicks,
+    COUNT(DISTINCT session_id)::BIGINT as unique_clicks,
+    COALESCE(
+      json_object_agg(country, country_count)
+      FILTER (WHERE country IS NOT NULL),
+      '{}'::json
+    ) as countries,
+    COALESCE(
+      json_object_agg(browser, browser_count)
+      FILTER (WHERE browser IS NOT NULL),
+      '{}'::json
+    ) as browsers,
+    COALESCE(
+      json_object_agg(device_type, device_count)
+      FILTER (WHERE device_type IS NOT NULL),
+      '{}'::json
+    ) as devices,
+    COALESCE(
+      json_object_agg(referer, referer_count)
+      FILTER (WHERE referer IS NOT NULL),
+      '{}'::json
+    ) as referrers
+  FROM (
+    SELECT
+      country,
+      COUNT(*) as country_count,
+      browser,
+      COUNT(*) as browser_count,
+      device_type,
+      COUNT(*) as device_count,
+      referer,
+      COUNT(*) as referer_count
+    FROM clicks
+    WHERE
+      link_id = p_link_id
+      AND created_at >= p_start_date
+      AND created_at <= p_end_date
+    GROUP BY country, browser, device_type, referer
+  ) stats;
+END;
+$$;
+
+-- Create functions for analytics
+CREATE OR REPLACE FUNCTION get_link_stats(
+  p_link_id UUID,
+  p_start_date TIMESTAMPTZ,
+  p_end_date TIMESTAMPTZ
+)
+RETURNS TABLE (
+  total_clicks BIGINT,
+  unique_clicks BIGINT,
+  countries JSON,
+  browsers JSON,
+  devices JSON,
+  referrers JSON
+) LANGUAGE plpgsql AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    COUNT(*)::BIGINT as total_clicks,
+    COUNT(DISTINCT session_id)::BIGINT as unique_clicks,
+    COALESCE(
+      json_object_agg(country, country_count)
+      FILTER (WHERE country IS NOT NULL),
+      '{}'::json
+    ) as countries,
+    COALESCE(
+      json_object_agg(browser, browser_count)
+      FILTER (WHERE browser IS NOT NULL),
+      '{}'::json
+    ) as browsers,
+    COALESCE(
+      json_object_agg(device_type, device_count)
+      FILTER (WHERE device_type IS NOT NULL),
+      '{}'::json
+    ) as devices,
+    COALESCE(
+      json_object_agg(referer, referer_count)
+      FILTER (WHERE referer IS NOT NULL),
+      '{}'::json
+    ) as referrers
+  FROM (
+    SELECT
+      country,
+      COUNT(*) as country_count,
+      browser,
+      COUNT(*) as browser_count,
+      device_type,
+      COUNT(*) as device_count,
+      referer,
+      COUNT(*) as referer_count
+    FROM clicks
+    WHERE
+      link_id = p_link_id
+      AND created_at >= p_start_date
+      AND created_at <= p_end_date
+    GROUP BY country, browser, device_type, referer
+  ) stats;
+END;
+$$;

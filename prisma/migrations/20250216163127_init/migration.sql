@@ -87,3 +87,32 @@ ALTER TABLE "sessions" ADD CONSTRAINT "sessions_userId_fkey" FOREIGN KEY ("userI
 
 -- AddForeignKey
 ALTER TABLE "profile" ADD CONSTRAINT "profile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+DO $$
+  BEGIN
+    -- Buat function jika belum ada
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_proc WHERE proname = 'create_user_profile'
+    ) THEN
+      CREATE OR REPLACE FUNCTION create_user_profile()
+      RETURNS TRIGGER AS $func$
+      BEGIN
+        -- Insert ke tabel profile dengan kolom snake_case
+        INSERT INTO "profile" (id, "userId", bio, location, date_of_birth, phone_number, website, created_at, updated_at)
+        VALUES (gen_random_uuid(), NEW.id, NULL, NULL, NULL, NULL, NULL, now(), now());
+        RETURN NEW;
+      END;
+      $func$ LANGUAGE plpgsql;
+    END IF;
+
+    -- Buat trigger jika belum ada
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_trigger WHERE tgname = 'after_user_insert'
+    ) THEN
+      CREATE TRIGGER after_user_insert
+      AFTER INSERT ON "users"
+      FOR EACH ROW
+      EXECUTE FUNCTION create_user_profile();
+    END IF;
+  END;
+  $$;
