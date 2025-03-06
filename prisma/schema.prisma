@@ -43,23 +43,23 @@ model Session {
 }
 
 model User {
-  id                String              @id @default(cuid())
-  name              String?
-  email             String?             @unique
-  password          String?
-  emailVerified     DateTime?
-  image             String?
-  role              String?
-  created_at        DateTime?           @default(now()) @db.Timestamptz(6)
-  updated_at        DateTime?           @default(now()) @db.Timestamptz(6)
-  bio_pages         bio_pages[]
-  links             links[]
-  user_settings     user_settings?
-  workspace_members workspace_members[]
-  workspaces        workspaces[]
-  accounts          Account[]
-  profile           Profile?
-  sessions          Session[]
+  id               String             @id @default(cuid())
+  name             String?
+  email            String?            @unique
+  password         String?
+  emailVerified    DateTime?
+  image            String?
+  role             String?
+  created_at       DateTime?          @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime?          @default(now()) @db.Timestamptz(6)
+  bioPages         BioPages[]
+  links            Links[]
+  userSettings     UserSettings?
+  workspaceMembers WorkspaceMembers[]
+  workspaces       Workspaces[]
+  accounts         Account[]
+  profile          Profile?
+  sessions         Session[]
 
   @@map("users")
 }
@@ -79,7 +79,7 @@ model Profile {
   @@map("profile")
 }
 
-model user_settings {
+model UserSettings {
   user_id                  String  @id
   theme                    String? @default("light")
   language                 String? @default("en")
@@ -88,26 +88,28 @@ model user_settings {
   created_at               BigInt?
   updated_at               BigInt?
   users                    User    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("user_settings")
 }
 
-model bio_links {
-  id          String    @id @default(cuid())
+model BioLinks {
+  id          String   @id @default(cuid())
   bio_page_id String
   title       String
   url         String
   icon        String?
-  sort_order  Int?      @default(0)
-  is_active   Boolean?  @default(true)
+  sort_order  Int?     @default(0)
+  is_active   Boolean? @default(true)
   created_at  BigInt?
   updated_at  BigInt?
-  bio_pages   bio_pages @relation(fields: [bio_page_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  bioPages    BioPages @relation(fields: [bio_page_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([bio_page_id])
   @@index([sort_order])
+  @@map("bio_links")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model bio_pages {
+model BioPages {
   id                String           @id @default(cuid())
   username          String           @unique
   title             String
@@ -125,18 +127,18 @@ model bio_pages {
   archived_at       BigInt?
   profile_image_url String?
   theme_config      Json?            @default("{     \"name\": \"default\",     \"label\": \"default\",     \"colors\": {       \"primary\": \"#4F46E5\",       \"text\": \"#111827\",       \"background\": \"#FFFFFF\",       \"darkPrimary\": \"#7A7CEB\",       \"darkText\": \"#FFFFFF\",       \"darkBackground\": \"#1A202C\"     }   }")
-  bio_links         bio_links[]
+  bioLinks          BioLinks[]
   users             User             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  workspaces        workspaces?      @relation(fields: [workspace_id], references: [id], onUpdate: NoAction)
-  links             links[]
-  social_links      social_links[]
+  workspaces        Workspaces?      @relation(fields: [workspace_id], references: [id], onUpdate: NoAction)
+  links             Links[]
+  socialLinks       SocialLinks[]
 
   @@index([workspace_id, created_at], map: "bio_pages_workspace_created_idx")
+  @@map("bio_pages")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model clicks {
-  id                 String            @id @default(cuid())
+model Clicks {
+  id                 String           @id @default(cuid())
   link_id            String
   ip                 String?
   city               String?
@@ -152,7 +154,7 @@ model clicks {
   utm_campaign       String?
   device_type        String?
   screen_resolution  String?
-  is_unique          Boolean?          @default(true)
+  is_unique          Boolean?         @default(true)
   visit_duration     Int?
   workspace_id       String?
   visitor_session_id String?
@@ -163,9 +165,9 @@ model clicks {
   platform           String?
   fingerprint        String?
   created_at         BigInt?
-  links              links             @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  visitor_sessions   visitor_sessions? @relation(fields: [visitor_session_id], references: [id], onUpdate: NoAction)
-  workspaces         workspaces?       @relation(fields: [workspace_id], references: [id], onUpdate: NoAction)
+  links              Links            @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  visitor_sessions   VisitorSessions? @relation(fields: [visitor_session_id], references: [id], onUpdate: NoAction)
+  workspaces         Workspaces?      @relation(fields: [workspace_id], references: [id], onUpdate: NoAction)
 
   @@index([browser, created_at])
   @@index([country, created_at])
@@ -178,10 +180,10 @@ model clicks {
   @@index([fingerprint])
   @@index([session_id])
   @@index([visitor_id])
+  @@map("clicks")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model daily_stats {
+model DailyStats {
   id            String  @id @default(cuid())
   date          BigInt?
   total_clicks  Int?    @default(0)
@@ -191,10 +193,10 @@ model daily_stats {
   updated_at    BigInt?
 
   @@index([date])
+  @@map("daily_stats")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model link_metadata {
+model LinkMetadata {
   link_id         String  @id
   title           String?
   description     String?
@@ -204,79 +206,81 @@ model link_metadata {
   last_checked_at BigInt?
   created_at      BigInt?
   updated_at      BigInt?
-  links           links   @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  links           Links   @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("link_metadata")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model link_tag_relations {
+model LinkTagRelations {
   link_id    String
   tag_id     String
   created_at DateTime? @default(now()) @db.Timestamptz(6)
-  links      links     @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  link_tags  link_tags @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  links      Links     @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  link_tags  LinkTags  @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([link_id, tag_id])
+  @@map("link_tag_relations")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model link_tags {
-  id                 String               @id @default(cuid())
-  name               String
-  color              String?              @default("#000000")
-  workspace_id       String?
-  created_at         DateTime?            @default(now()) @db.Timestamptz(6)
-  link_tag_relations link_tag_relations[]
-  workspaces         workspaces?          @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model LinkTags {
+  id               String             @id @default(cuid())
+  name             String
+  color            String?            @default("#000000")
+  workspace_id     String?
+  created_at       DateTime?          @default(now()) @db.Timestamptz(6)
+  linkTagRelations LinkTagRelations[]
+  workspaces       Workspaces?        @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([name, workspace_id])
+  @@map("link_tags")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model links {
-  id                 String               @id @default(cuid())
-  short_code         String               @unique
-  original_url       String
-  title              String?
-  user_id            String
-  bio_page_id        String?
-  is_active          Boolean?             @default(true)
-  workspace_id       String?
-  type               link_type?           @default(shortlink)
-  status             link_status?         @default(active)
-  visibility         visibility_type?     @default(public)
-  password_hash      String?
-  utm_source         String?
-  utm_medium         String?
-  utm_campaign       String?
-  custom_domain      String?
-  click_limit        Int?
-  created_at         BigInt?
-  updated_at         BigInt?
-  expires_at         BigInt?
-  clicks             clicks[]
-  link_metadata      link_metadata?
-  link_tag_relations link_tag_relations[]
-  bio_pages          bio_pages?           @relation(fields: [bio_page_id], references: [id], onUpdate: NoAction)
-  users              User                 @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  workspaces         workspaces?          @relation(fields: [workspace_id], references: [id], onUpdate: NoAction)
+model Links {
+  id               String             @id @default(cuid())
+  short_code       String             @unique
+  original_url     String
+  title            String?
+  user_id          String
+  bio_page_id      String?
+  is_active        Boolean?           @default(true)
+  workspace_id     String?
+  type             link_type?         @default(shortlink)
+  status           link_status?       @default(active)
+  visibility       visibility_type?   @default(public)
+  password_hash    String?
+  utm_source       String?
+  utm_medium       String?
+  utm_campaign     String?
+  custom_domain    String?
+  click_limit      Int?
+  created_at       BigInt?
+  updated_at       BigInt?
+  expires_at       BigInt?
+  clicks           Clicks[]
+  linkMetadata     LinkMetadata?
+  linkTagRelations LinkTagRelations[]
+  bioPages         BioPages?          @relation(fields: [bio_page_id], references: [id], onUpdate: NoAction)
+  users            User               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  workspaces       Workspaces?        @relation(fields: [workspace_id], references: [id], onUpdate: NoAction)
 
   @@index([status])
   @@index([type])
   @@index([workspace_id, created_at], map: "links_workspace_created_idx")
+  @@map("links")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model social_links {
-  id          String    @id @default(cuid())
+model SocialLinks {
+  id          String   @id @default(cuid())
   bio_page_id String
   platform    String
   url         String
   created_at  BigInt?
   updated_at  BigInt?
-  bio_pages   bio_pages @relation(fields: [bio_page_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  bioPages    BioPages @relation(fields: [bio_page_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([bio_page_id, platform])
   @@index([bio_page_id])
+  @@map("social_links")
 }
 
 model VerificationToken {
@@ -288,37 +292,38 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-model workspace_members {
+model WorkspaceMembers {
   workspace_id String
   user_id      String
   role         String     @default("member")
   created_at   DateTime?  @default(now()) @db.Timestamptz(6)
   users        User       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  workspaces   workspaces @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  workspaces   Workspaces @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([workspace_id, user_id])
+  @@map("workspace_members")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model workspaces {
-  id                String              @id @default(cuid())
-  name              String
-  slug              String              @unique
-  description       String?
-  created_at        BigInt?
-  updated_at        BigInt?
-  owner_id          String
-  bio_pages         bio_pages[]
-  clicks            clicks[]
-  link_tags         link_tags[]
-  links             links[]
-  workspace_members workspace_members[]
-  users             User                @relation(fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model Workspaces {
+  id               String             @id @default(cuid())
+  name             String
+  slug             String             @unique
+  description      String?
+  created_at       BigInt?
+  updated_at       BigInt?
+  owner_id         String
+  bioPages         BioPages[]
+  clicks           Clicks[]
+  linkTags         LinkTags[]
+  links            Links[]
+  workspaceMembers WorkspaceMembers[]
+  users            User               @relation(fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("workspaces")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model geolocation_data {
-  id               String            @id @default(cuid())
+model GeolocationData {
+  id               String           @id @default(cuid())
   session_id       String?
   latitude         Float?
   longitude        Float?
@@ -327,43 +332,44 @@ model geolocation_data {
   region           String?
   country          String?
   postal_code      String?
-  consent_given    Boolean?          @default(false)
+  consent_given    Boolean?         @default(false)
   created_at       BigInt?
-  visitor_sessions visitor_sessions? @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  visitor_sessions VisitorSessions? @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([session_id])
+  @@map("geolocation_data")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model visitor_data {
-  id                String   @id @default(cuid())
-  visitor_id        String
-  name              String?
-  email             String?
-  phone             String?
-  consent_given     Boolean? @default(false)
-  consent_timestamp BigInt?
-  created_at        BigInt?
-  updated_at        BigInt?
+model VisitorData {
+  id               String   @id @default(cuid())
+  visitorId        String
+  name             String?
+  email            String?
+  phone            String?
+  consentGiven     Boolean? @default(false)
+  consentTimestamp BigInt?
+  createdAt        BigInt?
+  updatedAt        BigInt?
 
-  @@index([visitor_id])
+  @@index([visitorId])
+  @@map("visitor_data")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model visitor_sessions {
-  id               String             @id @default(cuid())
-  visitor_id       String
-  fingerprint      String?
-  started_at       BigInt?
-  ended_at         BigInt?
-  duration         Int?
-  is_returning     Boolean?           @default(false)
-  created_at       BigInt?
-  clicks           clicks[]
-  geolocation_data geolocation_data[]
+model VisitorSessions {
+  id              String            @id @default(cuid())
+  visitorId       String
+  fingerprint     String?
+  startedAt       BigInt?
+  endedAt         BigInt?
+  duration        Int?
+  isReturning     Boolean?          @default(false)
+  createdAt       BigInt?
+  clicks          Clicks[]
+  geolocationData GeolocationData[]
 
   @@index([fingerprint])
-  @@index([visitor_id])
+  @@index([visitorId])
+  @@map("visitor_sessions")
 }
 
 enum link_status {
