@@ -76,3 +76,74 @@ ALTER TABLE "clicks" ADD CONSTRAINT "clicks_visitor_session_id_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "geolocation_data" ADD CONSTRAINT "geolocation_data_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "visitor_sessions"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+
+-- Enable Row Level Security
+ALTER TABLE visitor_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE visitor_data ENABLE ROW LEVEL SECURITY;
+ALTER TABLE geolocation_data ENABLE ROW LEVEL SECURITY;
+
+
+-- Create RLS policies
+CREATE POLICY "Users can read visitor sessions for their links" ON visitor_sessions
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM clicks
+      JOIN links ON clicks.link_id = links.id
+      WHERE clicks.visitor_session_id = visitor_sessions.id
+      AND links.user_id = current_setting('app.current_user_id')
+    )
+  );
+
+CREATE POLICY "Users can read visitor data for their links" ON visitor_data
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM clicks
+      JOIN links ON clicks.link_id = links.id
+      WHERE clicks.visitor_session_id = visitor_data.visitor_id
+      AND links.user_id = current_setting('app.current_user_id')
+    )
+  );
+
+CREATE POLICY "Users can read geolocation data for their links" ON geolocation_data
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM visitor_sessions
+      JOIN clicks ON clicks.visitor_session_id = visitor_sessions.id
+      JOIN links ON clicks.link_id = links.id
+      WHERE geolocation_data.session_id = visitor_sessions.id
+      AND links.user_id = current_setting('app.current_user_id')
+    )
+  );
+
+CREATE POLICY "System can insert visitor sessions" ON visitor_sessions
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "System can insert visitor data" ON visitor_data
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "System can insert geolocation data" ON geolocation_data
+  FOR INSERT WITH CHECK (true);
+
+-- Create trigger for updated_at
+CREATE TRIGGER update_visitor_data_updated_at
+  BEFORE UPDATE ON visitor_data
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+-- Create function to update session duration
+CREATE OR REPLACE FUNCTION update_session_duration()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.duration = EXTRACT(EPOCH FROM (NEW.ended_at - NEW.started_at))::INTEGER;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger for session duration
+CREATE TRIGGER update_visitor_session_duration
+  BEFORE UPDATE OF ended_at ON visitor_sessions
+  FOR EACH ROW
+  WHEN (OLD.ended_at IS NULL AND NEW.ended_at IS NOT NULL)
+  EXECUTE FUNCTION update_session_duration();
+
