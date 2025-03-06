@@ -214,9 +214,9 @@ model LinkMetadata {
 model LinkTagRelations {
   link_id    String
   tag_id     String
-  created_at DateTime? @default(now()) @db.Timestamptz(6)
-  links      Links     @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  link_tags  LinkTags  @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  created_at BigInt?
+  links      Links    @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  link_tags  LinkTags @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([link_id, tag_id])
   @@map("link_tag_relations")
@@ -227,7 +227,7 @@ model LinkTags {
   name             String
   color            String?            @default("#000000")
   workspace_id     String?
-  created_at       DateTime?          @default(now()) @db.Timestamptz(6)
+  created_at       BigInt?
   linkTagRelations LinkTagRelations[]
   workspaces       Workspaces?        @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
@@ -285,8 +285,8 @@ model SocialLinks {
 
 model VerificationToken {
   identifier String
-  token      String   @unique
-  expires    DateTime
+  token      String @unique
+  expires    BigInt
 
   @@unique([identifier, token])
   @@map("verification_tokens")
@@ -296,7 +296,7 @@ model WorkspaceMembers {
   workspace_id String
   user_id      String
   role         String     @default("member")
-  created_at   DateTime?  @default(now()) @db.Timestamptz(6)
+  created_at   BigInt?
   users        User       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   workspaces   Workspaces @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
