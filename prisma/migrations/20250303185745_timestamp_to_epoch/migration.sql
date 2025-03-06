@@ -213,8 +213,8 @@ BEGIN
   VALUES (
     NEW.id,
     'light',
-    COALESCE(NEW.raw_user_meta_data->>'language', 'en'),
-    COALESCE(NEW.raw_user_meta_data->>'timezone', 'UTC'),
+    'en',  -- Set language to 'en'
+    'UTC',  -- Set timezone to 'UTC'
     '{"email": true, "push": false}'::jsonb,
     current_epoch,
     current_epoch
@@ -222,6 +222,7 @@ BEGIN
 
   -- Create default workspace
   INSERT INTO workspaces (
+    id,
     name,
     slug,
     description,
@@ -230,6 +231,7 @@ BEGIN
     updated_at
   )
   VALUES (
+    gen_random_uuid(),
     'Personal Workspace',
     'personal-' || lower(regexp_replace(NEW.email, '[^a-zA-Z0-9]', '-', 'g')),
     'My personal workspace',
@@ -255,6 +257,7 @@ BEGIN
 
   -- Create default bio page
   INSERT INTO bio_pages (
+    id,
     username,
     title,
     description,
@@ -266,8 +269,9 @@ BEGIN
     updated_at
   )
   VALUES (
+    gen_random_uuid(),
     lower(regexp_replace(split_part(NEW.email, '@', 1), '[^a-zA-Z0-9]', '', 'g')),
-    COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)) || '''s Bio',
+    COALESCE(NEW.name, split_part(NEW.email, '@', 1)) || '''s Bio',
     'Welcome to my bio page!',
     'default',
     NEW.id,

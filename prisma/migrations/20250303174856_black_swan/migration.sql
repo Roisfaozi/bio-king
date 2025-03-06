@@ -342,7 +342,7 @@ CREATE POLICY "Users can update own bio pages" ON bio_pages
 CREATE POLICY "Users can delete own bio pages" ON bio_pages
   FOR DELETE USING (user_id = current_setting('app.current_user_id'));
 
-CREATE POLICY "Public can view public bio pages" ON "BioPage"
+CREATE POLICY "Public can view public bio pages" ON bio_pages
 FOR SELECT USING (visibility = 'public');
 
 -- Create RLS links
@@ -712,7 +712,7 @@ CREATE OR REPLACE TRIGGER on_user_created
   
 -- Create trigger for user deletion
 CREATE OR REPLACE TRIGGER on_auth_user_deleted
-  AFTER DELETE ON auth.users
+  AFTER DELETE ON users
   FOR EACH ROW EXECUTE FUNCTION public.handle_user_deletion();
 
   -- Permission setup untuk NeonDB
