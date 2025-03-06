@@ -35,6 +35,21 @@
 -- DropIndex
 DROP INDEX "daily_stats_date_key";
 
+CREATE OR REPLACE FUNCTION to_epoch_ms(ts TIMESTAMPTZ) 
+RETURNS BIGINT AS $$
+BEGIN
+  RETURN (EXTRACT(EPOCH FROM ts) * 1000)::BIGINT;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION from_epoch_ms(epoch_ms BIGINT) 
+RETURNS TIMESTAMPTZ AS $$
+BEGIN
+  RETURN to_timestamp(epoch_ms / 1000.0);
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- AlterTable
 ALTER TABLE "bio_links" DROP COLUMN "created_at",
 ADD COLUMN     "created_at" BIGINT,
@@ -102,6 +117,9 @@ ADD COLUMN     "created_at" BIGINT,
 DROP COLUMN "updated_at",
 ADD COLUMN     "updated_at" BIGINT;
 
+DROP TRIGGER update_visitor_session_duration ON visitor_sessions;
+
+
 -- AlterTable
 ALTER TABLE "visitor_sessions" DROP COLUMN "started_at",
 ADD COLUMN     "started_at" BIGINT,
@@ -110,6 +128,11 @@ ADD COLUMN     "ended_at" BIGINT,
 DROP COLUMN "created_at",
 ADD COLUMN     "created_at" BIGINT;
 
+CREATE TRIGGER update_visitor_session_duration
+  BEFORE UPDATE OF ended_at ON visitor_sessions
+  FOR EACH ROW
+  WHEN (OLD.ended_at IS NULL AND NEW.ended_at IS NOT NULL)
+  EXECUTE FUNCTION update_session_duration();
 -- AlterTable
 ALTER TABLE "workspaces" DROP COLUMN "created_at",
 ADD COLUMN     "created_at" BIGINT,
@@ -142,3 +165,126 @@ CREATE INDEX "daily_stats_date_idx" ON "daily_stats"("date");
 
 -- CreateIndex
 CREATE INDEX "links_workspace_created_idx" ON "links"("workspace_id", "created_at");
+
+
+-- Update the update_updated_at function to use epoch timestamps
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = to_epoch_ms(NOW());
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Update the update_session_duration function to use epoch timestamps
+CREATE OR REPLACE FUNCTION update_session_duration()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Convert epoch timestamps to seconds and calculate duration
+  NEW.duration = (NEW.ended_at / 1000) - (NEW.started_at / 1000);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Update the handle_new_user function to use epoch timestamps
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger
+SECURITY DEFINER
+SET search_path = public
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  default_workspace_id TEXT;
+  current_epoch BIGINT;
+BEGIN
+  -- Get current epoch timestamp
+  current_epoch := to_epoch_ms(NOW());
+
+  -- Create default user settings
+  INSERT INTO user_settings (
+    user_id,
+    theme,
+    language,
+    timezone,
+    notification_preferences,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    NEW.id,
+    'light',
+    COALESCE(NEW.raw_user_meta_data->>'language', 'en'),
+    COALESCE(NEW.raw_user_meta_data->>'timezone', 'UTC'),
+    '{"email": true, "push": false}'::jsonb,
+    current_epoch,
+    current_epoch
+  );
+
+  -- Create default workspace
+  INSERT INTO workspaces (
+    name,
+    slug,
+    description,
+    owner_id,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    'Personal Workspace',
+    'personal-' || lower(regexp_replace(NEW.email, '[^a-zA-Z0-9]', '-', 'g')),
+    'My personal workspace',
+    NEW.id,
+    current_epoch,
+    current_epoch
+  )
+  RETURNING id INTO default_workspace_id;
+
+  -- Add user to workspace members
+  INSERT INTO workspace_members (
+    workspace_id,
+    user_id,
+    role,
+    created_at
+  )
+  VALUES (
+    default_workspace_id,
+    NEW.id,
+    'owner',
+    current_epoch
+  );
+
+  -- Create default bio page
+  INSERT INTO bio_pages (
+    username,
+    title,
+    description,
+    theme,
+    user_id,
+    workspace_id,
+    visibility,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    lower(regexp_replace(split_part(NEW.email, '@', 1), '[^a-zA-Z0-9]', '', 'g')),
+    COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)) || '''s Bio',
+    'Welcome to my bio page!',
+    'default',
+    NEW.id,
+    default_workspace_id,
+    'public',
+    current_epoch,
+    current_epoch
+  );
+
+  RETURN NEW;
+END;
+$$;
+
+-- Trigger untuk user baru
+CREATE OR REPLACE TRIGGER on_user_created
+  AFTER INSERT ON users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+  
+  -- Permission setup untuk NeonDB
+GRANT EXECUTE ON FUNCTION public.handle_new_user TO PUBLIC;
