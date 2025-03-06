@@ -719,3 +719,58 @@ CREATE OR REPLACE TRIGGER on_auth_user_deleted
 GRANT EXECUTE ON FUNCTION public.handle_new_user TO PUBLIC;
 GRANT EXECUTE ON FUNCTION public.handle_user_deletion TO PUBLIC;
 GRANT USAGE ON SCHEMA public TO PUBLIC;
+
+
+-- Enable RLS
+ALTER TABLE social_links ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bio_links ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS policies for social_links
+CREATE POLICY "Users can manage their bio page social links" ON social_links
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM bio_pages
+      WHERE bio_pages.id = social_links.bio_page_id
+      AND bio_pages.user_id = current_setting('app.current_user_id')
+    )
+  );
+
+CREATE POLICY "Public can view social links" ON social_links
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM bio_pages
+      WHERE bio_pages.id = social_links.bio_page_id
+      AND bio_pages.visibility = 'public'
+    )
+  );
+
+-- Create RLS policies for bio_links
+CREATE POLICY "Users can manage their bio page links" ON bio_links
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM bio_pages
+      WHERE bio_pages.id = bio_links.bio_page_id
+      AND bio_pages.user_id = current_setting('app.current_user_id')
+    )
+  );
+
+CREATE POLICY "Public can view bio links" ON bio_links
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM bio_pages
+      WHERE bio_pages.id = bio_links.bio_page_id
+      AND bio_pages.visibility = 'public'
+    )
+  );
+
+
+-- Create trigger for updated_at
+CREATE TRIGGER update_social_links_updated_at
+  BEFORE UPDATE ON social_links
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+CREATE TRIGGER update_bio_links_updated_at
+  BEFORE UPDATE ON bio_links
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
