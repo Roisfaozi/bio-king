@@ -341,34 +341,34 @@ model GeolocationData {
 }
 
 model VisitorData {
-  id               String   @id @default(cuid())
-  visitorId        String
-  name             String?
-  email            String?
-  phone            String?
-  consentGiven     Boolean? @default(false)
-  consentTimestamp BigInt?
-  createdAt        BigInt?
-  updatedAt        BigInt?
+  id                String   @id @default(cuid())
+  visitor_id        String
+  name              String?
+  email             String?
+  phone             String?
+  consent_given     Boolean? @default(false)
+  consent_timestamp BigInt?
+  created_at        BigInt?
+  updated_at        BigInt?
 
-  @@index([visitorId])
+  @@index([visitor_id])
   @@map("visitor_data")
 }
 
 model VisitorSessions {
   id              String            @id @default(cuid())
-  visitorId       String
+  visitor_id      String
   fingerprint     String?
-  startedAt       BigInt?
-  endedAt         BigInt?
+  started_at      BigInt?
+  ended_at        BigInt?
   duration        Int?
-  isReturning     Boolean?          @default(false)
-  createdAt       BigInt?
+  is_returning    Boolean?          @default(false)
+  created_at      BigInt?
   clicks          Clicks[]
   geolocationData GeolocationData[]
 
   @@index([fingerprint])
-  @@index([visitorId])
+  @@index([visitor_id])
   @@map("visitor_sessions")
 }
 
