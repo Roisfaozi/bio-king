@@ -596,3 +596,126 @@ BEGIN
   ) stats;
 END;
 $$;
+
+
+-- Create a function to handle new user creation
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger
+SECURITY DEFINER
+SET search_path = public
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  default_workspace_id uuid;
+BEGIN
+  
+  -- Create default user settings
+  INSERT INTO user_settings (
+    user_id,
+    theme,
+    language,
+    timezone,
+    notification_preferences,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    NEW.id,
+    'light',
+    COALESCE(NEW.raw_user_meta_data->>'language', 'en'),
+    COALESCE(NEW.raw_user_meta_data->>'timezone', 'UTC'),
+    '{"email": true, "push": false}'::jsonb,
+    NOW(),
+    NOW()
+  );
+
+  -- Create default workspace
+  INSERT INTO workspaces (
+    name,
+    slug,
+    description,
+    owner_id,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    'Personal Workspace',
+    'personal-' || lower(regexp_replace(NEW.email, '[^a-zA-Z0-9]', '-', 'g')),
+    'My personal workspace',
+    NEW.id,
+    NOW(),
+    NOW()
+  )
+  RETURNING id INTO default_workspace_id;
+
+  -- Add user to workspace members
+  INSERT INTO workspace_members (
+    workspace_id,
+    user_id,
+    role,
+    created_at
+  )
+  VALUES (
+    default_workspace_id,
+    NEW.id,
+    'owner',
+    NOW()
+  );
+
+  -- Create default bio page
+  INSERT INTO bio_pages (
+    username,
+    title,
+    description,
+    theme,
+    user_id,
+    workspace_id,
+    visibility,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    lower(regexp_replace(split_part(NEW.email, '@', 1), '[^a-zA-Z0-9]', '', 'g')),
+    COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)) || '''s Bio',
+    'Welcome to my bio page!',
+    'default',
+    NEW.id,
+    default_workspace_id,
+    'public',
+    NOW(),
+    NOW()
+  );
+
+  RETURN NEW;
+END;
+$$;
+
+-- Create a function to handle user deletion
+CREATE OR REPLACE FUNCTION public.handle_user_deletion()
+RETURNS trigger
+SECURITY DEFINER
+SET search_path = public
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  -- Delete user profile and all related data
+  -- (Most cascades are handled by foreign key constraints)
+  DELETE FROM public.users WHERE id = OLD.id;
+  RETURN OLD;
+END;
+$$;
+
+-- Trigger untuk user baru
+CREATE OR REPLACE TRIGGER on_user_created
+  AFTER INSERT ON users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+  
+-- Create trigger for user deletion
+CREATE OR REPLACE TRIGGER on_auth_user_deleted
+  AFTER DELETE ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_user_deleti
+
+  -- Permission setup untuk NeonDB
+GRANT EXECUTE ON FUNCTION public.handle_new_user TO PUBLIC;
+GRANT EXECUTE ON FUNCTION public.handle_user_deletion TO PUBLIC;
+GRANT USAGE ON SCHEMA public TO PUBLIC;
