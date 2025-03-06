@@ -713,7 +713,7 @@ CREATE OR REPLACE TRIGGER on_user_created
 -- Create trigger for user deletion
 CREATE OR REPLACE TRIGGER on_auth_user_deleted
   AFTER DELETE ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_user_deleti
+  FOR EACH ROW EXECUTE FUNCTION public.handle_user_deletion();
 
   -- Permission setup untuk NeonDB
 GRANT EXECUTE ON FUNCTION public.handle_new_user TO PUBLIC;
