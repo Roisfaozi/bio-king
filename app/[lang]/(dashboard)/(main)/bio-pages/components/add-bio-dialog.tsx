@@ -17,7 +17,6 @@ import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 
 import {
   Tooltip,
@@ -25,14 +24,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { CreateBioInput, createBioSchema } from '@/validation/bio';
 import { HelpCircle } from 'lucide-react';
-
-const formSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  alias: z.string().optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
 
 const AddBioDialog = () => {
   const { theme: mode } = useTheme();
@@ -42,11 +35,11 @@ const AddBioDialog = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+  } = useForm<CreateBioInput>({
+    resolver: zodResolver(createBioSchema),
   });
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: CreateBioInput) => {
     try {
       const response = await fetch('/api/bio-pages', {
         method: 'POST',
@@ -97,26 +90,26 @@ const AddBioDialog = () => {
                           className='flex cursor-pointer items-center gap-2 text-sm text-default-700'
                           aria-label='A unique name will help you identify your bio page'
                         >
-                          Name <HelpCircle className='h-3 w-3' />
+                          Username <HelpCircle className='h-3 w-3' />
                         </Label>
                       </TooltipTrigger>
                       <TooltipContent>
-                        A unique name will help you identify your bio page
+                        A unique username will help you identify your bio page
                       </TooltipContent>
                     </Tooltip>
                     <Input
                       type='text'
                       placeholder='Enter first name'
-                      {...register('name')}
+                      {...register('username')}
                     />
                   </TooltipProvider>
                 </div>
                 <div className='flex flex-col gap-2'>
-                  <Label className='text-sm text-default-700'>Alias</Label>
+                  <Label className='text-sm text-default-700'>Title</Label>
                   <Input
                     type='text'
                     placeholder='Enter alias'
-                    {...register('alias')}
+                    {...register('title')}
                   />
                   <p className='text-xs text-default-600'>
                     Leave this field empty to generate a random alias
