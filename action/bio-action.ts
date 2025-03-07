@@ -1,3 +1,5 @@
+'use server';
+
 import { api } from '@/config/axios.config';
 import { CreateBioInput, EditBioInput } from '@/validation/bio';
 import { BioPages } from '@prisma/client';

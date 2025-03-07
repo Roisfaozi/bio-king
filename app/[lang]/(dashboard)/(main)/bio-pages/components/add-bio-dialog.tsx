@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { createBio } from '@/action/bio-action';
 import {
   Tooltip,
   TooltipContent,
@@ -26,6 +27,7 @@ import {
 } from '@/components/ui/tooltip';
 import { CreateBioInput, createBioSchema } from '@/validation/bio';
 import { HelpCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const AddBioDialog = () => {
   const { theme: mode } = useTheme();
@@ -34,6 +36,7 @@ const AddBioDialog = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<CreateBioInput>({
     resolver: zodResolver(createBioSchema),
@@ -41,19 +44,14 @@ const AddBioDialog = () => {
 
   const onSubmit = async (data: CreateBioInput) => {
     try {
-      const response = await fetch('/api/bio-pages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      console.log(data);
-      if (response.ok) {
-        const result = await response.json();
-        setOpen(false);
-        console.log(result.data);
-        router.push(`/bio-pages/${result.data.id}/edit`);
+      let response = await createBio(data);
+      if (response?.status === 'success') {
+        toast.success(response?.message);
+        reset();
+        console.log(response);
+        router.push(`/bio-pages/${response.id}/edit`);
       } else {
-        console.error('Failed to create bio page');
+        toast.error(response?.message);
       }
     } catch (error) {
       console.error('Error creating bio page:', error);
