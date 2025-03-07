@@ -141,14 +141,14 @@ erDiagram
 "link_tag_relations" {
   String link_id FK
   String tag_id FK
-  DateTime created_at "nullable"
+  BigInt created_at "nullable"
 }
 "link_tags" {
   String id PK
   String name
   String color "nullable"
   String workspace_id FK "nullable"
-  DateTime created_at "nullable"
+  BigInt created_at "nullable"
 }
 "links" {
   String id PK
@@ -183,13 +183,13 @@ erDiagram
 "verification_tokens" {
   String identifier
   String token UK
-  DateTime expires
+  BigInt expires
 }
 "workspace_members" {
   String workspace_id FK
   String user_id FK
   String role
-  DateTime created_at "nullable"
+  BigInt created_at "nullable"
 }
 "workspaces" {
   String id PK
@@ -238,7 +238,7 @@ erDiagram
 "sessions" }o--|| "users" : user
 "profile" |o--|| "users" : user
 "user_settings" |o--|| "users" : users
-"bio_links" }o--|| "bio_pages" : bio_pages
+"bio_links" }o--|| "bio_pages" : bioPages
 "bio_pages" }o--|| "users" : users
 "bio_pages" }o--o| "workspaces" : workspaces
 "clicks" }o--|| "links" : links
@@ -248,10 +248,10 @@ erDiagram
 "link_tag_relations" }o--|| "links" : links
 "link_tag_relations" }o--|| "link_tags" : link_tags
 "link_tags" }o--o| "workspaces" : workspaces
-"links" }o--o| "bio_pages" : bio_pages
+"links" }o--o| "bio_pages" : bioPages
 "links" }o--|| "users" : users
 "links" }o--o| "workspaces" : workspaces
-"social_links" }o--|| "bio_pages" : bio_pages
+"social_links" }o--|| "bio_pages" : bioPages
 "workspace_members" }o--|| "users" : users
 "workspace_members" }o--|| "workspaces" : workspaces
 "workspaces" }o--|| "users" : users
@@ -340,8 +340,6 @@ erDiagram
 
 ### `bio_pages`
 
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-
 **Properties**
 
 - `id`:
@@ -363,8 +361,6 @@ This model contains row level security and requires additional setup for migrati
 - `theme_config`:
 
 ### `clicks`
-
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 
 **Properties**
 
@@ -398,8 +394,6 @@ This model contains row level security and requires additional setup for migrati
 
 ### `daily_stats`
 
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-
 **Properties**
 
 - `id`:
@@ -411,8 +405,6 @@ This model contains row level security and requires additional setup for migrati
 - `updated_at`:
 
 ### `link_metadata`
-
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 
 **Properties**
 
@@ -428,8 +420,6 @@ This model contains row level security and requires additional setup for migrati
 
 ### `link_tag_relations`
 
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-
 **Properties**
 
 - `link_id`:
@@ -437,8 +427,6 @@ This model contains row level security and requires additional setup for migrati
 - `created_at`:
 
 ### `link_tags`
-
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 
 **Properties**
 
@@ -449,8 +437,6 @@ This model contains row level security and requires additional setup for migrati
 - `created_at`:
 
 ### `links`
-
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 
 **Properties**
 
@@ -476,8 +462,6 @@ This model contains row level security and requires additional setup for migrati
 - `expires_at`:
 
 ### `social_links`
-
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 
 **Properties**
 
@@ -507,8 +491,6 @@ This model contains row level security and requires additional setup for migrati
 
 ### `workspaces`
 
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-
 **Properties**
 
 - `id`:
@@ -520,8 +502,6 @@ This model contains row level security and requires additional setup for migrati
 - `owner_id`:
 
 ### `geolocation_data`
-
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 
 **Properties**
 
@@ -539,8 +519,6 @@ This model contains row level security and requires additional setup for migrati
 
 ### `visitor_data`
 
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-
 **Properties**
 
 - `id`:
@@ -554,8 +532,6 @@ This model contains row level security and requires additional setup for migrati
 - `updated_at`:
 
 ### `visitor_sessions`
-
-This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 
 **Properties**
 
