@@ -14,7 +14,7 @@ generator markdown {
 }
 
 model Account {
-  id                String  @id @default(cuid())
+  id                String  @id @default(dbgenerated("generate_cuid()"))
   userId            String
   type              String
   provider          String
@@ -33,7 +33,7 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(dbgenerated("generate_cuid()"))
   sessionToken String   @unique
   userId       String
   expires      DateTime
@@ -43,7 +43,7 @@ model Session {
 }
 
 model User {
-  id               String             @id @default(cuid())
+  id               String             @id @default(dbgenerated("generate_cuid()"))
   name             String?
   email            String?            @unique
   password         String?
@@ -65,7 +65,7 @@ model User {
 }
 
 model Profile {
-  id            String    @id @default(cuid())
+  id            String    @id @default(dbgenerated("generate_cuid()"))
   userId        String    @unique
   bio           String?
   location      String?
@@ -93,7 +93,7 @@ model UserSettings {
 }
 
 model BioLinks {
-  id          String   @id @default(cuid())
+  id          String   @id @default(dbgenerated("generate_cuid()"))
   bio_page_id String
   title       String
   url         String
@@ -110,7 +110,7 @@ model BioLinks {
 }
 
 model BioPages {
-  id                String           @id @default(cuid())
+  id                String           @id @default(dbgenerated("generate_cuid()"))
   username          String           @unique
   title             String
   description       String?
@@ -138,7 +138,7 @@ model BioPages {
 }
 
 model Clicks {
-  id                 String           @id @default(cuid())
+  id                 String           @id @default(dbgenerated("generate_cuid()"))
   link_id            String
   ip                 String?
   city               String?
@@ -184,7 +184,7 @@ model Clicks {
 }
 
 model DailyStats {
-  id            String  @id @default(cuid())
+  id            String  @id @default(dbgenerated("generate_cuid()"))
   date          BigInt?
   total_clicks  Int?    @default(0)
   unique_clicks Int?    @default(0)
@@ -223,7 +223,7 @@ model LinkTagRelations {
 }
 
 model LinkTags {
-  id               String             @id @default(cuid())
+  id               String             @id @default(dbgenerated("generate_cuid()"))
   name             String
   color            String?            @default("#000000")
   workspace_id     String?
@@ -236,7 +236,7 @@ model LinkTags {
 }
 
 model Links {
-  id               String             @id @default(cuid())
+  id               String             @id @default(dbgenerated("generate_cuid()"))
   short_code       String             @unique
   original_url     String
   title            String?
@@ -270,7 +270,7 @@ model Links {
 }
 
 model SocialLinks {
-  id          String   @id @default(cuid())
+  id          String   @id @default(dbgenerated("generate_cuid()"))
   bio_page_id String
   platform    String
   url         String
@@ -305,7 +305,7 @@ model WorkspaceMembers {
 }
 
 model Workspaces {
-  id               String             @id @default(cuid())
+  id               String             @id @default(dbgenerated("generate_cuid()"))
   name             String
   slug             String             @unique
   description      String?
@@ -323,7 +323,7 @@ model Workspaces {
 }
 
 model GeolocationData {
-  id               String           @id @default(cuid())
+  id               String           @id @default(dbgenerated("generate_cuid()"))
   session_id       String?
   latitude         Float?
   longitude        Float?
@@ -341,7 +341,7 @@ model GeolocationData {
 }
 
 model VisitorData {
-  id                String   @id @default(cuid())
+  id                String   @id @default(dbgenerated("generate_cuid()"))
   visitor_id        String
   name              String?
   email             String?
@@ -356,7 +356,7 @@ model VisitorData {
 }
 
 model VisitorSessions {
-  id              String            @id @default(cuid())
+  id              String            @id @default(dbgenerated("generate_cuid()"))
   visitor_id      String
   fingerprint     String?
   started_at      BigInt?
