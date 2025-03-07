@@ -1,80 +1,127 @@
+import { getAuthSession } from '@/lib/auth';
+import { withRLS } from '@/lib/db';
+import { editBioPageSchema } from '@/validation/bio';
 import { NextRequest, NextResponse } from 'next/server';
 
 const bioPagesData = [
-  {
-    id: '1',
-    title: 'John Smith',
-    image: 'https://picsum.photos/512/3',
-    url: 'https://example.com/john-smith',
-    views: 200,
-    createdAt: '2023-01-01',
-  },
-  {
-    id: '2',
-    title: 'Jane Doe',
-    image: 'https://picsum.photos/512/4',
-    url: 'https://example.com/jane-doe',
-    views: 150,
-    createdAt: '2023-01-02',
-  },
+  // Sample data
+  { id: '1', title: 'John Smith', url: 'https://example.com/john-smith' },
+  { id: '2', title: 'Jane Doe', url: 'https://example.com/jane-doe' },
 ];
 
+// Helper function for error logging
+function logError(message: string, error?: unknown) {
+  console.error(message, error);
+}
+
+// GET by ID
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const id = params.id;
-  try {
-    const bioPage = bioPagesData.find((page) => page.id === id);
+  const session = await getAuthSession();
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { status: 'fail', message: 'Unauthorized' },
+      { status: 401 },
+    );
+  }
 
+  try {
+    const db = withRLS(session?.user?.id);
+    const bioPage = await db.bioPages.findUnique({
+      where: { id: params.id },
+    });
     if (bioPage) {
-      return NextResponse.json({ status: 'success', data: bioPage });
+      return NextResponse.json(
+        { status: 'success', data: bioPage },
+        { status: 200 },
+      );
     } else {
-      throw new Error('Bio page not found');
+      return NextResponse.json(
+        { status: 'fail', message: 'Bio page not found' },
+        { status: 404 },
+      );
     }
   } catch (error) {
-    if (error instanceof Error)
-      return NextResponse.json({
-        status: 'Internal Server Error',
-        message: error.message,
-      });
+    logError('Error fetching bio page', error);
+    return NextResponse.json(
+      { status: 'fail', message: 'Internal Server Error' },
+      { status: 500 },
+    );
   }
 }
 
-export async function POST(request: NextRequest) {
+// PATCH
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  const session = await getAuthSession();
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { status: 'fail', message: 'Unauthorized' },
+      { status: 401 },
+    );
+  }
+
+  const id = params.id;
   const reqBody = await request.json();
-  const newId = (bioPagesData.length + 1).toString();
-  const newBioPage = { id: newId, ...reqBody };
-  bioPagesData.push(newBioPage);
-  return NextResponse.json({ status: 'success', data: newBioPage });
-}
+  const updateBioSchema = editBioPageSchema.partial();
 
-export async function DELETE(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-  const index = bioPagesData.findIndex((page) => page.id === id);
+  try {
+    const db = withRLS(session?.user?.id);
 
-  if (index !== -1) {
-    bioPagesData.splice(index, 1);
-    return NextResponse.json({
-      status: 'success',
-      message: 'Bio page deleted',
+    const result = await db.bioPages.update({
+      where: { id },
+      data: updateBioSchema.parse(reqBody),
     });
-  } else {
-    return NextResponse.json({ status: 'fail', message: 'Bio page not found' });
+
+    return NextResponse.json(
+      { status: 'success', data: result },
+      { status: 200 },
+    );
+  } catch (error) {
+    logError('Error updating bio page', error);
+    return NextResponse.json(
+      { status: 'fail', message: 'Internal Server Error' },
+      { status: 500 },
+    );
   }
 }
 
-export async function PUT(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-  const reqBody = await request.json();
-  const index = bioPagesData.findIndex((page) => page.id === id);
+// DELETE
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  const session = await getAuthSession();
 
-  if (index !== -1) {
-    bioPagesData[index] = { ...bioPagesData[index], ...reqBody };
-    return NextResponse.json({ status: 'success', data: bioPagesData[index] });
-  } else {
-    return NextResponse.json({ status: 'fail', message: 'Bio page not found' });
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { status: 'fail', message: 'Unauthorized' },
+      { status: 401 },
+    );
+  }
+
+  try {
+    const id = params.id;
+
+    const db = withRLS(session?.user?.id);
+
+    await db.bioPages.delete({
+      where: { id },
+    });
+
+    return NextResponse.json(
+      { status: 'success', message: 'Bio page deleted' },
+      { status: 200 },
+    );
+  } catch (error) {
+    logError('Error deleting bio page', error);
+    return NextResponse.json(
+      { status: 'fail', message: 'Internal Server Error' },
+      { status: 500 },
+    );
   }
 }
