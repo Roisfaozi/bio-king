@@ -1,8 +1,10 @@
 import { api } from '@/config/axios.config';
-import { UserRegisterInput } from '@/models/auth';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+type UserRegisterInput = {
+  name: string;
+  email: string;
+  password: string;
+};
 
 export async function registerUser(userData: UserRegisterInput) {
   try {
@@ -10,6 +12,7 @@ export async function registerUser(userData: UserRegisterInput) {
 
     return response.data;
   } catch (error: any) {
-    return error.response.data;
+    console.error(error.response.data);
+    return error.response;
   }
 }
