@@ -32,23 +32,28 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user.id,
+          name: user.name,
           email: user.email,
           role: user.role,
+          id: user.id.toString(),
         };
       },
     }),
   ],
   secret: process.env.AUTH_SECRET,
   callbacks: {
-    async jwt({ token, user }) {
-      if (user && 'role' in user) {
-        token.role = user.role as string | null;
+    async jwt(params: any) {
+      if (params.user?.role) {
+        params.token.role = params.user.role;
+        params.token.id = params.user.id;
       }
-      return token;
+      return params.token;
     },
     async session({ session, token }) {
-      session.user = { ...session.user, role: token.role };
+      if (session.user) {
+        (session.user as { id: string }).id = token.id as string;
+        (session.user as { role: string }).role = token.role as string;
+      }
       return session;
     },
   },
