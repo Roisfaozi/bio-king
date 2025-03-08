@@ -18,6 +18,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { BioPages } from '@prisma/client';
 import { editBioPageSchema } from '@/validation/bio';
+import { useRouter } from 'next/navigation';
 
 const schema = z.object({
   url: z.string().url({ message: 'Invalid URL' }),
@@ -39,11 +40,13 @@ interface UpdateShortlinkFormProps {
   data: BioPages;
 }
 
-export default async function UpdateShortlinkForm({
+export default function UpdateShortlinkForm({
   id,
   trans,
   data,
 }: UpdateShortlinkFormProps) {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof editBioPageSchema>>({
     resolver: zodResolver(editBioPageSchema),
     defaultValues: {
@@ -247,8 +250,12 @@ export default async function UpdateShortlinkForm({
               />
 
               <div className='flex justify-end space-x-2'>
-                <Button type='button' variant='outline'>
-                  Cancel
+                <Button
+                  type='button'
+                  variant='outline'
+                  onClick={() => router.back()}
+                >
+                  Cancel{' '}
                 </Button>
                 <Button type='submit'>Update Link</Button>
               </div>

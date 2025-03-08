@@ -1,4 +1,5 @@
 'use client';
+import { deleteBio } from '@/action/bio-action';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -7,9 +8,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal } from 'lucide-react';
-import { deleteBio } from '@/action/bio-action';
+import { useConfirm } from '@/provider/alert.dialog.provider';
+import { Icon } from '@iconify/react';
+import { MoreHorizontal, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface DropdownBioProps {
   id: string;
@@ -17,11 +20,31 @@ interface DropdownBioProps {
 
 const DropdownBio = ({ id }: DropdownBioProps) => {
   const router = useRouter();
+  const [open, setOpen] = useState<boolean>(false);
+  const confirm = useConfirm();
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this bio page?')) {
-      await deleteBio(id);
-      router.refresh();
+    const confirmed = await confirm({
+      title: 'Test',
+      body: 'Are you sure you want to do that?',
+      actionButton: 'Delete',
+      actionColorVariant: 'destructive',
+      cancelButton: 'Cancel',
+      cancelColorVariant: 'default',
+    });
+    console.log('confirmed', confirmed);
+    if (confirmed) {
+      try {
+        const response = await deleteBio(id);
+        if (response.status === 'fail') {
+          throw Error(response.data);
+        }
+      } catch (error: any) {
+        console.error('Error deleteing bio:', error.response.data);
+        return error.response.data;
+      } finally {
+        router.refresh();
+      }
     }
   };
 
@@ -42,18 +65,24 @@ const DropdownBio = ({ id }: DropdownBioProps) => {
         avoidCollisions
       >
         <DropdownMenuLabel>Option</DropdownMenuLabel>
-        <DropdownMenuItem>Statistik</DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => router.push(`/dashboard/bio/${id}/edit`)}
-        >
+        <DropdownMenuItem>Statistic</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push(`/bio-pages/${id}/edit`)}>
+          <Icon
+            icon='heroicons:pencil-square'
+            className='mr-1 h-3.5 w-3.5 text-default-700'
+          />
           Edit
         </DropdownMenuItem>
         <DropdownMenuItem>Reset</DropdownMenuItem>
         <hr className='w-full'></hr>
+
         <DropdownMenuItem
-          className='text-destructive-700'
-          onClick={() => handleDelete(id)}
+          className='text-destructive-700 focus:text-rose-800'
+          onClick={async () => {
+            await handleDelete(id);
+          }}
         >
+          <Trash2 className='mr-1 h-3.5 w-3.5 text-destructive-700' />
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
