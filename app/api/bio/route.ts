@@ -3,19 +3,20 @@ import { withRLS } from '@/lib/db';
 import { createBioSchema } from '@/validation/bio';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getCurrentEpoch } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   const session = await getAuthSession();
   const id = session?.user?.id;
   const { username, title } = createBioSchema.parse(await request.json());
-
+  console.log('ini username', username, title, id);
   try {
     const dbRls = withRLS(id);
 
     const isBioExists = await dbRls.bioPages.findFirst({
       where: { username, user_id: id },
     });
-
+    console.log('bio exists', isBioExists);
     if (isBioExists) {
       return NextResponse.json(
         {
@@ -25,11 +26,14 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
+    const currentEpoch = getCurrentEpoch();
 
     const data = await dbRls.bioPages.create({
       data: {
         username,
         title,
+        created_at: currentEpoch,
+        updated_at: currentEpoch,
         users: { connect: { id } },
       },
     });
@@ -72,11 +76,20 @@ export async function GET(request: NextRequest) {
   try {
     const dbRls = withRLS(userId);
     const bioPages = await dbRls.bioPages.findMany({
-      where: { user_id: userId },
+      where: {
+        user_id: session.user.id,
+      },
+      include: {
+        _count: {
+          select: { links: true },
+        },
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
     });
 
     if (bioPages.length > 0) {
-      console.log('Bio pages found');
       return NextResponse.json(
         { status: 'success', data: bioPages },
         { status: 200 },

@@ -3,12 +3,6 @@ import { withRLS } from '@/lib/db';
 import { editBioPageSchema } from '@/validation/bio';
 import { NextRequest, NextResponse } from 'next/server';
 
-const bioPagesData = [
-  // Sample data
-  { id: '1', title: 'John Smith', url: 'https://example.com/john-smith' },
-  { id: '2', title: 'Jane Doe', url: 'https://example.com/jane-doe' },
-];
-
 // Helper function for error logging
 function logError(message: string, error?: unknown) {
   console.error(message, error);
