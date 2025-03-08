@@ -2,6 +2,23 @@
 
 const nextConfig = {
   webpack(config) {
+    config.plugins.push({
+      apply(compiler) {
+        compiler.hooks.compilation.tap(
+          'BigIntPolyfillPlugin',
+          (compilation) => {
+            compilation.hooks.afterOptimizeChunkAssets.tap(
+              'BigIntPolyfillPlugin',
+              () => {
+                BigInt.prototype.toJSON = function () {
+                  return this.toString();
+                };
+              },
+            );
+          },
+        );
+      },
+    });
     // Grab the existing rule that handles SVG imports
     const fileLoaderRule = config.module.rules.find((rule) =>
       rule.test?.test?.('.svg'),

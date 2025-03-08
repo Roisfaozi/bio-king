@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
 import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
+import { NextResponse } from 'next/server';
 
 const defaultLocale = 'en';
 const locales = ['bn', 'en', 'ar'];
@@ -17,11 +17,12 @@ function getLocale(request: Request) {
 export function middleware(request: any) {
   // Check if there is any supported locale in the pathname
   const pathname = request.nextUrl.pathname;
-
-  const pathnameIsMissingLocale = locales.every(
-    (locale) =>
-      !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
-  );
+  const pathnameIsMissingLocale =
+    !pathname.startsWith('/api/') &&
+    locales.every(
+      (locale) =>
+        !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
+    );
 
   // Redirect if there is no locale
   if (pathnameIsMissingLocale) {
@@ -39,7 +40,7 @@ export const config = {
   matcher: [
     // Skip all internal paths (_next, assets, api)
     //"/((?!api|assets|.*\\..*|_next).*)",
-    '/((?!api|assets|docs|.*\\..*|_next).*)',
+    '/((?!assets|docs|.*\\..*|_next).*)',
     // Optional: only run on root (/) URL
   ],
 };
