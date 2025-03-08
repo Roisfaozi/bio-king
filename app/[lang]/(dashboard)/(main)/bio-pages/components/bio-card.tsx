@@ -1,34 +1,50 @@
 'use client';
-import DropdownBio from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/dropdown-bio';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Calendar, Eye } from 'lucide-react';
+import { BioPages } from '@prisma/client';
 import Link from 'next/link';
+import DropdownBio from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/dropdown-bio';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { formatEpochRelative } from '@/lib/utils';
+import { Calendar, Eye } from 'lucide-react';
+import { BioPagesResponse } from '@/app/[lang]/(dashboard)/(main)/bio-pages/view';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface BioPageProps {
-  bio: any;
+  bio: BioPagesResponse;
 }
 
 const BioCard = ({ bio }: BioPageProps) => {
+  /**
+   * @description Bio card component
+   * temporary avatar
+   * should be
+   * bio?.profile_image_url
+   */
+
+  const avatar = bio?.social_image_url!;
+
   return (
     <div className='right-0 z-50 h-full w-full flex-none'>
       {' '}
       <Card className='h-full overflow-hidden'>
         <CardHeader>
           <div className='flex items-start justify-end'>
-            <DropdownBio />
+            <DropdownBio id={bio.id} />
           </div>
           <div className='flex flex-col items-center gap-2'>
             <Avatar className='h-16 w-16 lg:h-24 lg:w-24'>
-              <AvatarImage src={bio?.image} alt='' />
+              <AvatarImage src={avatar} alt='' />
               <AvatarFallback>{bio?.title.slice(0, 2)}</AvatarFallback>
             </Avatar>
             <div className='mt-3 text-lg font-semibold text-default-900 lg:text-xl'>
               {bio?.title}
             </div>
             <div className='line-clamp-2 text-center text-sm text-default-600'>
-              <Link href={bio?.url} target='_blank' rel='noopener noreferrer'>
-                {bio?.url}
+              <Link
+                href={`/bio/${bio.username}`}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                {`/bio/${bio.username}`}
               </Link>
             </div>
           </div>
@@ -41,7 +57,7 @@ const BioCard = ({ bio }: BioPageProps) => {
                 <Eye />
               </div>
               <p className='text-base font-medium text-default-800'>
-                {bio?.views} Views
+                {bio?._count?.links || 0} Views
               </p>
             </div>
             <div className='flex gap-4'>
@@ -49,15 +65,12 @@ const BioCard = ({ bio }: BioPageProps) => {
                 <Calendar />
               </div>
               <p className='text-base font-medium text-default-800'>
-                {bio?.createdAt ? (
+                {bio?.created_at ? (
                   <time
-                    dateTime={new Date(bio.createdAt).toISOString()}
-                    title={new Date(bio.createdAt).toLocaleString()}
+                    dateTime={new Date(Number(bio.created_at)).toISOString()}
+                    title={new Date(Number(bio.created_at)).toLocaleString()}
                   >
-                    {`${Math.ceil(
-                      (Date.now() - new Date(bio.createdAt).getTime()) /
-                        (1000 * 60 * 60 * 24),
-                    )} days ago`}
+                    Created {formatEpochRelative(Number(bio?.created_at))} ago
                   </time>
                 ) : (
                   <span>&mdash;</span>

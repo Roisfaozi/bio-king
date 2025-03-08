@@ -4,18 +4,25 @@ import { getBios } from '@/action/bio-action';
 import AddBioDialog from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/add-bio-dialog';
 import BioCard from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/bio-card';
 import BioSummary from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/bio-summary';
-interface BiooPageViewProps {
+
+interface BioPageViewProps {
   trans: {
     [key: string]: string;
   };
 }
+
+export type BioPagesResponse = BioPages & {
+  _count: {
+    links: number;
+  };
+};
 
 const getBioPages = async () => {
   try {
     const data = await getBios();
     if (data.status === 'success') {
       const bio = data.data;
-      return bio as BioPages[];
+      return bio as BioPagesResponse[];
     }
     return [];
   } catch (error) {
@@ -24,8 +31,11 @@ const getBioPages = async () => {
   }
 };
 
-const BioPagesView = async ({ trans }: BiooPageViewProps) => {
+const BioPagesView = async ({ trans }: BioPageViewProps) => {
   const bio = await getBioPages();
+
+  const totalViews =
+    bio?.reduce((sum, page) => sum + (page._count?.links || 0), 0) || 0;
   return (
     <div className='space-y-6'>
       <div className='flex flex-wrap items-center justify-between gap-4'>
@@ -35,7 +45,7 @@ const BioPagesView = async ({ trans }: BiooPageViewProps) => {
         <AddBioDialog />
       </div>
       <div className='w-full'>
-        <BioSummary totalPages={12} totalViews={200} />
+        <BioSummary totalPages={bio?.length || 0} totalViews={totalViews} />
       </div>
       <div className='grid grid-cols-12 gap-6'>
         {bio &&

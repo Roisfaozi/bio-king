@@ -8,7 +8,23 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
-const DropdownBio = () => {
+import { deleteBio } from '@/action/bio-action';
+import { useRouter } from 'next/navigation';
+
+interface DropdownBioProps {
+  id: string;
+}
+
+const DropdownBio = ({ id }: DropdownBioProps) => {
+  const router = useRouter();
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this bio page?')) {
+      await deleteBio(id);
+      router.refresh();
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -27,10 +43,17 @@ const DropdownBio = () => {
       >
         <DropdownMenuLabel>Option</DropdownMenuLabel>
         <DropdownMenuItem>Statistik</DropdownMenuItem>
-        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => router.push(`/dashboard/bio/${id}/edit`)}
+        >
+          Edit
+        </DropdownMenuItem>
         <DropdownMenuItem>Reset</DropdownMenuItem>
         <hr className='w-full'></hr>
-        <DropdownMenuItem className='text-destructive-700'>
+        <DropdownMenuItem
+          className='text-destructive-700'
+          onClick={() => handleDelete(id)}
+        >
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
