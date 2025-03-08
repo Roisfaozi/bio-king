@@ -16,6 +16,8 @@ import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { BioPages } from '@prisma/client';
+import { editBioPageSchema } from '@/validation/bio';
 
 const schema = z.object({
   url: z.string().url({ message: 'Invalid URL' }),
@@ -34,41 +36,38 @@ const schema = z.object({
 interface UpdateShortlinkFormProps {
   id: string;
   trans: any;
-  data: BioPage;
+  data: BioPages;
 }
 
-type BioPage = {
-  id: string;
-  url: string;
-  metaTitle: string;
-  metaDescription: string;
-  deepLinking: boolean;
-  expirationDate: string;
-  expirationRedirect: string;
-  password: string;
-  description: string;
-  createdAt: string;
-};
-
-export default function UpdateShortlinkForm({
+export default async function UpdateShortlinkForm({
   id,
   trans,
   data,
 }: UpdateShortlinkFormProps) {
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  const form = useForm<z.infer<typeof editBioPageSchema>>({
+    resolver: zodResolver(editBioPageSchema),
     defaultValues: {
-      url: data.url,
-      metaTitle: '',
-      metaDescription: '',
-      deepLinking: false,
-      expirationDate: '',
-      expirationRedirect: '',
-      password: '',
-      description: '',
+      title: data.title,
+      username: data.username,
+      description: data.description || '',
+      visibility: data.visibility ?? 'public',
+      profile_image_url: data.profile_image_url || '',
+      theme_config: data.theme_config as {
+        name?: string | undefined;
+        colors?:
+          | {
+              primary?: string | undefined;
+              text?: string | undefined;
+              background?: string | undefined;
+            }
+          | undefined;
+      },
+      seo_title: data.seo_title || '',
+      seo_description: data.seo_description || '',
+      social_image_url: data.social_image_url || '',
     },
   });
-  const onSubmit = async (data: z.infer<typeof schema>) => {
+  const onSubmit = async (data: z.infer<typeof editBioPageSchema>) => {
     const response = await fetch('/api/update-link', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -86,19 +85,19 @@ export default function UpdateShortlinkForm({
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
               <FormField
                 control={form.control}
-                name='url'
+                name='title'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Url</FormLabel>
+                    <FormLabel>Title</FormLabel>
                     <FormControl>
                       <Input
                         placeholder='https://example.com'
                         {...field}
                         className={cn('', {
                           'border-destructive focus:border-destructive':
-                            form.formState.errors.url,
+                            form.formState.errors.title,
                         })}
-                        value={data.url}
+                        value={data.title}
                       />
                     </FormControl>
                     <FormMessage className='px-0' />
@@ -108,17 +107,17 @@ export default function UpdateShortlinkForm({
 
               <FormField
                 control={form.control}
-                name='metaTitle'
+                name='username'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Meta Title</FormLabel>
+                    <FormLabel>Username</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Meta title'
+                        placeholder='Username'
                         {...field}
                         className={cn('', {
                           'border-destructive focus:border-destructive':
-                            form.formState.errors.metaTitle,
+                            form.formState.errors.username,
                         })}
                       />
                     </FormControl>
@@ -129,17 +128,17 @@ export default function UpdateShortlinkForm({
 
               <FormField
                 control={form.control}
-                name='metaDescription'
+                name='social_image_url'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Meta Description</FormLabel>
+                    <FormLabel>social_image_url</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Meta description'
+                        placeholder='social_image_url'
                         {...field}
                         className={cn('', {
                           'border-destructive focus:border-destructive':
-                            form.formState.errors.metaDescription,
+                            form.formState.errors.social_image_url,
                         })}
                       />
                     </FormControl>
@@ -166,18 +165,18 @@ export default function UpdateShortlinkForm({
 
               <FormField
                 control={form.control}
-                name='expirationDate'
+                name='visibility'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Expiration Date</FormLabel>
+                    <FormLabel>Visibility</FormLabel>
                     <FormControl>
                       <Input
                         type='date'
-                        placeholder='Expiration date'
+                        placeholder='Private'
                         {...field}
                         className={cn('', {
                           'border-destructive focus:border-destructive':
-                            form.formState.errors.expirationDate,
+                            form.formState.errors.visibility,
                         })}
                       />
                     </FormControl>
@@ -188,17 +187,17 @@ export default function UpdateShortlinkForm({
 
               <FormField
                 control={form.control}
-                name='expirationRedirect'
+                name='seo_title'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Expiration Redirect</FormLabel>
+                    <FormLabel>SEO Title</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Expiration redirect'
+                        placeholder='SEO Title'
                         {...field}
                         className={cn('', {
                           'border-destructive focus:border-destructive':
-                            form.formState.errors.expirationRedirect,
+                            form.formState.errors.seo_title,
                         })}
                       />
                     </FormControl>
@@ -209,18 +208,18 @@ export default function UpdateShortlinkForm({
 
               <FormField
                 control={form.control}
-                name='password'
+                name='seo_description'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>SEO Description</FormLabel>
                     <FormControl>
                       <Input
-                        type='password'
-                        placeholder='Password'
+                        type='text'
+                        placeholder='SEO Description'
                         {...field}
                         className={cn('', {
                           'border-destructive focus:border-destructive':
-                            form.formState.errors.password,
+                            form.formState.errors.seo_description,
                         })}
                       />
                     </FormControl>
