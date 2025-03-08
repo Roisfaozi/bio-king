@@ -4,6 +4,7 @@ import { getCookie } from '@/action/action-utils';
 import { api } from '@/config/axios.config';
 import { CreateBioInput, EditBioInput } from '@/validation/bio';
 import { BioPages } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 
 /**
  * Gets a bio page by ID
@@ -12,8 +13,18 @@ import { BioPages } from '@prisma/client';
  * @throws {Error} If there is a problem getting the bio page
  */
 export const getBio = async (id: string) => {
-  const response = await api.get<BioPages>(`/bio/${id}`);
-  return response.data;
+  try {
+    const cookie = await getCookie('next-auth.session-token');
+    const response = await api.get<BioPages>(`/bio/${id}`, {
+      headers: {
+        Cookie: `next-auth.session-token=${cookie}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching all bio pages:', error.response.data);
+    return error.response.data;
+  }
 };
 
 /**
@@ -49,10 +60,17 @@ export const getBios = async () => {
  */
 export const createBio = async (data: CreateBioInput) => {
   try {
-    const response = await api.post<CreateBioInput>('/bio', data);
+    const cookie = await getCookie('next-auth.session-token');
+
+    const response = await api.post<CreateBioInput>('/bio', data, {
+      headers: {
+        Cookie: `next-auth.session-token=${cookie}`,
+      },
+    });
+    revalidatePath('/bio-pages');
     return response.data;
   } catch (error: any) {
-    console.error(error.response);
+    console.error('failed create bio', error.response.data);
     return error.response.data;
   }
 };
