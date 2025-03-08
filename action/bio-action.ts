@@ -85,8 +85,19 @@ export const updateBio = async (
   id: string,
   data: Partial<Omit<EditBioInput, 'id' | 'createdAt' | 'updatedAt'>>,
 ) => {
-  const response = await api.patch<EditBioInput>(`/bio/${id}`, data);
-  return response.data;
+  try {
+    const cookie = await getCookie('next-auth.session-token');
+
+    const response = await api.patch<EditBioInput>(`/bio/${id}`, data, {
+      headers: {
+        Cookie: `next-auth.session-token=${cookie}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('Error updating bio page:', error.response.data);
+    return error.response.data;
+  }
 };
 
 /**
@@ -95,6 +106,15 @@ export const updateBio = async (
  * @returns The deleted bio page
  */
 export const deleteBio = async (id: string) => {
-  const response = await api.delete(`/bio/${id}`);
-  return response.data;
+  try {
+    const cookie = await getCookie('next-auth.session-token');
+    const response = await api.delete(`/bio/${id}`, {
+      headers: {
+        Cookie: `next-auth.session-token=${cookie}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    return error.response.data;
+  }
 };

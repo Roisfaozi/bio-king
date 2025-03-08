@@ -26,17 +26,18 @@ export async function GET(
     const bioPage = await db.bioPages.findUnique({
       where: { id: params.id },
     });
-    if (bioPage) {
-      return NextResponse.json(
-        { status: 'success', data: bioPage },
-        { status: 200 },
-      );
-    } else {
+
+    if (!bioPage) {
       return NextResponse.json(
         { status: 'fail', message: 'Bio page not found' },
         { status: 404 },
       );
     }
+
+    return NextResponse.json(
+      { status: 'success', data: bioPage },
+      { status: 200 },
+    );
   } catch (error) {
     logError('Error fetching bio page', error);
     return NextResponse.json(
@@ -102,6 +103,16 @@ export async function DELETE(
     const id = params.id;
 
     const db = withRLS(session?.user?.id);
+
+    const bioPage = await db.bioPages.findUnique({
+      where: { id },
+    });
+    if (!bioPage) {
+      return NextResponse.json(
+        { status: 'fail', message: 'Bio page not found' },
+        { status: 404 },
+      );
+    }
 
     await db.bioPages.delete({
       where: { id },

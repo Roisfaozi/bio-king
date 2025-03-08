@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         status: 'success',
-        message: 'User created successfully',
+        message: 'Bio created successfully',
         data,
       },
       { status: 201 },
