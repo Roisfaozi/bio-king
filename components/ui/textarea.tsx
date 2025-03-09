@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-import { cva, type VariantProps } from 'class-variance-authority';
 import { Radius, Shadow, TextAreaColor, TextAreaVariant } from '@/lib/type';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 export const textareaVariants = cva(
   'flex flex-1 bg-background w-full min-h-[80px]   px-3 py-[10px] text-sm  file:border-0 file:bg-transparent file:text-sm file:font-medium  read-only:bg-background  disabled:cursor-not-allowed disabled:opacity-50  transition duration-300 ',
@@ -11,7 +11,7 @@ export const textareaVariants = cva(
     variants: {
       color: {
         default:
-          'border-default-300 text-default-500 focus:outline-none focus:border-primary disabled:bg-default-200  placeholder:text-accent-foreground/50',
+          'border-default-300  focus:outline-none focus:border-primary disabled:bg-default-200  placeholder:text-accent-foreground/50',
         primary:
           'border-primary text-primary focus:outline-none focus:border-primary-700 disabled:bg-primary/30 disabled:placeholder:text-primary  placeholder:text-primary/70',
         info: 'border-info/50 text-info focus:outline-none focus:border-info-700 disabled:bg-info/30 disabled:placeholder:text-info  placeholder:text-info/70',

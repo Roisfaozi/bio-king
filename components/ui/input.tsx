@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
 import { InputColor, InputVariant, Radius, Shadow } from '@/lib/type';
+import { cn } from '@/lib/utils';
+import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 
 //py-[10px]
 export const inputVariants = cva(
@@ -10,7 +10,7 @@ export const inputVariants = cva(
     variants: {
       color: {
         default:
-          'border-default-300 text-default-500 focus:outline-none focus:border-primary disabled:bg-default-200  placeholder:text-accent-foreground/50',
+          'border-default-300 focus:outline-none focus:border-primary disabled:bg-default-200  placeholder:text-accent-foreground/50',
         primary:
           'border-primary text-primary focus:outline-none focus:border-primary-700 disabled:bg-primary/30 disabled:placeholder:text-primary  placeholder:text-primary/70',
         info: 'border-info/50 text-info focus:outline-none focus:border-info-700 disabled:bg-info/30 disabled:placeholder:text-info  placeholder:text-info/70',
