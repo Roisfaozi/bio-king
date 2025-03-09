@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { format, formatDistanceToNow } from 'date-fns';
 import { customAlphabet } from 'nanoid';
+import { ChangeEvent } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { UAParser } from 'ua-parser-js';
 export function cn(...inputs: ClassValue[]) {
@@ -270,4 +271,35 @@ export function addDaysToEpoch(epoch: number, days: number): number {
   const date = epochToDate(epoch);
   date.setDate(date.getDate() + days);
   return dateToEpoch(date);
+}
+
+export function getImageData(event: ChangeEvent<HTMLInputElement>) {
+  // FileList is immutable, so we need to create a new one
+  const dataTransfer = new DataTransfer();
+
+  // Add newly uploaded images
+  Array.from(event.target.files!).forEach((image) =>
+    dataTransfer.items.add(image),
+  );
+
+  const files = dataTransfer.files;
+  const displayUrl = URL.createObjectURL(event.target.files![0]);
+
+  return { files, displayUrl };
+}
+
+export function toBase64(file: File) {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+
+    fileReader.readAsDataURL(file);
+
+    fileReader.onload = () => {
+      resolve(fileReader.result);
+    };
+
+    fileReader.onerror = (error) => {
+      reject(error);
+    };
+  });
 }
