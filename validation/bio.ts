@@ -1,5 +1,5 @@
 import { visibility_type } from '@prisma/client';
-import { TypeOf, literal, nativeEnum, object, string } from 'zod';
+import { TypeOf, array, literal, nativeEnum, object, string } from 'zod';
 
 export const createBioSchema = object({
   username: string()
@@ -45,6 +45,18 @@ export const editBioPageSchema = object({
   seo_title: string().optional(),
   seo_description: string().optional(),
   social_image_url: string().url().optional().or(literal('')),
+  social_links: array(
+    object({
+      platform: string(),
+      url: string().url({ message: 'Invalid URL' }),
+    }),
+  ),
+  bio_links: array(
+    object({
+      title: string(),
+      url: string().url({ message: 'Invalid URL' }),
+    }),
+  ),
 });
 
 export type CreateBioInput = TypeOf<typeof createBioSchema>;

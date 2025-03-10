@@ -30,7 +30,11 @@ interface UpdateShortlinkFormProps {
   data: BioPages;
 }
 
-export default function UpdateShortlinkForm({ id, trans, data }) {
+export default function UpdateShortlinkForm({
+  id,
+  trans,
+  data,
+}: UpdateShortlinkFormProps) {
   return (
     <div className='space-y-6'>
       <div className='space-y-6'>
