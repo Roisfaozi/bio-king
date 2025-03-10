@@ -114,7 +114,7 @@
     "html-to-image": "^1.11.11",
     "leaflet": "^1.9.4",
     "lucide": "^0.270.0",
-    "lucide-react": "^0.269.0",
+    "lucide-react": "^0.479.0",
     "moment": "^2.29.4",
     "nanoid": "^5.1.2",
     "negotiator": "^0.6.3",
