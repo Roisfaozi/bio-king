@@ -7,10 +7,10 @@ import { toBase64 } from '@/lib/utils';
 import { PencilIcon, User2Icon } from 'lucide-react';
 import React, { useState } from 'react';
 
-type AvatarUploadProps = {
-  value?: string;
+interface AvatarUploadProps {
+  value?: string | File;
   onChange?: (value?: File) => void;
-};
+}
 
 export function AvatarUpload({ value, onChange }: AvatarUploadProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
