@@ -25,6 +25,10 @@ export async function GET(
     const db = withRLS(session?.user?.id);
     const bioPage = await db.bioPages.findUnique({
       where: { id: params.id },
+      include: {
+        socialLinks: true,
+        bioLinks: true,
+      },
     });
 
     if (!bioPage) {
