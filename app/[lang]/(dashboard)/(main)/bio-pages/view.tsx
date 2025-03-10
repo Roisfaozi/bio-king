@@ -11,18 +11,18 @@ interface BioPageViewProps {
   };
 }
 
-export type BioPagesResponse = BioPages & {
+interface BioPagesWithClicksResponse extends BioPages {
   _count: {
     links: number;
   };
-};
+}
 
 const getBioPages = async () => {
   try {
     const data = await getBios();
     if (data.status === 'success') {
       const bio = data.data;
-      return bio as BioPagesResponse[];
+      return bio as BioPagesWithClicksResponse[];
     }
     return [];
   } catch (error) {

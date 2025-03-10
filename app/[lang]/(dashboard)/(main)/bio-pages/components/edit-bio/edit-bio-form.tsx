@@ -21,7 +21,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { SOCIAL_PLATFORMS, THEMES } from '@/config/bio.config';
-import { BioLink, BioPage, SocialLink } from '@/models/bio-page';
+import {
+  BioLinkResponse,
+  BioPageResponse,
+  SocialLinkResponse,
+} from '@/models/bio-page-response';
 import { EditBioInput, editBioPageSchema } from '@/validation/bio';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ImageUp, Plus } from 'lucide-react';
@@ -32,15 +36,16 @@ import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ImageUploader } from '@/components/ui/upload-preview-image';
 
-export default function EditBioForm({ bioPage }: { bioPage: BioPage }) {
+export default function EditBioForm({ bioPage }: { bioPage: BioPageResponse }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
+  const [socialLinks, setSocialLinks] = useState<SocialLinkResponse[]>(
     bioPage.social_links || [],
   );
-  const [bioLinks, setBioLinks] = useState<BioLink[]>(bioPage.bio_links || []);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [bioLinks, setBioLinks] = useState<BioLinkResponse[]>(
+    bioPage.bio_links || [],
+  );
 
   const router = useRouter();
 
@@ -59,6 +64,7 @@ export default function EditBioForm({ bioPage }: { bioPage: BioPage }) {
       social_links: bioPage.social_links || [],
       bio_links: bioPage.bio_links || [],
     },
+    mode: 'onChange',
   });
 
   const {
@@ -87,18 +93,6 @@ export default function EditBioForm({ bioPage }: { bioPage: BioPage }) {
     control: form.control,
   });
   const selectedTheme = watch('theme_config.name');
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      form.setValue('social_image_url', file);
-    }
-  };
 
   function onSubmit(values: EditBioInput) {
     try {
@@ -153,7 +147,7 @@ export default function EditBioForm({ bioPage }: { bioPage: BioPage }) {
                     <FormLabel>Bio Image</FormLabel>
                     <FormControl>
                       <AvatarUpload
-                        value={field.value}
+                        value={watch('profile_image_url') || field.value}
                         onChange={field.onChange}
                       />
                     </FormControl>

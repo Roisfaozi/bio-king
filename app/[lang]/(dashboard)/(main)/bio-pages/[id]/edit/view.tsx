@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/card';
 import { BioPages } from '@prisma/client';
 import { z } from 'zod';
+import { BioPageResponse } from '@/models/bio-page-response';
 
 const schema = z.object({
   url: z.string().url({ message: 'Invalid URL' }),
@@ -24,17 +25,17 @@ const schema = z.object({
   description: z.string().optional(),
 });
 
-interface UpdateShortlinkFormProps {
+interface UpdateBioPageFormProps {
   id: string;
   trans: any;
-  data: BioPages;
+  data: BioPageResponse;
 }
 
-export default function UpdateShortlinkForm({
+export default function UpdateBioPageForm({
   id,
   trans,
   data,
-}: UpdateShortlinkFormProps) {
+}: UpdateBioPageFormProps) {
   return (
     <div className='space-y-6'>
       <div className='space-y-6'>

@@ -1,10 +1,10 @@
-interface SocialLink {
+interface SocialLinkResponse {
   id: string;
   platform: string;
   url: string;
 }
 
-interface BioLink {
+interface BioLinkResponse {
   id: string;
   title: string;
   url: string;
@@ -13,7 +13,7 @@ interface BioLink {
   is_active: boolean;
 }
 
-interface BioPage {
+interface BioPageResponse {
   id: string;
   title: string;
   username: string;
@@ -31,8 +31,8 @@ interface BioPage {
   seo_title: string | null;
   seo_description: string | null;
   social_image_url: string | null;
-  social_links: SocialLink[];
-  bio_links: BioLink[];
+  social_links: SocialLinkResponse[];
+  bio_links: BioLinkResponse[];
 }
 
-export type { BioLink, BioPage, SocialLink };
+export type { BioLinkResponse, BioPageResponse, SocialLinkResponse };
