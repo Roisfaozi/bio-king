@@ -1,5 +1,14 @@
 import { visibility_type } from '@prisma/client';
-import { TypeOf, array, literal, nativeEnum, object, string } from 'zod';
+import { TypeOf, array, literal, nativeEnum, object, string, z } from 'zod';
+import { oneOf } from 'prop-types';
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+];
 
 export const createBioSchema = object({
   username: string()
@@ -33,7 +42,18 @@ export const editBioPageSchema = object({
       },
     )
     .default(visibility_type.public),
-  profile_image_url: string().url().optional().or(literal('')),
+  profile_image_url: z
+    .union([
+      z.string().url('Please enter a valid image URL'),
+      z
+        .instanceof(File)
+        .refine((file) => file.size <= MAX_FILE_SIZE, 'Max file size is 5MB')
+        .refine(
+          (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
+          'Only .jpg, .jpeg, .png and .webp formats are supported',
+        ),
+    ])
+    .optional(),
   theme_config: object({
     name: string(),
     colors: object({
@@ -44,7 +64,18 @@ export const editBioPageSchema = object({
   }),
   seo_title: string().optional(),
   seo_description: string().optional(),
-  social_image_url: string().url().optional().or(literal('')),
+  social_image_url: z
+    .union([
+      z.string().url('Please enter a valid image URL'),
+      z
+        .instanceof(File)
+        .refine((file) => file.size <= MAX_FILE_SIZE, 'Max file size is 5MB')
+        .refine(
+          (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
+          'Only .jpg, .jpeg, .png and .webp formats are supported',
+        ),
+    ])
+    .optional(),
   social_links: array(
     object({
       platform: string(),
