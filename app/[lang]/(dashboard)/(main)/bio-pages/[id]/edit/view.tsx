@@ -7,9 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { BioPages } from '@prisma/client';
-import { z } from 'zod';
 import { BioPageResponse } from '@/models/bio-page-response';
+import { z } from 'zod';
 
 const schema = z.object({
   url: z.string().url({ message: 'Invalid URL' }),
