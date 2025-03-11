@@ -3,7 +3,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { toBase64 } from '@/lib/utils';
 import { PencilIcon, User2Icon } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -19,19 +18,25 @@ export function AvatarUpload({ value, onChange }: AvatarUploadProps) {
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setImagePreview(URL.createObjectURL(file));
       onChange?.(file);
     }
+  };
+
+  const watch = () => {
+    if (value instanceof File) {
+      return URL.createObjectURL(value);
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    return imagePreview;
   };
 
   return (
     <div className='relative h-40 w-40'>
       <Avatar className='h-full w-full'>
-        <AvatarImage src={imagePreview} className='object-cover' />
+        <AvatarImage src={watch() as string} className='object-cover' />
         <AvatarFallback>
           <User2Icon className='h-16 w-16' />
         </AvatarFallback>

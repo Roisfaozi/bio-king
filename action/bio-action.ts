@@ -22,7 +22,7 @@ export const getBio = async (id: string) => {
     });
     return response.data;
   } catch (error: any) {
-    console.error('Error fetching all bio pages:', error.response.data);
+    console.error('Error fetching bio page:', error.response.data);
     return error.response.data;
   }
 };
@@ -81,13 +81,9 @@ export const createBio = async (data: CreateBioInput) => {
  * @param data - The data to update the bio page with
  * @returns The updated bio page
  */
-export const updateBio = async (
-  id: string,
-  data: Partial<Omit<EditBioInput, 'id' | 'createdAt' | 'updatedAt'>>,
-) => {
+export const updateBio = async (id: string, data: FormData) => {
   try {
     const cookie = await getCookie('next-auth.session-token');
-
     const response = await api.patch<EditBioInput>(`/bio/${id}`, data, {
       headers: {
         Cookie: `next-auth.session-token=${cookie}`,
@@ -95,7 +91,7 @@ export const updateBio = async (
     });
     return response.data;
   } catch (error: any) {
-    console.error('Error updating bio page:', error.response.data);
+    console.error('Error updating bio page:', error);
     return error.response.data;
   }
 };
@@ -106,8 +102,11 @@ export const updateBio = async (
  * @returns The deleted bio page
  */
 export const deleteBio = async (id: string) => {
+  console.log('dari action sebelum try-catch'); // tambahkan console.log di sini
+
   try {
     const cookie = await getCookie('next-auth.session-token');
+
     const response = await api.delete(`/bio/${id}`, {
       headers: {
         Cookie: `next-auth.session-token=${cookie}`,
