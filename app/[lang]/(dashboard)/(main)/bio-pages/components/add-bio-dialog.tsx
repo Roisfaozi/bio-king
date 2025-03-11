@@ -28,7 +28,6 @@ import {
 import { CreateBioInput, createBioSchema } from '@/validation/bio';
 import { HelpCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { revalidatePath } from 'next/cache';
 
 const AddBioDialog = () => {
   const { theme: mode } = useTheme();

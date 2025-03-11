@@ -5,11 +5,13 @@ import DropdownBio from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/dr
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { formatEpochRelative } from '@/lib/utils';
 import { Calendar, Eye } from 'lucide-react';
-import { BioPagesResponse } from '@/app/[lang]/(dashboard)/(main)/bio-pages/view';
+import { BioPagesWithClicksResponse } from '@/app/[lang]/(dashboard)/(main)/bio-pages/view';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { siteConfig } from '@/config/site';
+import { credentialsConfig } from '@/config/credentials.config';
 
 interface BioPageProps {
-  bio: BioPagesResponse;
+  bio: BioPagesWithClicksResponse;
 }
 
 const BioCard = ({ bio }: BioPageProps) => {
@@ -20,7 +22,7 @@ const BioCard = ({ bio }: BioPageProps) => {
    * bio?.profile_image_url
    */
 
-  const avatar = bio?.social_image_url!;
+  const avatar = bio?.profile_image_url!;
 
   return (
     <div className='right-0 z-50 h-full w-full flex-none'>
@@ -31,7 +33,7 @@ const BioCard = ({ bio }: BioPageProps) => {
             <DropdownBio id={bio.id} />
           </div>
           <div className='flex flex-col items-center gap-2'>
-            <Avatar className='h-16 w-16 lg:h-24 lg:w-24'>
+            <Avatar className='h-16 w-16 lg:h-32 lg:w-32'>
               <AvatarImage src={avatar} alt='' />
               <AvatarFallback>{bio?.title.slice(0, 2)}</AvatarFallback>
             </Avatar>
@@ -44,7 +46,7 @@ const BioCard = ({ bio }: BioPageProps) => {
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                {`/bio/${bio.username}`}
+                {`${credentialsConfig.siteUrl}/bio/${bio.username}`}
               </Link>
             </div>
           </div>
