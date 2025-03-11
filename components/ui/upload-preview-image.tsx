@@ -48,12 +48,12 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   );
 
   React.useEffect(() => {
-    if (form.getValues('social_image_url')) {
+    if (form.getValues('social_image_url') instanceof File) {
       const watch = form.watch('social_image_url');
       const objectUrl = URL.createObjectURL(watch);
       setPreview(objectUrl);
     } else {
-      setPreview(null);
+      setPreview(form.watch('social_image_url'));
     }
   }, [form.watch('social_image_url')]);
 
