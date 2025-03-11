@@ -5,9 +5,9 @@ export const credentialsConfig = {
     redirectUri: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || '',
   },
   cloudinary: {
-    cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '',
-    apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || '',
-    apiSecret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET || '',
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+    apiKey: process.env.CLOUDINARY_API_KEY || '',
+    apiSecret: process.env.CLOUDINARY_API_SECRET || '',
   },
   supabase: {
     url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',

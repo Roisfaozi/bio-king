@@ -9,16 +9,26 @@ cloudinary.config({
 
 const cloudinaryDir = 'bio_king-dev';
 
-async function cloudinaryUpload(file: any, folder?: string) {
+async function cloudinaryUpload(
+  file: any,
+  public_name: string,
+  display_name: string,
+  folder?: string,
+) {
   return new Promise((resolve, reject) => {
     let dir = cloudinaryDir;
     if (folder !== '') {
       dir = `${cloudinaryDir}/${folder}`;
     }
-
     cloudinary.uploader
       .upload_stream(
-        { resource_type: 'image', folder: dir, public_id: 'bio' },
+        {
+          resource_type: 'image',
+          folder: dir,
+          public_id: `${public_name}`,
+          overwrite: true,
+          display_name: display_name,
+        },
         onDone,
       )
       .end(file);
