@@ -1,6 +1,5 @@
 import { visibility_type } from '@prisma/client';
-import { TypeOf, array, literal, nativeEnum, object, string, z } from 'zod';
-import { oneOf } from 'prop-types';
+import { TypeOf, array, nativeEnum, object, string, z } from 'zod';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = [
@@ -28,7 +27,7 @@ export const editBioPageSchema = object({
       /^[a-z0-9-]+$/,
       'Username can only contain lowercase letters, numbers, and hyphens',
     ),
-  description: string().optional(),
+  description: string(),
   visibility: nativeEnum(visibility_type)
     .refine(
       (value) =>
@@ -44,14 +43,15 @@ export const editBioPageSchema = object({
     .default(visibility_type.public),
   profile_image_url: z
     .union([
-      z.string().url('Please enter a valid image URL'),
+      z.string().url('Please enter a valid image URL').optional(),
       z
         .instanceof(File)
         .refine((file) => file.size <= MAX_FILE_SIZE, 'Max file size is 5MB')
         .refine(
           (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
           'Only .jpg, .jpeg, .png and .webp formats are supported',
-        ),
+        )
+        .optional(),
     ])
     .optional(),
   theme_config: object({
@@ -61,33 +61,36 @@ export const editBioPageSchema = object({
       text: string(),
       background: string(),
     }),
-  }),
+  }).optional(),
   seo_title: string().optional(),
   seo_description: string().optional(),
   social_image_url: z
     .union([
-      z.string().url('Please enter a valid image URL'),
+      z.string().url('Please enter a valid image URL').optional(),
       z
         .instanceof(File)
         .refine((file) => file.size <= MAX_FILE_SIZE, 'Max file size is 5MB')
         .refine(
           (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
           'Only .jpg, .jpeg, .png and .webp formats are supported',
-        ),
+        )
+        .optional(),
     ])
     .optional(),
   social_links: array(
     object({
-      platform: string(),
-      url: string().url({ message: 'Invalid URL' }),
+      id: string().optional(),
+      platform: string().optional(),
+      url: string().url({ message: 'Invalid URL' }).optional(),
     }),
-  ),
+  ).optional(),
   bio_links: array(
     object({
-      title: string(),
-      url: string().url({ message: 'Invalid URL' }),
+      id: string().optional(),
+      title: string().optional(),
+      url: string().url({ message: 'Invalid URL' }).optional(),
     }),
-  ),
+  ).optional(),
 });
 
 export type CreateBioInput = TypeOf<typeof createBioSchema>;
