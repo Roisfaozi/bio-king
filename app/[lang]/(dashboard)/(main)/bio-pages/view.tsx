@@ -11,7 +11,7 @@ interface BioPageViewProps {
   };
 }
 
-interface BioPagesWithClicksResponse extends BioPages {
+export interface BioPagesWithClicksResponse extends BioPages {
   _count: {
     links: number;
   };

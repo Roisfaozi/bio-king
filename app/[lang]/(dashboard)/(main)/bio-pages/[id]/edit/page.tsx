@@ -1,6 +1,6 @@
+import { getBio } from '@/action/bio-action';
 import UpdateBioPageForm from '@/app/[lang]/(dashboard)/(main)/bio-pages/[id]/edit/view';
 import { getDictionary } from '@/app/dictionaries';
-import { getBio } from '@/action/bio-action';
 import { BioPageResponse } from '@/models/bio-page-response';
 
 interface DashboardProps {
@@ -26,7 +26,6 @@ const getBioEditPage = async (id: string): Promise<BioPageResponse | any> => {
 const EditBioPage = async ({ params: { lang, id } }: DashboardProps) => {
   const trans = await getDictionary(lang);
   const data = await getBioEditPage(id);
-  console.log(data);
   return <UpdateBioPageForm id={id} trans={trans} data={data} />;
 };
 
