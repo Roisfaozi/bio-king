@@ -1,12 +1,10 @@
 import { getAuthSession } from '@/lib/auth';
 import { withRLS } from '@/lib/db';
-import { editBioPageSchema } from '@/validation/bio';
+import { createBioSchema, editBioPageSchema } from '@/validation/bio';
 import { NextRequest, NextResponse } from 'next/server';
-
-// Helper function for error logging
-function logError(message: string, error?: unknown) {
-  console.error(message, error);
-}
+import { z } from 'zod';
+import { logError } from '@/lib/helper';
+import { updateBioPageWithLinks } from '@/lib/db-transaction/bio';
 
 // GET by ID
 export async function GET(
@@ -58,34 +56,36 @@ export async function PATCH(
 ) {
   const session = await getAuthSession();
   if (!session?.user?.id) {
+    logError('Unauthorized');
     return NextResponse.json(
       { status: 'fail', message: 'Unauthorized' },
       { status: 401 },
     );
   }
-
   const id = params.id;
-  const reqBody = await request.json();
-  const updateBioSchema = editBioPageSchema.partial();
-
+  const userId = session?.user?.id;
   try {
-    const db = withRLS(session?.user?.id);
+    const data = await request.json();
 
-    const result = await db.bioPages.update({
-      where: { id },
-      data: updateBioSchema.parse(reqBody),
-    });
+    // Now validate with your schema
+    const validatedData = editBioPageSchema.parse(data);
+    const res = await updateBioPageWithLinks(userId, id, validatedData);
 
-    return NextResponse.json(
-      { status: 'success', data: result },
-      { status: 200 },
-    );
+    return NextResponse.json({ status: 'success', data: res }, { status: 200 });
   } catch (error) {
-    logError('Error updating bio page', error);
-    return NextResponse.json(
-      { status: 'fail', message: 'Internal Server Error' },
-      { status: 500 },
-    );
+    let res;
+    if (error instanceof z.ZodError) {
+      res = {
+        status: 'fail validation',
+        message: error.issues.map((issue) => issue.message).join(', '),
+      };
+      logError('error from zod');
+      return NextResponse.json(res, { status: 400 });
+    }
+
+    res = { status: 500, message: 'Internal Server Error', error: error };
+    logError('error 500', error);
+    return NextResponse.json(res, { status: 500 });
   }
 }
 
