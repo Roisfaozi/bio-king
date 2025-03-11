@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from 'cloudinary';
 import { credentialsConfig } from '@/config/credentials.config';
+import { v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
   cloud_name: credentialsConfig.cloudinary.cloudName,
@@ -7,7 +7,7 @@ cloudinary.config({
   api_secret: credentialsConfig.cloudinary.apiSecret,
 });
 
-const cloudinaryDir = 'bio_king';
+const cloudinaryDir = 'bio_king-dev';
 
 async function cloudinaryUpload(file: any, folder?: string) {
   return new Promise((resolve, reject) => {
@@ -17,7 +17,10 @@ async function cloudinaryUpload(file: any, folder?: string) {
     }
 
     cloudinary.uploader
-      .upload_stream({ resource_type: 'image', folder: dir }, onDone)
+      .upload_stream(
+        { resource_type: 'image', folder: dir, public_id: 'bio' },
+        onDone,
+      )
       .end(file);
     function onDone(error: any, result: any) {
       if (error) {

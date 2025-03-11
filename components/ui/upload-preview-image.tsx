@@ -1,24 +1,17 @@
 'use client';
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useDropzone } from 'react-dropzone';
-import { z } from 'zod';
-import { Input } from '@/components/ui/input';
 import {
-  Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { ImagePlus, X } from 'lucide-react';
-import { toast } from 'sonner';
-import Image from 'next/image';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { ImagePlus, X } from 'lucide-react';
+import Image from 'next/image';
+import React from 'react';
+import { useDropzone } from 'react-dropzone';
 
 interface ImageUploaderProps {
   form: any; // You can type this more specifically based on your form structure
@@ -26,6 +19,7 @@ interface ImageUploaderProps {
   label?: string;
   description?: string;
   maxSize?: number;
+  onPreview?: (image: any) => void;
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
@@ -39,19 +33,29 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
   const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
-      const reader = new FileReader();
       try {
-        reader.onload = () => setPreview(reader.result);
-        reader.readAsDataURL(acceptedFiles[0]);
-        form.setValue('image', acceptedFiles[0]);
-        form.clearErrors('image');
+        form.setValue('social_image_url', acceptedFiles[0]);
+        const watch = form.watch('social_image_url');
+        const objectUrl = URL.createObjectURL(watch);
+        setPreview(objectUrl);
+        form.clearErrors('social_image_url');
       } catch (error) {
         setPreview(null);
-        form.resetField('image');
+        form.resetField('social_image_url');
       }
     },
     [form, name],
   );
+
+  React.useEffect(() => {
+    if (form.getValues('social_image_url')) {
+      const watch = form.watch('social_image_url');
+      const objectUrl = URL.createObjectURL(watch);
+      setPreview(objectUrl);
+    } else {
+      setPreview(null);
+    }
+  }, [form.watch('social_image_url')]);
 
   const { getRootProps, getInputProps, isDragActive, fileRejections } =
     useDropzone({
@@ -76,7 +80,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   return (
     <FormField
       control={form.control}
-      name='image'
+      name='social_image_url'
       render={({ field, fieldState }) => (
         <FormItem className='mx-auto md:w-1/2'>
           <FormLabel>{label}</FormLabel>
