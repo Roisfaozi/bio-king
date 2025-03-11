@@ -1,5 +1,6 @@
 import db from '@/lib/db';
 import { Prisma } from '@prisma/client';
+import { logError } from '@/lib/helper';
 
 /**
  * Creates a Prisma client extension for bypassing RLS
@@ -43,7 +44,10 @@ export const createBypassRLSClient = () => {
                   );
                 }
               }
-
+              if (error instanceof Prisma.PrismaClientValidationError) {
+                logError('Prisma Validation Error:', error.message);
+                throw new Error('Invalid input. Please check your data.');
+              }
               throw error;
             }
           },
@@ -92,7 +96,11 @@ export const createRLSClient = (userId?: string) => {
                   );
                 }
               }
+              if (error instanceof Prisma.PrismaClientValidationError) {
+                logError('Prisma Validation Error:', error.message);
 
+                throw new Error('Invalid input. Please check your data.');
+              }
               throw error;
             }
           },

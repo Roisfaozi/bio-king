@@ -4,19 +4,19 @@ import { createBioSchema } from '@/validation/bio';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getCurrentEpoch } from '@/lib/utils';
+import { logError } from '@/lib/helper';
 
 export async function POST(request: NextRequest) {
   const session = await getAuthSession();
   const id = session?.user?.id;
   const { username, title } = createBioSchema.parse(await request.json());
-  console.log('ini username', username, title, id);
   try {
     const dbRls = withRLS(id);
 
     const isBioExists = await dbRls.bioPages.findFirst({
       where: { username, user_id: id },
     });
-    console.log('bio exists', isBioExists);
+
     if (isBioExists) {
       return NextResponse.json(
         {
@@ -37,7 +37,6 @@ export async function POST(request: NextRequest) {
         users: { connect: { id } },
       },
     });
-    console.log(data);
     return NextResponse.json(
       {
         status: 'success',
@@ -53,12 +52,12 @@ export async function POST(request: NextRequest) {
         status: 'fail validation',
         message: error.issues.map((issue) => issue.message).join(', '),
       };
-      console.log('error from zod');
+      logError('error from zod');
       return NextResponse.json(res, { status: 400 });
     }
 
     res = { status: 500, message: 'Internal Server Error' };
-    console.log('error 500', error);
+    logError('error 500', error);
     return NextResponse.json(res, { status: 500 });
   }
 }
@@ -95,14 +94,14 @@ export async function GET(request: NextRequest) {
         { status: 200 },
       );
     } else {
-      console.log('No bio pages found');
+      logError('No bio pages found');
       return NextResponse.json(
         { status: 'fail', message: 'No bio pages found' },
         { status: 404 },
       );
     }
   } catch (error) {
-    console.log('Internal Server Error', error);
+    logError('Internal Server Error', error);
     return NextResponse.json(
       { status: 'fail', message: 'Internal Server Error' },
       { status: 500 },
