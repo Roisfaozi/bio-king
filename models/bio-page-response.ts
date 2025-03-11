@@ -31,8 +31,8 @@ interface BioPageResponse {
   seo_title: string | null;
   seo_description: string | null;
   social_image_url: string | null;
-  social_links: SocialLinkResponse[];
-  bio_links: BioLinkResponse[];
+  socialLinks: SocialLinkResponse[];
+  bioLinks: BioLinkResponse[];
 }
 
 export type { BioLinkResponse, BioPageResponse, SocialLinkResponse };
