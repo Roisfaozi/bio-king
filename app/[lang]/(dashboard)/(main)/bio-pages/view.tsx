@@ -1,19 +1,12 @@
-import { BioPages } from '@prisma/client';
-
 import { getBios } from '@/action/bio-action';
 import AddBioDialog from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/add-bio-dialog';
 import BioCard from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/bio-card';
 import BioSummary from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/bio-summary';
+import { BioPagesWithClicksResponse } from '@/models/bio-page-response';
 
 interface BioPageViewProps {
   trans: {
     [key: string]: string;
-  };
-}
-
-export interface BioPagesWithClicksResponse extends BioPages {
-  _count: {
-    links: number;
   };
 }
 

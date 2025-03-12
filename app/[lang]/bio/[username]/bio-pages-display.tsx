@@ -1,19 +1,20 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+'use client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   ExternalLink,
   FacebookIcon,
   GithubIcon,
   InstagramIcon,
   LinkedinIcon,
-  Twitter,
   TwitterIcon,
   YoutubeIcon,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 function SocialIcon({ platform }: { platform: string }) {
   switch (platform) {
@@ -55,19 +56,40 @@ export function BioPagesDisplay({
   themeConfig,
 }: BioPagesDisplayProps) {
   // Gunakan warna dari theme config
-
   const { colors } = themeConfig;
-  console.log('BioPagesDisplay', bioPage);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { theme } = useTheme();
 
+  useEffect(() => {
+    setIsDarkMode(theme === 'dark');
+  }, [theme]);
+
+  const handleToggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+  const clr = isDarkMode
+    ? {
+        primary: colors?.darkPrimary || colors?.primary || '#4F46E5',
+        text: colors?.darkText || '#FFFFFF',
+        background: colors?.darkBackground || '#111827',
+      }
+    : {
+        primary: colors?.primary || '#4F46E5',
+        text: colors?.text || '#111827',
+        background: colors?.background || '#FFFFFF',
+      };
   return (
     <div
       className='flex min-h-screen flex-col items-center px-4 py-10'
-      style={{ backgroundColor: colors.background, color: colors.text }}
+      style={{
+        backgroundColor: clr.background,
+        color: clr.text,
+      }}
     >
-      <div className='mx-auto flex w-full max-w-md flex-col items-center'>
+      <div className='mx-auto flex w-full max-w-lg flex-col items-center'>
         {/* Profile Image */}
         <div className='mb-4'>
-          <Avatar className='h-24 w-24'>
+          <Avatar className='h-32 w-32'>
             {bioPage.profile_image_url ? (
               <AvatarImage
                 src={bioPage.profile_image_url}
@@ -82,56 +104,19 @@ export function BioPagesDisplay({
         </div>
 
         {/* Bio Title */}
-        <h1 className='mb-2 text-2xl font-bold'>{bioPage.title}</h1>
+        <h1
+          className='mb-2 text-center text-2xl font-bold'
+          style={{ color: clr.text }}
+        >
+          {bioPage.title}
+        </h1>
 
         {/* Bio Description */}
         {bioPage.description && (
-          <p className='mb-8 text-center'>{bioPage.description}</p>
+          <p className='mb-8 text-center' style={{ color: clr.text }}>
+            {bioPage.description}
+          </p>
         )}
-
-        {/* Links */}
-        <div className='mb-8 w-full space-y-3'>
-          {bioPage.bioLinks &&
-            bioPage.bioLinks.map((link: any, index: number) => (
-              <Card
-                key={index}
-                className='w-full overflow-hidden border-0 shadow-sm'
-              >
-                <Link
-                  href={link.url}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='block'
-                >
-                  <CardContent
-                    className='flex items-center justify-between p-3'
-                    style={{ backgroundColor: colors.primary }}
-                  >
-                    <div className='flex-1'>
-                      <h3
-                        className='font-medium'
-                        style={{ color: colors.text }}
-                      >
-                        {link.title}
-                      </h3>
-                      {link.description && (
-                        <p
-                          className='text-sm opacity-80'
-                          style={{ color: colors.text }}
-                        >
-                          {link.description}
-                        </p>
-                      )}
-                    </div>
-                    <ExternalLink
-                      className='h-4 w-4 flex-shrink-0'
-                      style={{ color: colors.text }}
-                    />
-                  </CardContent>
-                </Link>
-              </Card>
-            ))}
-        </div>
 
         {/* Social Links */}
         {bioPage.socialLinks && bioPage.socialLinks.length > 0 && (
@@ -149,8 +134,9 @@ export function BioPagesDisplay({
                     size='icon'
                     className='rounded-full'
                     style={{
-                      borderColor: colors.primary,
+                      borderColor: clr.primary,
                       backgroundColor: 'transparent',
+                      color: clr.text,
                     }}
                   >
                     <SocialIcon platform={social.platform} />
@@ -161,6 +147,84 @@ export function BioPagesDisplay({
           </div>
         )}
 
+        {/* Links */}
+        <div className='mb-8 w-full space-y-3'>
+          {bioPage.bioLinks &&
+            bioPage.bioLinks.map((link: any, index: number) => (
+              <Card
+                key={index}
+                className='w-full overflow-hidden border-0 shadow-sm'
+              >
+                <Link
+                  href={link.url}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='block'
+                >
+                  <CardContent
+                    className='flex items-center justify-between p-4'
+                    style={{
+                      backgroundColor: clr.primary,
+                    }}
+                  >
+                    <div className='flex-1'>
+                      <h3
+                        className='text-lg font-medium'
+                        style={{
+                          color: clr.background,
+                        }}
+                      >
+                        {link.title}
+                      </h3>
+                    </div>
+                    <ExternalLink
+                      className='h-4 w-4 flex-shrink-0'
+                      style={{
+                        color: clr.background,
+                      }}
+                    />
+                  </CardContent>
+                </Link>
+              </Card>
+            ))}
+        </div>
+
+        <button
+          className='absolute right-4 top-4'
+          onClick={handleToggleDarkMode}
+        >
+          {isDarkMode ? (
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              className='h-6 w-6'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z'
+              />
+            </svg>
+          ) : (
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              className='h-6 w-6'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707-1.414-1.414l.707.707 1.414-1.414l.707.707'
+              />
+            </svg>
+          )}
+        </button>
         {/* Footer */}
         <div className='mt-auto pt-6 text-center text-sm opacity-70'>
           <p>
