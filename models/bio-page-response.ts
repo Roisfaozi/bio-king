@@ -1,3 +1,5 @@
+import { BioPages } from '@prisma/client';
+
 interface SocialLinkResponse {
   id: string;
   platform: string;
@@ -35,4 +37,15 @@ interface BioPageResponse {
   bioLinks: BioLinkResponse[];
 }
 
-export type { BioLinkResponse, BioPageResponse, SocialLinkResponse };
+interface BioPagesWithClicksResponse extends BioPages {
+  _count: {
+    links: number;
+  };
+}
+
+export type {
+  BioLinkResponse,
+  BioPageResponse,
+  BioPagesWithClicksResponse,
+  SocialLinkResponse,
+};

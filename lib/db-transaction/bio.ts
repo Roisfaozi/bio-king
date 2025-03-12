@@ -1,11 +1,14 @@
 import { withRLS } from '@/lib/db';
 import { logError } from '@/lib/helper';
+import { getCurrentEpoch } from '@/lib/utils';
 
 export async function updateBioPageWithLinks(
   userId: string,
   bioPageId: string,
   data: any,
 ) {
+  const currentEpoch = getCurrentEpoch();
+
   const {
     title,
     username,
@@ -48,7 +51,7 @@ export async function updateBioPageWithLinks(
       // 🔄 Update Bio Page
       const updatedBioPage = await tx.bioPages.update({
         where: { id: bioPageId },
-        data: bioUpdate,
+        data: { ...bioUpdate, updated_at: currentEpoch },
       });
 
       // 🔍 Ambil semua link terkait bio_page ini
@@ -76,7 +79,11 @@ export async function updateBioPageWithLinks(
           // Jika ada ID dan bukan string kosong, update
           await tx.bioLinks.update({
             where: { id: link.id },
-            data: { title: link.title, url: link.url },
+            data: {
+              title: link.title,
+              url: link.url,
+              updated_at: currentEpoch,
+            },
           });
         } else {
           // Jika tidak ada ID atau ID kosong, buat baru
@@ -85,6 +92,8 @@ export async function updateBioPageWithLinks(
               bio_page_id: bioPageId,
               title: link.title,
               url: link.url,
+              updated_at: currentEpoch,
+              created_at: currentEpoch,
             },
           });
         }
