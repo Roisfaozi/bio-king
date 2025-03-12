@@ -97,9 +97,9 @@ export const updateBio = async (id: string, data: FormData) => {
       seo_title: data.get('seo_title'),
       seo_description: data.get('seo_description'),
     };
-
     // Handle file uploads
     const profileImageFile = data.get('profile_image_url') as File;
+
     if (profileImageFile && profileImageFile.size > 0) {
       // convert to array buffer
       const arrayBuffer = await profileImageFile.arrayBuffer();
@@ -121,6 +121,7 @@ export const updateBio = async (id: string, data: FormData) => {
     }
 
     const socialImageFile = data.get('social_image_url') as File;
+
     if (socialImageFile && socialImageFile.size > 0) {
       const arrayBuffer = await socialImageFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
@@ -136,8 +137,8 @@ export const updateBio = async (id: string, data: FormData) => {
         'social',
       );
       bioData.social_image_url = socialImageUrl.result.secure_url as string;
-    } else if (data.get('social_image_url_string')) {
-      bioData.social_image_url = data.get('social_image_url_string');
+    } else if (data.get('social_image_url')) {
+      bioData.social_image_url = data.get('social_image_url');
     }
 
     const cookie = await getCookie('next-auth.session-token');

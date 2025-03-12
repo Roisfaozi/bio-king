@@ -24,11 +24,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/ui/upload-preview-image';
 import { toast as htoast } from '@/components/ui/use-toast';
 import { SOCIAL_PLATFORMS, THEMES } from '@/config/bio.config';
-import {
-  BioLinkResponse,
-  BioPageResponse,
-  SocialLinkResponse,
-} from '@/models/bio-page-response';
 import { EditBioInput, editBioPageSchema } from '@/validation/bio';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash2 } from 'lucide-react';
@@ -36,12 +31,10 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { revalidatePath } from 'next/cache';
+import { BioPageResponse } from '@/models/bio-page-response';
 
 export default function EditBioForm({ bioPage }: { bioPage: BioPageResponse }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   const router = useRouter();
 
@@ -123,10 +116,8 @@ export default function EditBioForm({ bioPage }: { bioPage: BioPageResponse }) {
       } else if (data.social_image_url) {
         formData.append('social_image_url', String(data.social_image_url));
       }
-
       // You'd need to modify updateBio to handle FormData
       const response = await updateBio(bioPage.id, formData);
-
       if (response.status === 'success') {
         toast.success('Bio page updated successfully');
         reset();

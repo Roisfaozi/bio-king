@@ -1,14 +1,12 @@
 'use client';
-import { BioPages } from '@prisma/client';
-import Link from 'next/link';
 import DropdownBio from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/dropdown-bio';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { formatEpochRelative } from '@/lib/utils';
-import { Calendar, Eye } from 'lucide-react';
-import { BioPagesWithClicksResponse } from '@/app/[lang]/(dashboard)/(main)/bio-pages/view';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { siteConfig } from '@/config/site';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { credentialsConfig } from '@/config/credentials.config';
+import { formatEpochRelative } from '@/lib/utils';
+import { BioPagesWithClicksResponse } from '@/models/bio-page-response';
+import { Calendar, Eye } from 'lucide-react';
+import Link from 'next/link';
 
 interface BioPageProps {
   bio: BioPagesWithClicksResponse;
