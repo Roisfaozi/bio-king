@@ -132,7 +132,7 @@ model BioPages {
   workspaces        Workspaces?      @relation(fields: [workspace_id], references: [id], onUpdate: NoAction)
   links             Links[]
   socialLinks       SocialLinks[]
-  Clicks            Clicks[]
+  clicks            Clicks[]
 
   @@index([user_id, title, id], map: "bio_pages_user_id_title_idx")
   @@index([workspace_id, created_at], map: "bio_pages_workspace_created_idx")

@@ -91,7 +91,8 @@ erDiagram
 }
 "clicks" {
   String id PK
-  String link_id FK
+  String link_id FK "nullable"
+  String bio_page_id FK "nullable"
   String ip "nullable"
   String city "nullable"
   String country "nullable"
@@ -241,7 +242,8 @@ erDiagram
 "bio_links" }o--|| "bio_pages" : bioPages
 "bio_pages" }o--|| "users" : users
 "bio_pages" }o--o| "workspaces" : workspaces
-"clicks" }o--|| "links" : links
+"clicks" }o--o| "links" : links
+"clicks" }o--o| "bio_pages" : bioPages
 "clicks" }o--o| "visitor_sessions" : visitor_sessions
 "clicks" }o--o| "workspaces" : workspaces
 "link_metadata" |o--|| "links" : links
@@ -366,6 +368,7 @@ erDiagram
 
 - `id`:
 - `link_id`:
+- `bio_page_id`:
 - `ip`:
 - `city`:
 - `country`:
