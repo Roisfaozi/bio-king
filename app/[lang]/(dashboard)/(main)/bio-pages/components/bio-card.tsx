@@ -32,7 +32,11 @@ const BioCard = ({ bio }: BioPageProps) => {
           </div>
           <div className='flex flex-col items-center gap-2'>
             <Avatar className='h-16 w-16 lg:h-32 lg:w-32'>
-              <AvatarImage src={avatar} alt='' />
+              <AvatarImage
+                src={avatar}
+                alt={bio?.title}
+                className='object-cover'
+              />
               <AvatarFallback>{bio?.title.slice(0, 2)}</AvatarFallback>
             </Avatar>
             <div className='mt-3 text-lg font-semibold text-default-900 lg:text-xl'>
