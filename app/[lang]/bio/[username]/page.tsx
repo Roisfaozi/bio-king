@@ -87,24 +87,23 @@ export default async function BioPage({ params }: BioPageProps) {
     typeof bioPage.theme_config === 'string'
       ? JSON.parse(bioPage.theme_config)
       : bioPage.theme_config;
-  // await db.clicks.create({
-  //   data: {
-  //     bio_page_id: bioPage.id,
-  //     ip,
-  //     referer,
-  //     browser,
-  //     os,
-  //     device,
-  //     userAgent,
-  //     language: language.split(',')[0],
-  //     type: 'bio_view',
-  //     utmSource: searchParams.get('utm_source'),
-  //     utmMedium: searchParams.get('utm_medium'),
-  //     utmCampaign: searchParams.get('utm_campaign'),
-  //     createdAt: currentEpoch,
-  //     isUnique: true,
-  //   },
-  // })
+  await db.clicks.create({
+    data: {
+      bio_page_id: bioPage.id,
+      ip,
+      referer,
+      browser,
+      os,
+      device,
+      user_agent: userAgent,
+      language: language.split(',')[0],
+      utm_source: searchParams.get('utm_source'),
+      utm_medium: searchParams.get('utm_medium'),
+      utm_campaign: searchParams.get('utm_campaign'),
+      created_at: currentEpoch,
+      is_unique: true,
+    },
+  });
 
   if (bioPage.visibility === 'private') {
     const session = await getAuthSession();
