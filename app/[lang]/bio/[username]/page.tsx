@@ -83,28 +83,56 @@ export default async function BioPage({ params }: BioPageProps) {
     searchParams = new URLSearchParams(url.search);
   }
 
+  const existingClick = await db.clicks.findFirst({
+    where: {
+      bio_page_id: bioPage.id,
+      ip,
+      user_agent: userAgent,
+    },
+    select: { id: true },
+  });
+  if (!existingClick) {
+    await db.clicks.create({
+      data: {
+        bio_page_id: bioPage.id,
+        ip,
+        referer,
+        browser,
+        os,
+        device,
+        user_agent: userAgent,
+        language: language.split(',')[0],
+        utm_source: searchParams.get('utm_source'),
+        utm_medium: searchParams.get('utm_medium'),
+        utm_campaign: searchParams.get('utm_campaign'),
+        created_at: currentEpoch,
+        is_unique: true,
+      },
+    });
+  } else {
+    await db.clicks.create({
+      data: {
+        bio_page_id: bioPage.id,
+        ip,
+        referer,
+        browser,
+        os,
+        device,
+        user_agent: userAgent,
+        language: language.split(',')[0],
+        utm_source: searchParams.get('utm_source'),
+        utm_medium: searchParams.get('utm_medium'),
+        utm_campaign: searchParams.get('utm_campaign'),
+        created_at: currentEpoch,
+        is_unique: false,
+      },
+    });
+  }
+
   const themeConfig =
     typeof bioPage.theme_config === 'string'
       ? JSON.parse(bioPage.theme_config)
       : bioPage.theme_config;
-  await db.clicks.create({
-    data: {
-      bio_page_id: bioPage.id,
-      ip,
-      referer,
-      browser,
-      os,
-      device,
-      user_agent: userAgent,
-      language: language.split(',')[0],
-      utm_source: searchParams.get('utm_source'),
-      utm_medium: searchParams.get('utm_medium'),
-      utm_campaign: searchParams.get('utm_campaign'),
-      created_at: currentEpoch,
-      is_unique: true,
-    },
-  });
-
   if (bioPage.visibility === 'private') {
     const session = await getAuthSession();
     if (!session || session.user.id !== bioPage.user_id) {

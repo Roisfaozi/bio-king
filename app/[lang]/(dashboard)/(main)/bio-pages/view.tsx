@@ -15,6 +15,7 @@ const getBioPages = async () => {
     const data = await getBios();
     if (data.status === 'success') {
       const bio = data.data;
+
       return bio as BioPagesWithClicksResponse[];
     }
     return [];
@@ -28,7 +29,7 @@ const BioPagesView = async ({ trans }: BioPageViewProps) => {
   const bio = await getBioPages();
 
   const totalViews =
-    bio?.reduce((sum, page) => sum + (page._count?.links || 0), 0) || 0;
+    bio?.reduce((sum, page) => sum + (page._count?.clicks || 0), 0) || 0;
   return (
     <div className='space-y-6'>
       <div className='flex flex-wrap items-center justify-between gap-4'>

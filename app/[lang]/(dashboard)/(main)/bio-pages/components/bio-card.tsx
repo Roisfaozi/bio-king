@@ -61,7 +61,7 @@ const BioCard = ({ bio }: BioPageProps) => {
                 <Eye />
               </div>
               <p className='text-base font-medium text-default-800'>
-                {bio?._count?.links || 0} Views
+                {bio?._count?.clicks || 0} Views
               </p>
             </div>
             <div className='flex gap-4'>
