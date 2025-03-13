@@ -88,12 +88,13 @@ export function BioPagesDisplay({
     >
       <div className='mx-auto flex w-full max-w-lg flex-col items-center'>
         {/* Profile Image */}
-        <div className='mb-4'>
-          <Avatar className='h-32 w-32'>
+        <div className='relative mb-4 h-40 w-40'>
+          <Avatar className='h-full w-full'>
             {bioPage.profile_image_url ? (
               <AvatarImage
                 src={bioPage.profile_image_url}
                 alt={bioPage.title || bioPage.username}
+                className='object-cover'
               />
             ) : (
               <AvatarFallback>
