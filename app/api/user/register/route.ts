@@ -7,9 +7,7 @@ export async function POST(request: NextRequest, response: any) {
     const { name, email, password } = createUserSchema.parse(
       await request.json(),
     );
-    console.log('dari req', name, email, password);
     const existingUser = await db.user.findUnique({ where: { email } });
-    console.log('dari db', existingUser);
     if (existingUser) {
       return NextResponse.json({
         status: 400,
