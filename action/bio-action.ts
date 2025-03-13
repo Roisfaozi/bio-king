@@ -2,11 +2,11 @@
 
 import { getCookie } from '@/action/action-utils';
 import { api } from '@/config/axios.config';
+import { cloudinaryUpload } from '@/lib/cloudinary';
+import { logError } from '@/lib/helper';
 import { CreateBioInput, EditBioInput } from '@/validation/bio';
 import { BioPages } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-import { cloudinaryUpload } from '@/lib/cloudinary';
-import { logError } from '@/lib/helper';
 
 /**
  * Gets a bio page by ID
@@ -151,6 +151,9 @@ export const updateBio = async (id: string, data: FormData) => {
   } catch (error: any) {
     logError('Error updating bio page:', error.response.data);
     return error.response.data;
+  } finally {
+    revalidatePath('/[lang]/bio/[username]', 'page');
+    revalidatePath('/[lang]/(main)/bio-pages/[id]/edit', 'layout');
   }
 };
 

@@ -1,10 +1,10 @@
 import { getAuthSession } from '@/lib/auth';
 import { withRLS } from '@/lib/db';
-import { createBioSchema, editBioPageSchema } from '@/validation/bio';
+import { updateBioPageWithLinks } from '@/lib/db-transaction/bio';
+import { logError } from '@/lib/helper';
+import { editBioPageSchema } from '@/validation/bio';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { logError } from '@/lib/helper';
-import { updateBioPageWithLinks } from '@/lib/db-transaction/bio';
 
 // GET by ID
 export async function GET(
