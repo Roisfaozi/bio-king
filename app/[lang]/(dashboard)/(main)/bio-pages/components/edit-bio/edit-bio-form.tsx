@@ -31,9 +31,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { BioPageResponse } from '@/models/bio-page-response';
 
-export default function EditBioForm({ bioPage }: { bioPage: BioPageResponse }) {
+export default function EditBioForm({ bioPage }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
@@ -137,7 +136,7 @@ export default function EditBioForm({ bioPage }: { bioPage: BioPageResponse }) {
 
       toast.error('An error occurred');
     } finally {
-      router.refresh();
+      router.back();
     }
   };
 
