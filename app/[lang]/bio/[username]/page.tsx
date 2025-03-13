@@ -2,6 +2,7 @@
 import { BioPagesDisplay } from '@/app/[lang]/bio/[username]/bio-pages-display';
 import { getAuthSession } from '@/lib/auth';
 import db from '@/lib/db';
+import { getGeo } from '@/lib/geo-api';
 import { getCurrentEpoch, isValidUrl, parseUserAgent } from '@/lib/utils';
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
@@ -54,6 +55,8 @@ export default async function BioPage({ params }: BioPageProps) {
   const ip = headersList.get('x-forwarded-for') || '';
   const language = headersList.get('accept-language') || '';
 
+  const getData = await getGeo(ip);
+
   const bioPage = await db.bioPages.findFirst({
     where: {
       username: username,
@@ -101,6 +104,8 @@ export default async function BioPage({ params }: BioPageProps) {
         os,
         device,
         user_agent: userAgent,
+        city: getData?.city || null,
+        country: getData?.country || null,
         language: language.split(',')[0],
         utm_source: searchParams.get('utm_source'),
         utm_medium: searchParams.get('utm_medium'),
@@ -118,8 +123,10 @@ export default async function BioPage({ params }: BioPageProps) {
         browser,
         os,
         device,
-        user_agent: userAgent,
+        city: getData?.city || null,
+        country: getData?.country || null,
         language: language.split(',')[0],
+        user_agent: userAgent,
         utm_source: searchParams.get('utm_source'),
         utm_medium: searchParams.get('utm_medium'),
         utm_campaign: searchParams.get('utm_campaign'),
