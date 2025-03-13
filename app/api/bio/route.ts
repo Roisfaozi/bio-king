@@ -1,10 +1,10 @@
 import { getAuthSession } from '@/lib/auth';
 import { withRLS } from '@/lib/db';
+import { logError } from '@/lib/helper';
+import { getCurrentEpoch } from '@/lib/utils';
 import { createBioSchema } from '@/validation/bio';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getCurrentEpoch } from '@/lib/utils';
-import { logError } from '@/lib/helper';
 
 export async function POST(request: NextRequest) {
   const session = await getAuthSession();
@@ -80,14 +80,13 @@ export async function GET(request: NextRequest) {
       },
       include: {
         _count: {
-          select: { links: true },
+          select: { clicks: true },
         },
       },
       orderBy: {
         created_at: 'desc',
       },
     });
-
     if (bioPages.length > 0) {
       return NextResponse.json(
         { status: 'success', data: bioPages },

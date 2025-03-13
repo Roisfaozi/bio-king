@@ -39,7 +39,7 @@ interface BioPageResponse {
 
 interface BioPagesWithClicksResponse extends BioPages {
   _count: {
-    links: number;
+    clicks: number;
   };
 }
 
