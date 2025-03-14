@@ -75,3 +75,64 @@ export async function createBulkShortlinks(data: BulkShortlinkInput) {
     };
   }
 }
+
+export const getShortlinkByShortcode = async (shortcode: string) => {
+  try {
+    const cookie = await getCookie('next-auth.session-token');
+    const response = await api.get<Links>(`/shortlink/${shortcode}`, {
+      headers: {
+        Cookie: `next-auth.session-token=${cookie}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    logError('Error fetching shortlink by shortcode:', error.response.data);
+    return error.response.data;
+  }
+};
+
+export const updateShortlinkByShortcode = async ({
+  shortcode,
+  title,
+}: {
+  shortcode: string;
+  title?: string;
+}) => {
+  try {
+    const cookie = await getCookie('next-auth.session-token');
+
+    const response = await api.patch<Links>(
+      `/shortlink/${shortcode}`,
+      {
+        title,
+      },
+      {
+        headers: {
+          Cookie: `next-auth.session-token=${cookie}`,
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error: any) {
+    logError('Error updating shortlink by shortcode:', error.response.data);
+    return error.response.data;
+  }
+};
+
+export const deleteShortlinkByShortcode = async (shortcode: string) => {
+  try {
+    const cookie = await getCookie('next-auth.session-token');
+
+    const response = await api.delete<Links>(`/shortlink/${shortcode}`, {
+      headers: {
+        Cookie: `next-auth.session-token=${cookie}`,
+      },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    logError('Error deleting shortlink by shortcode:', error.response.data);
+    return error.response.data;
+  }
+};
