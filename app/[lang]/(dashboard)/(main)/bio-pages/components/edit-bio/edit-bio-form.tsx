@@ -56,8 +56,6 @@ export default function EditBioForm({ bioPage }) {
   });
 
   const {
-    register,
-    handleSubmit,
     reset,
     watch,
     setValue,
