@@ -15,7 +15,11 @@ interface UpdateBioPageFormProps {
   data: BioPageResponse;
 }
 
-export default function UpdateBioPageForm({ id, trans, data }) {
+export default function UpdateBioPageForm({
+  id,
+  trans,
+  data,
+}: UpdateBioPageFormProps) {
   return (
     <div className='space-y-6'>
       <div className='space-y-6'>
