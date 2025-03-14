@@ -9,7 +9,7 @@ import { PrismaClient } from '@prisma/client';
 
 const globalForPrisma = global as unknown as { db: PrismaClient };
 
-export const db = globalForPrisma.db || new PrismaClient();
+export const db = globalForPrisma.db || new PrismaClient({ log: ['query'] });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.db = db;
 
@@ -33,7 +33,7 @@ export async function withRLSContext<T>(
  * @returns Extended Prisma client with RLS
  */
 export const withRLS = (userId?: string) => {
-  return new PrismaClient().$extends(createRLSClient(userId));
+  return db.$extends(createRLSClient(userId));
 };
 
 /**
@@ -45,7 +45,7 @@ export const withRLS = (userId?: string) => {
 export async function withBypassRLS<T>(
   operation: () => Promise<T>,
 ): Promise<T> {
-  const bypassRLSClient = new PrismaClient().$extends(createBypassRLSClient());
+  const bypassRLSClient = db.$extends(createBypassRLSClient());
   return operation();
 }
 
@@ -56,7 +56,7 @@ export async function withBypassRLS<T>(
  */
 
 export const bypassRLS = () => {
-  return new PrismaClient().$extends(createBypassRLSClient());
+  return db.$extends(createBypassRLSClient());
 };
 
 export default db;
