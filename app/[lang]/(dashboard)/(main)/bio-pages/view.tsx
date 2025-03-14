@@ -1,4 +1,4 @@
-import { getBios } from '@/action/bio-action';
+import { getBiosWithClick } from '@/action/bio-action';
 import AddBioDialog from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/add-bio-dialog';
 import BioCard from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/bio-card';
 import BioSummary from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/bio-summary';
@@ -12,7 +12,7 @@ interface BioPageViewProps {
 
 const getBioPages = async () => {
   try {
-    const data = await getBios();
+    const data = await getBiosWithClick();
     if (data.status === 'success') {
       const bio = data.data;
 

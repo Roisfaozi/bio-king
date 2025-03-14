@@ -8,21 +8,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { BioPageResponse } from '@/models/bio-page-response';
-import { z } from 'zod';
-
-const schema = z.object({
-  url: z.string().url({ message: 'Invalid URL' }),
-  metaTitle: z.string().min(1, { message: 'Meta title is required' }),
-  metaDescription: z.string().optional(),
-  deepLinking: z.boolean().optional(),
-  expirationDate: z.string().optional(),
-  expirationRedirect: z.string().url().optional(),
-  password: z
-    .string()
-    .min(6, { message: 'Password must be at least 6 characters' })
-    .optional(),
-  description: z.string().optional(),
-});
 
 interface UpdateBioPageFormProps {
   id: string;
@@ -30,11 +15,7 @@ interface UpdateBioPageFormProps {
   data: BioPageResponse;
 }
 
-export default function UpdateBioPageForm({
-  id,
-  trans,
-  data,
-}: UpdateBioPageFormProps) {
+export default function UpdateBioPageForm({ id, trans, data }) {
   return (
     <div className='space-y-6'>
       <div className='space-y-6'>
