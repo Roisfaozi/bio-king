@@ -158,17 +158,17 @@ async function main() {
     const bioPagesC = await tx.bioPages.findMany();
     const bioPageIds = bioPagesC.map((bioPage) => bioPage.id);
 
-    const bioPageClicks = await tx.clicks.createMany({
-      data: bioPageIds.reduce((acc, bioPageId) => {
-        return acc.concat({
-          bio_page_id: bioPageId,
-          ip: faker.internet.ip(),
-          browser: faker.internet.userAgent(),
-          country: faker.location.country(),
-          created_at: getCurrentEpoch(),
-        });
-      }, []),
-    });
+    // const bioPageClicks = await tx.clicks.createMany({
+    //   data: bioPageIds.reduce((acc, bioPageId) => {
+    //     return acc.concat({
+    //       bio_page_id: bioPageId,
+    //       ip: faker.internet.ip(),
+    //       browser: faker.internet.userAgent(),
+    //       country: faker.location.country(),
+    //       created_at: getCurrentEpoch(),
+    //     });
+    //   }, []),
+    // });
   });
 
   console.log('Seeding completed!');
