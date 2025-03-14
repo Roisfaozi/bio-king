@@ -6,6 +6,7 @@ import ReportsArea from './components/reports-area';
 import ReportsSnapshot from './components/reports-snapshot';
 import ShortLinksForm from './components/short-links-form';
 import { RecentLinkResponse } from '@/models/shortlink-response';
+import { getRecentClicks } from '@/action/dashboard-action';
 
 interface DashboardPageViewProps {
   trans: {
@@ -42,10 +43,24 @@ const getBioPages = async () => {
   }
 };
 
+const getClicks = async () => {
+  try {
+    const data = await getRecentClicks();
+    if (data.status === 'success') {
+      const clicks = data.data;
+
+      return clicks;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching bio pages:', error);
+    return [];
+  }
+};
 const DashboardPageView = async ({ trans }: DashboardPageViewProps) => {
   const recentLinks = await getRecentShortLinks();
   const recentBio = await getBioPages();
-
+  const recentClicks = await getClicks();
   const combinedLinks = [
     ...(recentLinks?.map((link) => ({
       id: link.id,

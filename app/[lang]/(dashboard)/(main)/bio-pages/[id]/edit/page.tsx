@@ -25,7 +25,7 @@ const getBioEditPage = async (id: string): Promise<BioPageResponse | any> => {
   }
 };
 
-const EditBioPage = async ({ params: { lang, id } }) => {
+const EditBioPage = async ({ params: { lang, id } }: DashboardProps) => {
   const trans = await getDictionary(lang);
   const data = await getBioEditPage(id);
   return <UpdateBioPageForm id={id} trans={trans} data={data} />;
