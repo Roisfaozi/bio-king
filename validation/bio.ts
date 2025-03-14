@@ -43,7 +43,10 @@ export const editBioPageSchema = object({
     .default(visibility_type.public),
   profile_image_url: z
     .union([
-      z.string().url('Please enter a valid image URL').optional(),
+      z
+        .string()
+        .url('Please enter a valid image URL, e.g. https://image.example.com')
+        .optional(),
       z
         .instanceof(File)
         .refine((file) => file.size <= MAX_FILE_SIZE, 'Max file size is 5MB')
@@ -54,6 +57,7 @@ export const editBioPageSchema = object({
         .optional(),
     ])
     .optional(),
+
   theme_config: object({
     name: string(),
     colors: object({
@@ -69,7 +73,10 @@ export const editBioPageSchema = object({
   seo_description: string().optional(),
   social_image_url: z
     .union([
-      z.string().url('Please enter a valid image URL').optional(),
+      z
+        .string()
+        .url({ message: 'Please enter a valid URL, e.g. https://example.com' })
+        .optional(),
       z
         .instanceof(File)
         .refine((file) => file.size <= MAX_FILE_SIZE, 'Max file size is 5MB')
@@ -84,14 +91,18 @@ export const editBioPageSchema = object({
     object({
       id: string().optional(),
       platform: string().optional(),
-      url: string().url({ message: 'Invalid URL' }).optional(),
+      url: string()
+        .url({ message: 'Please enter a valid URL, e.g. https://example.com' })
+        .optional(),
     }),
   ).optional(),
   bio_links: array(
     object({
       id: string().optional(),
       title: string().optional(),
-      url: string().url({ message: 'Invalid URL' }).optional(),
+      url: string()
+        .url({ message: 'Please enter a valid URL, e.g. https://example.com' })
+        .optional(),
     }),
   ).optional(),
 });

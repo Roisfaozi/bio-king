@@ -1,8 +1,13 @@
 import { getAuthSession } from '@/lib/auth';
 import { withRLS } from '@/lib/db';
+import {
+  getAllBioPages,
+  getAllBioPagesWithClicks,
+} from '@/lib/db-transaction/bio';
 import { logError } from '@/lib/helper';
 import { getCurrentEpoch } from '@/lib/utils';
 import { createBioSchema } from '@/validation/bio';
+import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -37,6 +42,8 @@ export async function POST(request: NextRequest) {
         users: { connect: { id } },
       },
     });
+    revalidatePath('/dashboard');
+
     return NextResponse.json(
       {
         status: 'success',
@@ -71,22 +78,22 @@ export async function GET(request: NextRequest) {
       { status: 401 },
     );
   }
+  const searchParams = request.nextUrl.searchParams;
 
+  const limit = searchParams.get('limit') || 10;
+
+  const withClickParam = searchParams.get('withclick');
+  const withClick = withClickParam === 'true';
   try {
-    const dbRls = withRLS(userId);
-    const bioPages = await dbRls.bioPages.findMany({
-      where: {
-        user_id: session.user.id,
-      },
-      include: {
-        _count: {
-          select: { clicks: true },
-        },
-      },
-      orderBy: {
-        created_at: 'desc',
-      },
-    });
+    let bioPages: any = [];
+
+    if (withClick) {
+      bioPages = await getAllBioPagesWithClicks(userId, limit);
+    }
+    if (!withClick) {
+      bioPages = await getAllBioPages(userId, limit);
+    }
+
     if (bioPages.length > 0) {
       return NextResponse.json(
         { status: 'success', data: bioPages },

@@ -146,3 +146,52 @@ export async function updateBioPageWithLinks(
     throw new Error(error.message || 'An unexpected error occurred.');
   }
 }
+
+export async function getAllBioPagesWithClicks(
+  userId: string,
+  limit?: string | number,
+) {
+  try {
+    const dbRls = withRLS(userId);
+
+    const bioPages = await dbRls.bioPages.findMany({
+      where: {
+        user_id: userId,
+      },
+      include: {
+        _count: {
+          select: { clicks: true },
+        },
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+      take: Number(limit),
+    });
+    return bioPages;
+  } catch (error: any) {
+    logError('Unknown Error:', error.message);
+    throw new Error(error.message || 'An unexpected error occurred.');
+  }
+}
+
+export async function getAllBioPages(userId: string, limit?: string | number) {
+  try {
+    const dbRls = withRLS(userId);
+
+    const bioPages = await dbRls.bioPages.findMany({
+      where: {
+        user_id: userId,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+      take: Number(limit),
+    });
+
+    return bioPages;
+  } catch (error: any) {
+    logError('Unknown Error:', error.message);
+    throw new Error(error.message || 'An unexpected error occurred.');
+  }
+}
