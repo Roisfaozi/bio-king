@@ -3,8 +3,9 @@
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import toast from 'react-hot-toast';
 
+import { createShortlink } from '@/action/links-action';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -14,48 +15,50 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { toast } from '@/components/ui/use-toast';
-
-const FormSchema = z.object({
-  username: z.string().min(2, {
-    message: 'Username must be at least 2 characters.',
-  }),
-});
+import { CreateShortlinkInput, createShortlinkSchema } from '@/validation/link';
+import { useRouter } from 'next/navigation';
 
 const InputFormLink = () => {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      username: '',
-    },
+  const router = useRouter();
+
+  const form = useForm<CreateShortlinkInput>({
+    resolver: zodResolver(createShortlinkSchema),
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: 'You submitted the following values:',
-      description: (
-        <pre className='mt-2 w-[340px] rounded-md bg-default-950 p-4'>
-          <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  async function onSubmit(data: CreateShortlinkInput) {
+    try {
+      let response = await createShortlink(data);
+      if (response?.status === 'success') {
+        toast.success(response?.message);
+        const { id } = response.data;
+        console.log('id', id);
+        form?.reset();
+
+        router.push(`/bio-pages/${id}/edit`);
+      } else {
+        toast.error(response?.message);
+      }
+    } catch (error) {
+      console.error('Error creating bio page:', error);
+    }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='flex gap-4 pt-6'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='flex gap-4 pt-4'>
         <FormField
           control={form.control}
-          name='username'
+          name='original_url'
           render={({ field }) => (
             <FormItem className='w-full'>
               <FormControl>
                 <Input
                   placeholder='DashTail'
+                  size='lg'
                   {...field}
                   className={cn('', {
                     'border-destructive focus:border-destructive':
-                      form.formState.errors.username,
+                      form.formState.errors.original_url,
                   })}
                 />
               </FormControl>

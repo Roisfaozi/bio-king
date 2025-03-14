@@ -1,9 +1,17 @@
-import { Card, CardHeader } from '@/components/ui/card';
-import CardSnippet from '@/components/ui/card-snippet';
+import BulkShortlinkForm from '@/app/[lang]/(dashboard)/(main)/dashboard/components/short-links-form/multiple-link-forms';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InputFormLink from './link-forms';
 import RecentLink from './recent-links';
+import RecentLinks from './recent-links';
+import { RecentLinkResponse } from '@/models/shortlink-response';
 
-const ShortLinksForm = () => {
+interface DashboardPageViewProps {
+  recentLinks: RecentLinkResponse[];
+}
+
+const ShortLinksForm = ({ recentLinks }: DashboardPageViewProps) => {
   return (
     <div className='space-y-5'>
       <Card>
@@ -17,11 +25,26 @@ const ShortLinksForm = () => {
             </div>
           </div>
         </CardHeader>
+        <CardContent className='px-4'>
+          <div className='w-full'>
+            <Tabs defaultValue='single'>
+              <TabsList className='grid w-full grid-cols-2'>
+                <TabsTrigger value='single'>Single Shortlink</TabsTrigger>
+                <TabsTrigger value='bulk'>Bulk Creation</TabsTrigger>
+              </TabsList>
+              <Separator className='my-4' />
+              <TabsContent value='single'>
+                <InputFormLink />
+              </TabsContent>
+              <TabsContent value='bulk'>
+                <BulkShortlinkForm />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </CardContent>
       </Card>
-      <CardSnippet>
-        <InputFormLink />
-      </CardSnippet>
-      <RecentLink />
+
+      <RecentLink recentLinks={recentLinks} />
     </div>
   );
 };

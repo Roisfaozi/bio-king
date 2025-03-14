@@ -6,115 +6,15 @@ import { InputGroup, InputGroupText } from '@/components/ui/input-group';
 import { Icon } from '@iconify/react';
 import { Copy, Eye } from 'lucide-react';
 import DropdownLinks from './DropdownLinks';
-
-type link = {
-  id: number;
-  type: string;
-  title: string;
-  status: string;
-  visibility: string;
-  url: string;
-  createdAt: string;
-};
-
-const links: link[] = [
-  {
-    id: 1,
-    type: 'Bio Short Link',
-    title: 'ShortLink',
-    status: 'online',
-    visibility: 'Public',
-    url: 'https://bio.namatin.com/DojiF',
-    createdAt: '2022-01-01',
-  },
-  {
-    id: 2,
-    type: 'Bio Short Link',
-    title: 'ShortLink',
-    status: 'online',
-    visibility: 'Public',
-    url: 'https://bio.namatin.com/DojiF',
-    createdAt: '2022-01-01',
-  },
-  {
-    id: 3,
-    type: 'Bio Short Link',
-    title: 'ShortLink',
-    status: 'disbaled',
-    visibility: 'Public',
-    url: 'https://bio.namatin.com/DojiF',
-    createdAt: '2022-01-01',
-  },
-  {
-    id: 4,
-    type: 'Bio Short Link',
-    title: 'ShortLink',
-    status: 'online',
-    visibility: 'Public',
-    url: 'https://bio.namatin.com/DojiF',
-    createdAt: '2022-01-01',
-  },
-  {
-    id: 5,
-    type: 'Bio Short Link',
-    title: 'ShortLink',
-    status: 'online',
-    visibility: 'Public',
-    url: 'https://bio.namatin.com/DojiF',
-    createdAt: '2022-01-01',
-  },
-  {
-    id: 6,
-    type: 'Bio Short Link',
-    title: 'ShortLink',
-    status: 'online',
-    visibility: 'Public',
-    url: 'https://bio.namatin.com/DojiF',
-    createdAt: '2022-01-01',
-  },
-  {
-    id: 7,
-    type: 'Bio Short Link',
-    title: 'ShortLink',
-    status: 'online',
-    visibility: 'Public',
-    url: 'https://bio.namatin.com/DojiF',
-    createdAt: '2022-01-01',
-  },
-  {
-    id: 8,
-    type: 'Bio Short Link',
-    title: 'ShortLink',
-    status: 'online',
-    visibility: 'Public',
-    url: 'https://bio.namatin.com/DojiF',
-    createdAt: '2022-01-01',
-  },
-  {
-    id: 9,
-    type: 'Bio Short Link',
-    title: 'ShortLink',
-    status: 'online',
-    visibility: 'Public',
-    url: 'https://bio.namatin.com/DojiF',
-    createdAt: '2022-01-01',
-  },
-  {
-    id: 10,
-    type: 'Bio Short Link',
-    title: 'ShortLink',
-    status: 'online',
-    visibility: 'Public',
-    url: 'https://bio.namatin.com/DojiF',
-    createdAt: '2022-01-01',
-  },
-];
+import { RecentLinkResponse } from '@/models/shortlink-response';
+import { credentialsConfig } from '@/config/credentials.config';
+import { formatEpochRelative } from '@/lib/utils';
 
 interface RecentLinkProps {
-  links: link[];
+  recentLinks: RecentLinkResponse[];
 }
 
-const RecentLink = () => {
+const RecentLink = ({ recentLinks }: RecentLinkProps) => {
   return (
     <Card>
       <CardHeader className='flex-row items-center justify-between border-none pb-0'>
@@ -130,7 +30,7 @@ const RecentLink = () => {
           </InputGroup>
         </div>
       </CardContent>
-      {links.map((link) => (
+      {recentLinks.map((link) => (
         <LinkList link={link} key={`social-item-${link.id}`} />
       ))}
     </Card>
@@ -140,7 +40,7 @@ const RecentLink = () => {
 export default RecentLink;
 
 interface LinkListProps {
-  link: link;
+  link: RecentLinkResponse;
 }
 
 function LinkList({ link }: LinkListProps) {
@@ -180,7 +80,14 @@ function LinkList({ link }: LinkListProps) {
       </div>
       <div className='flex gap-3'>
         <div className={`rounded-md p-[2px]`}>
-          <p className='text-sm font-medium text-primary'>{link.url}</p>
+          <a
+            href={link.url}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='text-sm font-medium text-primary'
+          >
+            {credentialsConfig.siteUrl + link.url}
+          </a>
         </div>
         <div className='flex items-center justify-center gap-2'>
           <div className='h-4 w-4'>
@@ -189,7 +96,18 @@ function LinkList({ link }: LinkListProps) {
         </div>
       </div>
       <div className='flex w-full flex-wrap gap-2'>
-        <div className='flex items-center gap-2'>{link.createdAt}</div>
+        <p className='flex items-center gap-2'>
+          {link?.created_at ? (
+            <time
+              dateTime={new Date(Number(link.created_at)).toISOString()}
+              title={new Date(Number(link.created_at)).toLocaleString()}
+            >
+              Created {formatEpochRelative(Number(link?.created_at))} ago
+            </time>
+          ) : (
+            <span>&mdash;</span>
+          )}
+        </p>
       </div>
     </div>
   );
