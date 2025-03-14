@@ -7,7 +7,6 @@ import { logError } from '@/lib/helper';
 import { CreateBioInput, EditBioInput } from '@/validation/bio';
 import { BioPages } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-
 /**
  * Gets a bio page by ID
  * @param id - The ID of the bio page to get
@@ -30,21 +29,45 @@ export const getBio = async (id: string) => {
 };
 
 /**
- * Gets all bio pages
+ * Gets all bio pages with Clicks
  * @returns An array of bio pages
  * @throws {Error} If there is a problem getting the bio pages
  */
-export const getBios = async () => {
+export const getBiosWithClick = async (limit: number = 10) => {
   try {
     const cookie = await getCookie('next-auth.session-token');
     const response = await api.get<BioPages[]>(`/bio`, {
       headers: {
         Cookie: `next-auth.session-token=${cookie}`,
       },
+      params: {
+        withclick: true,
+        limit: limit,
+      },
     });
+    console.log('get bios executed');
     return response.data;
   } catch (error: any) {
-    logError('Error fetching all bio pages:', error.response.data);
+    logError('Error fetching all with clicks bio pages:', error.response.data);
+    return error.response.data;
+  }
+};
+
+export const getAllBios = async (limit: number = 10) => {
+  try {
+    const cookie = await getCookie('next-auth.session-token');
+    const response = await api.get<BioPages[]>(`/bio`, {
+      headers: {
+        Cookie: `next-auth.session-token=${cookie}`,
+      },
+      params: {
+        limit: limit,
+      },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    logError('Error fetching all with clicks bio pages:', error.response.data);
     return error.response.data;
   }
 };
