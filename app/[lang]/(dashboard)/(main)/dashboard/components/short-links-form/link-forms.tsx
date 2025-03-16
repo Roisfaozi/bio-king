@@ -12,6 +12,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -44,29 +45,56 @@ const InputFormLink = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='flex gap-4 pt-4'>
-        <FormField
-          control={form.control}
-          name='original_url'
-          render={({ field }) => (
-            <FormItem className='w-full'>
-              <FormControl>
-                <Input
-                  placeholder='DashTail'
-                  size='lg'
-                  {...field}
-                  className={cn('', {
-                    'border-destructive focus:border-destructive':
-                      form.formState.errors.original_url,
-                  })}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4 pt-4'>
+        <div className='flex flex-col gap-4'>
+          <FormField
+            control={form.control}
+            name='original_url'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>URL</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder='Masukkan URL (https://example.com)'
+                    size='lg'
+                    {...field}
+                    className={cn('', {
+                      'border-destructive focus:border-destructive':
+                        form.formState.errors.original_url,
+                    })}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button type='submit'>Short</Button>
+          <FormField
+            control={form.control}
+            name='title'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>Judul (Opsional)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder='Judul (opsional)'
+                    size='lg'
+                    {...field}
+                    className={cn('', {
+                      'border-destructive focus:border-destructive':
+                        form.formState.errors.title,
+                    })}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button type='submit' className='md:self-start'>
+            Short
+          </Button>
+        </div>
       </form>
     </Form>
   );

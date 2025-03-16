@@ -48,11 +48,20 @@ type RecentActivities = RecentActivity[];
 
 type RecentCliksResponse = ClickActivity[];
 
+interface ApiResponse<T> {
+  status: 'success' | 'error';
+  message: string;
+  data: T;
+}
+
+export type ClicksApiResponse = ApiResponse<RecentCliksResponse>;
+
 export type {
+  ApiResponse,
+  BioPage,
   ClickActivity,
   Link,
-  BioPage,
-  RecentCliksResponse,
   RecentActivities,
   RecentActivity as RecentActivityType,
+  RecentCliksResponse,
 };

@@ -1,10 +1,9 @@
+import { bypassRLS } from '@/lib/db';
 import { getCurrentEpoch, parseUserAgent } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server';
-import { bypassRLS } from '@/lib/db';
-import { getShortlinkByShortcode } from '@/action/links-action';
 
 export async function GET(
   req: NextRequest,
@@ -127,9 +126,5 @@ export async function GET(
   }
 
   revalidatePath('/dashboard');
-  return NextResponse.redirect(link.original_url || '/', {
-    headers: {
-      'Cache-Control': 'public, max-age=86400, immutable',
-    },
-  });
+  return NextResponse.redirect(link.original_url || '/');
 }

@@ -1,14 +1,16 @@
 'use client';
 import { Web } from '@/components/svg';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupText } from '@/components/ui/input-group';
+import { toast } from '@/components/ui/use-toast';
+import { credentialsConfig } from '@/config/credentials.config';
+import { copyToClipboard, formatEpochRelative } from '@/lib/utils';
+import { RecentLinkResponse } from '@/models/shortlink-response';
 import { Icon } from '@iconify/react';
 import { Copy, Eye } from 'lucide-react';
 import DropdownLinks from './DropdownLinks';
-import { RecentLinkResponse } from '@/models/shortlink-response';
-import { credentialsConfig } from '@/config/credentials.config';
-import { formatEpochRelative } from '@/lib/utils';
 
 interface RecentLinkProps {
   recentLinks: RecentLinkResponse[];
@@ -90,9 +92,16 @@ function LinkList({ link }: LinkListProps) {
           </a>
         </div>
         <div className='flex items-center justify-center gap-2'>
-          <div className='h-4 w-4'>
+          <Button
+            className='h-6 w-6'
+            variant='ghost'
+            size='icon'
+            onClick={() =>
+              copyToClipboard(credentialsConfig.siteUrl + link.url, toast)
+            }
+          >
             <Copy className='h-4 w-4' />
-          </div>
+          </Button>
         </div>
       </div>
       <div className='flex w-full flex-wrap gap-2'>

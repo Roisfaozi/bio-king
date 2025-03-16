@@ -1,14 +1,13 @@
 import { getAllBios } from '@/action/bio-action';
 import { getShortlinks } from '@/action/links-action';
+import { getRecentClicks } from '@/action/server-actions';
+import ActivityList from '@/app/[lang]/(dashboard)/(main)/dashboard/components/activity-list';
+import { RecentActivities, RecentCliksResponse } from '@/models/click-resonse';
+import { RecentLinkResponse } from '@/models/shortlink-response';
 import { BioPages, Links } from '@prisma/client';
-import RecentActivity from './components/recent-activity';
 import ReportsArea from './components/reports-area';
 import ReportsSnapshot from './components/reports-snapshot';
 import ShortLinksForm from './components/short-links-form';
-import { RecentLinkResponse } from '@/models/shortlink-response';
-import { getRecentClicks } from '@/action/dashboard-action';
-import { RecentActivities, RecentCliksResponse } from '@/models/click-resonse';
-import ActivityList from '@/app/[lang]/(dashboard)/(main)/dashboard/components/activity-list';
 
 interface DashboardPageViewProps {
   trans: {
