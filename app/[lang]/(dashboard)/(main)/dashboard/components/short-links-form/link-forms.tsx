@@ -31,10 +31,9 @@ const InputFormLink = () => {
       if (response?.status === 'success') {
         toast.success(response?.message);
         const { id } = response.data;
-        console.log('id', id);
         form?.reset();
 
-        router.push(`/bio-pages/${id}/edit`);
+        // router.push(`/bio-pages/${id}/edit`);
       } else {
         toast.error(response?.message);
       }
