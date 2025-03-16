@@ -1,8 +1,13 @@
+import { AnalyticsResponse } from '@/action/analytics-action';
 import SelectingLayers from '@/app/[lang]/(dashboard)/(main)/analytics/components/maps/selecting-layers';
 import DashboardSelect from '@/components/dasboard-select';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
-const Maps = () => {
+interface MapsProps {
+  analytics: AnalyticsResponse | { status: string; message: string };
+}
+
+const Maps = ({ analytics }: MapsProps) => {
   return (
     <div>
       <Card>
@@ -17,7 +22,7 @@ const Maps = () => {
           </div>
         </CardHeader>
         <CardContent className='px-5 pb-0'>
-          <SelectingLayers />
+          <SelectingLayers analytics={analytics} />
         </CardContent>
       </Card>
     </div>

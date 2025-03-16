@@ -1,14 +1,20 @@
-import AnalitycsPageView from '@/app/[lang]/(dashboard)/(main)/analytics/view';
+import { getAnalytics } from '@/action/analytics-action';
 import { getDictionary } from '@/app/dictionaries';
+import AnalyticsView from './view';
 
-interface DashboardProps {
+interface AnalyticsPageProps {
   params: {
-    lang: any;
+    lang: 'en' | 'bn' | 'ar';
   };
 }
-const BioPages = async ({ params: { lang } }: DashboardProps) => {
+
+const AnalyticsPage = async ({ params: { lang } }: AnalyticsPageProps) => {
   const trans = await getDictionary(lang);
-  return <AnalitycsPageView trans={trans} />;
+
+  // Fetch analytics data
+  const response = await getAnalytics();
+
+  return <AnalyticsView trans={trans} analytics={response} />;
 };
 
-export default BioPages;
+export default AnalyticsPage;
