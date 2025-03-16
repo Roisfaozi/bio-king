@@ -35,9 +35,13 @@ export async function GET(
         { status: 404 },
       );
     }
-
+    const serializedData = JSON.parse(
+      JSON.stringify(bioPage, (key, value) =>
+        typeof value === 'bigint' ? value.toString() : value,
+      ),
+    );
     return NextResponse.json(
-      { status: 'success', data: bioPage },
+      { status: 'success', data: serializedData },
       { status: 200 },
     );
   } catch (error) {

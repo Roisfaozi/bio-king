@@ -17,36 +17,28 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
 
     const limit = searchParams.get('limit') || 10;
-    let filterQuery = {
-      select: {
-        id: true,
-        links: {
-          select: {
-            short_code: true,
-            id: true,
-            title: true,
-          },
-        },
-        bioPages: {
-          select: {
-            username: true,
-            id: true,
-            title: true,
-          },
-        },
-      },
-    };
     const recentClicks = await dbRls.clicks.findMany({
       where: {
         OR: [{ links: { user_id: id } }, { bioPages: { user_id: id } }],
       },
-      include: {
+      select: {
+        id: true,
+        ip: true,
+        city: true,
+        country: true,
+        os: true,
+        device: true,
+        browser: true,
+        referer: true,
+        language: true,
+        created_at: true,
         links: {
           select: {
             id: true,
             short_code: true,
             original_url: true,
             user_id: true,
+            title: true,
           },
         },
         bioPages: {
@@ -61,7 +53,7 @@ export async function GET(req: NextRequest) {
       orderBy: {
         created_at: 'desc', // Urutkan berdasarkan klik terbaru
       },
-      take: 10,
+      take: Number(limit),
     });
 
     return NextResponse.json(
