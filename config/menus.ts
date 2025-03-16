@@ -1,4 +1,4 @@
-import { Cart, ClipBoard, DashBoard, Graph, Grid } from '@/components/svg';
+import { Cart, ClipBoard, DashBoard, Graph, Grid, Web } from '@/components/svg';
 
 export interface MenuItemProps {
   title: string;
@@ -45,6 +45,11 @@ export const menusConfig = {
         title: 'Dashboard',
         href: '/dashboard',
         icon: Grid,
+      },
+      {
+        title: 'Shortlinks',
+        href: '/shortlinks',
+        icon: Web,
       },
       {
         title: 'Bio Pages ',

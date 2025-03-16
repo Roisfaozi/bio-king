@@ -103,6 +103,13 @@ export async function GET(req: NextRequest) {
         created_at: 'desc',
       },
       take: Number(limit),
+      include: {
+        _count: {
+          select: {
+            clicks: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(

@@ -1,11 +1,7 @@
-interface RecentLinkResponse {
-  id: string;
-  type: 'bio' | 'shortlink';
-  status: 'online';
-  visibility: 'public';
-  title: string;
-  url: string;
-  created_at: bigint | null;
-}
+import { Links } from '@prisma/client';
 
-export type { RecentLinkResponse };
+export interface ShortlinkWithClicksResponse extends Links {
+  _count?: {
+    clicks: number;
+  };
+}

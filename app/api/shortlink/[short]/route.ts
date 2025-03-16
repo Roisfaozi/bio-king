@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth';
 import { bypassRLS, withRLS } from '@/lib/db';
-import { z } from 'zod';
 import { logError } from '@/lib/helper';
-import { createShortlinkSchema } from '@/validation/link';
+import { updateShortlinkSchema } from '@/validation/link';
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export async function GET(
   req: NextRequest,
@@ -33,9 +33,13 @@ export async function GET(
         expires_at: true,
         created_at: true,
         updated_at: true,
+        _count: {
+          select: {
+            clicks: true,
+          },
+        },
       },
     });
-    console.log('ini short from action', shortlink);
 
     if (!shortlink) {
       logError('Shortlink not found');
@@ -106,15 +110,19 @@ export async function PATCH(
     }
 
     const data = await req.json();
-    const validatedData = createShortlinkSchema.parse(data);
+    const validatedData = updateShortlinkSchema.parse(data);
 
     await dbRls.links.update({
       where: {
         short_code: shortCode,
       },
       data: {
-        title: validatedData.title || shortlink.title,
-        original_url: validatedData.original_url || shortlink.original_url,
+        title: validatedData.title ?? shortlink.title,
+        original_url: validatedData.original_url ?? shortlink.original_url,
+        is_active:
+          validatedData.is_active !== undefined
+            ? validatedData.is_active
+            : undefined,
       },
     });
 
