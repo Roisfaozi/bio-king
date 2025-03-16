@@ -94,14 +94,20 @@ const BioAnalyticsPage = ({ params }: BioAnalyticsPageProps) => {
           setError(analyticsResponse.message);
           return;
         }
-
         // Process chart data dari charts.clicks
-        if (analyticsResponse.data?.charts?.clicks?.length > 0) {
+        if (
+          'data' in analyticsResponse &&
+          analyticsResponse.data?.charts?.clicks?.length > 0
+        ) {
           const clicksData = analyticsResponse.data.charts.clicks;
           console.log('Clicks Data:', clicksData);
 
-          const dates = clicksData.map((item) => formatDate(item.date));
-          const clicks = clicksData.map((item) => item.bioPageClicks);
+          const dates = clicksData.map((item: { date: string }) =>
+            formatDate(item.date),
+          );
+          const clicks = clicksData.map(
+            (item: { bioPageClicks: number }) => item.bioPageClicks,
+          );
 
           console.log('Processed Data:', { dates, clicks });
 

@@ -6,6 +6,7 @@ import { logError } from '@/lib/helper';
 
 export interface AnalyticsResponse {
   status: string;
+  message?: string;
   data: {
     counts: {
       shortlinks: number;
