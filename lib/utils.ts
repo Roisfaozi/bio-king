@@ -314,3 +314,12 @@ export function toBase64(file: File) {
     };
   });
 }
+
+export const copyToClipboard = (text: string, toast: any) => {
+  navigator.clipboard.writeText(text);
+  toast({
+    title: 'Copied to clipboard',
+    description: 'The URL has been copied to your clipboard.',
+    duration: 3000,
+  });
+};
