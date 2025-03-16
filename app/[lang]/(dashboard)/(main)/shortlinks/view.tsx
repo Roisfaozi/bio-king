@@ -40,6 +40,7 @@ import { credentialsConfig } from '@/config/credentials.config';
 import { formatEpochDate } from '@/lib/utils';
 import { ShortlinkWithClicksResponse } from '@/models/shortlink-response';
 import {
+  ChartBar,
   Copy,
   Edit,
   ExternalLink,
@@ -275,15 +276,22 @@ const ShortlinksPageView = ({
                     <TableCell className='text-right'>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button
-                            variant='ghost'
-                            size='icon'
-                            className='h-8 w-8 rounded-full'
-                          >
+                          <Button variant='ghost' className='h-8 w-8 p-0'>
+                            <span className='sr-only'>Open menu</span>
                             <MoreHorizontal className='h-4 w-4' />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align='end'>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              router.push(
+                                `/shortlinks/${link.short_code}/analytics`,
+                              )
+                            }
+                          >
+                            <ChartBar className='mr-2 h-4 w-4' />
+                            Statistik
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             className='flex items-center gap-2'
                             onClick={() => handleOpenLink(link.short_code)}
