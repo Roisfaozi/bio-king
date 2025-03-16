@@ -1,35 +1,67 @@
-import { getAuthSession } from '@/lib/auth';
-import { bypassRLS, withRLS } from '@/lib/db';
+import { authOptions } from '@/lib/auth';
+import { bypassRLS } from '@/lib/db';
 import { logError } from '@/lib/helper';
+import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getAuthSession();
-    const id = session?.user?.id;
+    const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
+    if (!session || !session.user) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const dbRls = withRLS(id);
+    const id = session.user.id;
     const dbBypass = bypassRLS();
 
-    // Get total shortlinks created by user
-    const shortlinksCount = await dbRls.links.count({
+    // Ambil parameter dari query string
+    const searchParams = request.nextUrl.searchParams;
+    const timeRange = searchParams.get('timeRange') || '30'; // Default 30 hari
+    const groupBy = searchParams.get('groupBy') || 'daily'; // Default daily
+
+    // Tentukan rentang waktu berdasarkan parameter timeRange
+    const endDate = new Date();
+    const startDate = new Date();
+
+    switch (timeRange) {
+      case '7':
+        startDate.setDate(endDate.getDate() - 7);
+        break;
+      case '30':
+        startDate.setDate(endDate.getDate() - 30);
+        break;
+      case '60':
+        startDate.setDate(endDate.getDate() - 60);
+        break;
+      case '90':
+        startDate.setDate(endDate.getDate() - 90);
+        break;
+      case 'year':
+        startDate.setFullYear(endDate.getFullYear() - 1);
+        break;
+      default:
+        startDate.setDate(endDate.getDate() - 30); // Default 30 hari
+    }
+
+    // Konversi ke timestamp untuk query
+    const startTimestamp = BigInt(startDate.getTime());
+    const endTimestamp = BigInt(endDate.getTime());
+
+    // Hitung total shortlinks dan bio pages
+    const shortlinksCount = await dbBypass.links.count({
       where: {
         user_id: id,
       },
     });
 
-    // Get total bio pages created by user
-    const bioPagesCount = await dbRls.bioPages.count({
+    const bioPagesCount = await dbBypass.bioPages.count({
       where: {
         user_id: id,
       },
     });
 
-    // Get total clicks for shortlinks
+    // Hitung total klik
     const shortlinkClicks = await dbBypass.clicks.count({
       where: {
         links: {
@@ -41,7 +73,6 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Get total clicks for bio pages
     const bioPageClicks = await dbBypass.clicks.count({
       where: {
         bioPages: {
@@ -53,35 +84,31 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Get total clicks (both shortlinks and bio pages)
     const totalClicks = shortlinkClicks + bioPageClicks;
 
-    // Get recent activity (last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const sevenDaysAgoEpoch = BigInt(sevenDaysAgo.getTime());
+    // Hitung aktivitas terbaru (7 hari terakhir)
+    const recentDate = new Date();
+    recentDate.setDate(recentDate.getDate() - 7);
+    const recentTimestamp = BigInt(recentDate.getTime());
 
-    // Recent shortlinks
-    const recentShortlinks = await dbRls.links.count({
+    const recentShortlinks = await dbBypass.links.count({
       where: {
         user_id: id,
         created_at: {
-          gte: sevenDaysAgoEpoch,
+          gte: recentTimestamp,
         },
       },
     });
 
-    // Recent bio pages
-    const recentBioPages = await dbRls.bioPages.count({
+    const recentBioPages = await dbBypass.bioPages.count({
       where: {
         user_id: id,
         created_at: {
-          gte: sevenDaysAgoEpoch,
+          gte: recentTimestamp,
         },
       },
     });
 
-    // Recent clicks
     const recentClicks = await dbBypass.clicks.count({
       where: {
         OR: [
@@ -103,13 +130,13 @@ export async function GET(req: NextRequest) {
           },
         ],
         created_at: {
-          gte: sevenDaysAgoEpoch,
+          gte: recentTimestamp,
         },
       },
     });
 
-    // Get top 5 most clicked shortlinks
-    const topShortlinks = await dbRls.links.findMany({
+    // Dapatkan top 5 shortlinks berdasarkan klik
+    const topShortlinks = await dbBypass.links.findMany({
       where: {
         user_id: id,
       },
@@ -132,8 +159,8 @@ export async function GET(req: NextRequest) {
       take: 5,
     });
 
-    // Get top 5 most clicked bio pages
-    const topBioPages = await dbRls.bioPages.findMany({
+    // Dapatkan top 5 bio pages berdasarkan klik
+    const topBioPages = await dbBypass.bioPages.findMany({
       where: {
         user_id: id,
       },
@@ -155,25 +182,8 @@ export async function GET(req: NextRequest) {
       take: 5,
     });
 
-    // Get daily clicks for the last 30 days
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const thirtyDaysAgoEpoch = BigInt(thirtyDaysAgo.getTime());
-
-    // Create an array of the last 30 days
-    const last30Days = Array.from({ length: 30 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      return {
-        date: date.toISOString().split('T')[0],
-        shortlinkClicks: 0,
-        bioPageClicks: 0,
-        totalClicks: 0,
-      };
-    }).reverse();
-
-    // Get all clicks for the last 30 days
-    const clicksLast30Days = await dbBypass.clicks.findMany({
+    // Dapatkan data klik untuk rentang waktu yang ditentukan
+    const clicksData = await dbBypass.clicks.findMany({
       where: {
         OR: [
           {
@@ -194,7 +204,8 @@ export async function GET(req: NextRequest) {
           },
         ],
         created_at: {
-          gte: thirtyDaysAgoEpoch,
+          gte: startTimestamp,
+          lte: endTimestamp,
         },
       },
       select: {
@@ -204,66 +215,130 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Group clicks by date
-    clicksLast30Days.forEach((click) => {
-      const clickDate = new Date(Number(click.created_at))
-        .toISOString()
-        .split('T')[0];
-      const dayData = last30Days.find((day) => day.date === clickDate);
+    // Dapatkan data shortlinks dan bio pages yang dibuat dalam rentang waktu
+    const linksInTimeRange = await dbBypass.links.findMany({
+      where: {
+        user_id: id,
+        created_at: {
+          gte: startTimestamp,
+          lte: endTimestamp,
+        },
+      },
+      select: {
+        created_at: true,
+      },
+    });
 
-      if (dayData) {
-        if (click.link_id) {
-          dayData.shortlinkClicks += 1;
-        } else if (click.bio_page_id) {
-          dayData.bioPageClicks += 1;
-        }
-        dayData.totalClicks += 1;
+    const bioPagesInTimeRange = await dbBypass.bioPages.findMany({
+      where: {
+        user_id: id,
+        created_at: {
+          gte: startTimestamp,
+          lte: endTimestamp,
+        },
+      },
+      select: {
+        created_at: true,
+      },
+    });
+
+    // Fungsi untuk mendapatkan tanggal dalam format yang sesuai berdasarkan groupBy
+    const getFormattedDate = (timestamp: bigint, groupingType: string) => {
+      const date = new Date(Number(timestamp));
+
+      if (groupingType === 'monthly') {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      } else if (groupingType === 'weekly') {
+        // Mendapatkan tanggal awal minggu (Minggu)
+        const firstDayOfWeek = new Date(date);
+        const day = date.getDay();
+        firstDayOfWeek.setDate(date.getDate() - day);
+        return `${firstDayOfWeek.getFullYear()}-${String(firstDayOfWeek.getMonth() + 1).padStart(2, '0')}-${String(firstDayOfWeek.getDate()).padStart(2, '0')}`;
+      } else {
+        // Daily (default)
+        return date.toISOString().split('T')[0];
       }
-    });
+    };
 
-    // Get daily created links and bio pages for the last 30 days
-    const linksLast30Days = await dbRls.links.findMany({
-      where: {
-        user_id: id,
-        created_at: {
-          gte: thirtyDaysAgoEpoch,
-        },
-      },
-      select: {
-        created_at: true,
-      },
-    });
+    // Fungsi untuk membuat array tanggal berdasarkan rentang waktu dan pengelompokan
+    const generateDateArray = (
+      start: Date,
+      end: Date,
+      groupingType: string,
+    ) => {
+      const dates = [];
+      const current = new Date(start);
 
-    const bioPagesLast30Days = await dbRls.bioPages.findMany({
-      where: {
-        user_id: id,
-        created_at: {
-          gte: thirtyDaysAgoEpoch,
-        },
-      },
-      select: {
-        created_at: true,
-      },
-    });
+      while (current <= end) {
+        dates.push({
+          date: getFormattedDate(BigInt(current.getTime()), groupingType),
+          shortlinkClicks: 0,
+          bioPageClicks: 0,
+          totalClicks: 0,
+        });
 
-    // Create an array for created items
-    const createdItems = Array.from({ length: 30 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      return {
-        date: date.toISOString().split('T')[0],
-        shortlinks: 0,
-        bioPages: 0,
-        total: 0,
-      };
-    }).reverse();
+        if (groupingType === 'monthly') {
+          current.setMonth(current.getMonth() + 1);
+        } else if (groupingType === 'weekly') {
+          current.setDate(current.getDate() + 7);
+        } else {
+          current.setDate(current.getDate() + 1);
+        }
+      }
 
-    // Group created items by date
-    linksLast30Days.forEach((link) => {
-      const linkDate = new Date(Number(link.created_at))
-        .toISOString()
-        .split('T')[0];
-      const dayData = createdItems.find((day) => day.date === linkDate);
+      return dates;
+    };
+
+    // Buat array tanggal untuk data klik
+    const clicksDateArray = generateDateArray(startDate, endDate, groupBy);
+
+    // Kelompokkan data klik berdasarkan tanggal dan jenis
+    clicksData.forEach(
+      (click: {
+        created_at: bigint | null;
+        link_id: string | null;
+        bio_page_id: string | null;
+      }) => {
+        const formattedDate = getFormattedDate(
+          click.created_at || BigInt(0),
+          groupBy,
+        );
+        const dayData = clicksDateArray.find(
+          (day) => day.date === formattedDate,
+        );
+
+        if (dayData) {
+          if (click.link_id) {
+            dayData.shortlinkClicks += 1;
+          } else if (click.bio_page_id) {
+            dayData.bioPageClicks += 1;
+          }
+          dayData.totalClicks += 1;
+        }
+      },
+    );
+
+    // Buat array tanggal untuk data item yang dibuat
+    const createdItemsArray = generateDateArray(
+      startDate,
+      endDate,
+      groupBy,
+    ).map((item) => ({
+      date: item.date,
+      shortlinks: 0,
+      bioPages: 0,
+      total: 0,
+    }));
+
+    // Kelompokkan item yang dibuat berdasarkan tanggal
+    linksInTimeRange.forEach((link: { created_at: bigint | null }) => {
+      const formattedDate = getFormattedDate(
+        link.created_at || BigInt(0),
+        groupBy,
+      );
+      const dayData = createdItemsArray.find(
+        (day) => day.date === formattedDate,
+      );
 
       if (dayData) {
         dayData.shortlinks += 1;
@@ -271,11 +346,14 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    bioPagesLast30Days.forEach((page) => {
-      const pageDate = new Date(Number(page.created_at))
-        .toISOString()
-        .split('T')[0];
-      const dayData = createdItems.find((day) => day.date === pageDate);
+    bioPagesInTimeRange.forEach((page: { created_at: bigint | null }) => {
+      const formattedDate = getFormattedDate(
+        page.created_at || BigInt(0),
+        groupBy,
+      );
+      const dayData = createdItemsArray.find(
+        (day) => day.date === formattedDate,
+      );
 
       if (dayData) {
         dayData.bioPages += 1;
@@ -305,6 +383,10 @@ export async function GET(req: NextRequest) {
             },
           },
         ],
+        created_at: {
+          gte: startTimestamp,
+          lte: endTimestamp,
+        },
       },
       _count: {
         browser: true,
@@ -338,6 +420,10 @@ export async function GET(req: NextRequest) {
             },
           },
         ],
+        created_at: {
+          gte: startTimestamp,
+          lte: endTimestamp,
+        },
       },
       _count: {
         device: true,
@@ -371,6 +457,10 @@ export async function GET(req: NextRequest) {
             },
           },
         ],
+        created_at: {
+          gte: startTimestamp,
+          lte: endTimestamp,
+        },
       },
       _count: {
         os: true,
@@ -408,6 +498,10 @@ export async function GET(req: NextRequest) {
         country: {
           not: null,
         },
+        created_at: {
+          gte: startTimestamp,
+          lte: endTimestamp,
+        },
       },
       _count: {
         country: true,
@@ -440,6 +534,10 @@ export async function GET(req: NextRequest) {
             },
           },
         ],
+        created_at: {
+          gte: startTimestamp,
+          lte: endTimestamp,
+        },
       },
       select: {
         id: true,
@@ -490,8 +588,8 @@ export async function GET(req: NextRequest) {
             bioPages: topBioPages,
           },
           charts: {
-            clicks: last30Days,
-            created: createdItems,
+            clicks: clicksDateArray,
+            created: createdItemsArray,
           },
           visitors: {
             browsers: visitorDetails,
@@ -500,6 +598,8 @@ export async function GET(req: NextRequest) {
             countries: countryData,
             recent: recentVisitors,
           },
+          timeRange,
+          groupBy,
         },
       },
       { status: 200 },
