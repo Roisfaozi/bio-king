@@ -19,7 +19,7 @@ interface BioAnalyticsPageProps {
   };
 }
 
-const BioAnalyticsPage = ({ params }) => {
+const BioAnalyticsPage = ({ params }: BioAnalyticsPageProps) => {
   const router = useRouter();
   const { theme: config } = useThemeStore();
   const { theme: mode } = useTheme();
@@ -71,144 +71,91 @@ const BioAnalyticsPage = ({ params }) => {
   };
 
   useEffect(() => {
-    const fetchBioPage = async () => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const response = await getBioById(params.id);
-        if (response.status === 'success' && response.data) {
-          setBioPage(response.data);
-        } else {
-          setError('Bio page tidak ditemukan');
+        const bioResponse = await getBioById(params.id);
+        if (bioResponse.status === 'error') {
+          setError(bioResponse.message);
+          return;
         }
-      } catch (error) {
-        console.error('Error fetching bio page:', error);
-        setError('Gagal mengambil data bio page');
-      }
-    };
+        setBioPage(bioResponse.data);
 
-    fetchBioPage();
-  }, [params.id]);
-
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Mengambil data analitik khusus untuk bio page ini
-        const response = await getAnalytics({
-          timeRange,
+        const analyticsResponse = await getAnalytics({
+          timeRange: timeRange,
           groupBy: 'daily',
-          bioId: params.id, // Parameter tambahan untuk filter berdasarkan bio ID
+          bioId: params.id,
         });
 
-        console.log('Analytics response for bio:', response);
+        console.log('Analytics Response:', analyticsResponse);
 
-        if (
-          response.status === 'success' &&
-          'data' in response &&
-          response.data?.charts?.clicks?.length > 0
-        ) {
-          // Persiapkan data chart dari respons API
-          const clicksData = response.data.charts.clicks;
-          console.log('Raw clicks data length:', clicksData.length);
-
-          // Pastikan data tidak kosong dan valid
-          if (
-            clicksData &&
-            Array.isArray(clicksData) &&
-            clicksData.length > 0
-          ) {
-            // Urutkan data berdasarkan tanggal (dari terlama ke terbaru)
-            const sortedData = [...clicksData].sort((a, b) => {
-              return new Date(a.date).getTime() - new Date(b.date).getTime();
-            });
-
-            console.log('Sorted data by date:', sortedData);
-            console.log('Sorted data length:', sortedData.length);
-
-            // Ambil data lengkap
-            const totalClicksData = sortedData.map(
-              (day: { totalClicks: number }) =>
-                typeof day.totalClicks === 'number' ? day.totalClicks : 0,
-            );
-
-            // Format tanggal sesuai kebutuhan
-            const categories = sortedData
-              .map((day: { date: string }) =>
-                typeof day.date === 'string' ? formatDate(day.date) : '',
-              )
-              .filter((date) => date !== '');
-
-            console.log('API data prepared:', {
-              totalClicksData,
-              categories,
-              totalClicksDataLength: totalClicksData.length,
-              categoriesLength: categories.length,
-            });
-
-            if (totalClicksData.length > 0 && categories.length > 0) {
-              // Simpan data dalam state
-              const newChartData = [
-                {
-                  name: 'Total Klik',
-                  data: totalClicksData,
-                },
-              ];
-
-              console.log('Setting chart data:', newChartData);
-
-              // Update state
-              setChartData(newChartData);
-              setChartCategories(categories);
-            } else {
-              console.warn(
-                'Data from API is empty or invalid after processing',
-              );
-              setError('Data tidak lengkap setelah diproses');
-            }
-          } else {
-            console.warn('Clicks data is not valid');
-            setError('Data klik tidak valid');
-          }
-        } else {
-          console.warn('API returned no data or invalid response structure');
-          console.warn('Response status:', response.status);
-          console.warn('Has data property:', 'data' in response);
-
-          // Gunakan type guard untuk memeriksa properti data
-          if ('data' in response) {
-            console.warn(
-              'Has charts property:',
-              response.data?.charts ? 'yes' : 'no',
-            );
-            console.warn(
-              'Has clicks property:',
-              response.data?.charts?.clicks ? 'yes' : 'no',
-            );
-            console.warn(
-              'Clicks length:',
-              response.data?.charts?.clicks?.length || 0,
-            );
-          } else {
-            console.warn('No data property in response');
-          }
-
-          setError('Tidak ada data dari API');
+        if (analyticsResponse.status === 'error') {
+          setError(analyticsResponse.message);
+          return;
         }
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
-        setError('Gagal mengambil data analitik');
+
+        // Process chart data dari charts.clicks
+        if (analyticsResponse.data?.charts?.clicks?.length > 0) {
+          const clicksData = analyticsResponse.data.charts.clicks;
+          console.log('Clicks Data:', clicksData);
+
+          const dates = clicksData.map((item) => formatDate(item.date));
+          const clicks = clicksData.map((item) => item.bioPageClicks);
+
+          console.log('Processed Data:', { dates, clicks });
+
+          setChartCategories(dates);
+          setChartData([
+            {
+              name: 'Klik',
+              data: clicks,
+            },
+          ]);
+        } else {
+          setError('Tidak ada data klik yang tersedia');
+        }
+      } catch (err) {
+        setError('Terjadi kesalahan saat mengambil data. Silakan coba lagi.');
       } finally {
         setLoading(false);
       }
     };
 
-    if (bioPage) {
-      fetchAnalytics();
-    }
-  }, [params.id, timeRange, bioPage]);
+    fetchData();
+  }, [params.id, timeRange]);
 
   const primary = `hsl(${theme?.cssVars[mode === 'dark' ? 'dark' : 'light'].primary})`;
+
+  if (loading) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        <div className='text-center'>
+          <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-primary'></div>
+          <p>Memuat data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        <div className='text-center'>
+          <div className='mb-4 text-red-500'>⚠️</div>
+          <p className='text-red-500'>{error}</p>
+          <Button
+            color='primary'
+            className='mt-4'
+            onClick={() => router.back()}
+          >
+            <ArrowLeft className='mr-2 h-4 w-4' />
+            Kembali
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>

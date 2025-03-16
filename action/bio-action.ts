@@ -53,22 +53,26 @@ export const getBiosWithClick = async (limit: number = 10) => {
   }
 };
 
-export const getAllBios = async (limit: number = 10) => {
+export const getAllBios = async (limit?: number) => {
   try {
     const cookie = await getCookie('next-auth.session-token');
-    const response = await api.get<BioPages[]>(`/bio`, {
+    const response = await api.get('/bio-pages', {
       headers: {
         Cookie: `next-auth.session-token=${cookie}`,
       },
       params: {
-        limit: limit,
+        limit,
+        include: 'clicks',
       },
     });
 
     return response.data;
   } catch (error: any) {
-    logError('Error fetching all with clicks bio pages:', error.response.data);
-    return error.response.data;
+    logError('Error fetching bio pages:', error.response?.data || error);
+    return {
+      status: 'fail',
+      message: error.response?.data?.message || 'Failed to fetch bio pages',
+    };
   }
 };
 
@@ -188,34 +192,49 @@ export const updateBio = async (id: string, data: FormData) => {
 export const deleteBio = async (id: string) => {
   try {
     const cookie = await getCookie('next-auth.session-token');
-
-    const response = await api.delete(`/bio/${id}`, {
+    const response = await api.delete(`/bio-pages/${id}`, {
       headers: {
         Cookie: `next-auth.session-token=${cookie}`,
       },
     });
+
     return response.data;
   } catch (error: any) {
-    logError('Error deleting bio page:', error.response.data);
-    return error.response.data;
+    logError('Error deleting bio page:', error.response?.data || error);
+    return {
+      status: 'fail',
+      message: error.response?.data?.message || 'Failed to delete bio page',
+    };
   }
 };
 
 export const getBioById = async (id: string) => {
   try {
     const cookie = await getCookie('next-auth.session-token');
-    const response = await api.get(`/bio-pages/${id}`, {
+    const response = await api.get(`/bio/${id}`, {
       headers: {
         Cookie: `next-auth.session-token=${cookie}`,
       },
+      params: {
+        include: 'clicks,links,socialLinks',
+      },
     });
 
-    return response.data;
-  } catch (error: any) {
-    logError('Error fetching bio page:', error.response?.data || error);
+    if (response.data.status === 'success') {
+      return response.data;
+    }
+
     return {
       status: 'error',
-      message: error.response?.data?.message || 'Failed to fetch bio page',
+      message: 'Bio page tidak ditemukan',
+    };
+  } catch (error: any) {
+    logError('Error fetching bio page:', error.response?.data || error.message);
+    return {
+      status: 'error',
+      message:
+        error.response?.data?.message ||
+        'Terjadi kesalahan saat mengambil data bio page',
     };
   }
 };
