@@ -7,6 +7,8 @@ import ReportsSnapshot from './components/reports-snapshot';
 import ShortLinksForm from './components/short-links-form';
 import { RecentLinkResponse } from '@/models/shortlink-response';
 import { getRecentClicks } from '@/action/dashboard-action';
+import { RecentActivities, RecentCliksResponse } from '@/models/click-resonse';
+import ActivityList from '@/app/[lang]/(dashboard)/(main)/dashboard/components/activity-list';
 
 interface DashboardPageViewProps {
   trans: {
@@ -48,8 +50,7 @@ const getClicks = async () => {
     const data = await getRecentClicks();
     if (data.status === 'success') {
       const clicks = data.data;
-
-      return clicks;
+      return clicks as RecentCliksResponse;
     }
     return [];
   } catch (error) {
@@ -60,6 +61,7 @@ const getClicks = async () => {
 const DashboardPageView = async ({ trans }: DashboardPageViewProps) => {
   const recentLinks = await getRecentShortLinks();
   const recentBio = await getBioPages();
+
   const recentClicks = await getClicks();
   const combinedLinks = [
     ...(recentLinks?.map((link) => ({
@@ -87,10 +89,28 @@ const DashboardPageView = async ({ trans }: DashboardPageViewProps) => {
     return dateB - dateA;
   }) as RecentLinkResponse[];
 
+  const recentActivities: RecentActivities = recentClicks.map((click) => {
+    return {
+      id: click.id,
+      type: click.links ? 'shortlink' : 'bio',
+      title: click.links?.title || click.bioPages?.title,
+      url: click?.links
+        ? `/${click?.links?.short_code}`
+        : `/bio/${click?.bioPages?.username}`,
+      visited_at: click.created_at,
+      ip: click.ip || 'Unknown',
+      city: click.city || 'Unknown',
+      country: click.country || 'Unknown',
+      os: click.os || 'Unknown',
+      browser: click.browser || 'Unknown',
+      device: click.device,
+      referrer: click.referer,
+      language: click.language,
+    };
+  });
+
   return (
     <div className='space-y-6'>
-      {/* reports area */}
-
       <div className='grid grid-cols-12 gap-6'>
         <div className='col-span-12 lg:col-span-2'>
           <div className='grid h-full grid-cols-1 gap-6'>
@@ -107,7 +127,7 @@ const DashboardPageView = async ({ trans }: DashboardPageViewProps) => {
           <ShortLinksForm recentLinks={combinedLinks} />
         </div>
         <div className='col-span-12 lg:col-span-6 xl:col-span-6'>
-          <RecentActivity />
+          <ActivityList activity={recentActivities} />
         </div>
       </div>
     </div>
