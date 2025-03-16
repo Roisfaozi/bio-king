@@ -6,6 +6,7 @@ import ReportsChart from '@/app/[lang]/(dashboard)/(main)/dashboard/components/r
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { themes } from '@/config/thems';
+import { formatEpochDate } from '@/lib/utils';
 import { BioPagesWithClicksResponse } from '@/models/bio-page-response';
 import { useThemeStore } from '@/store';
 import { ArrowLeft } from 'lucide-react';
@@ -35,40 +36,6 @@ const BioAnalyticsPage = ({ params }: BioAnalyticsPageProps) => {
   const [chartCategories, setChartCategories] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState('60'); // Default 60 hari (2 bulan)
-
-  // Array nama bulan dalam bahasa Indonesia
-  const namaBulan = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'Mei',
-    'Jun',
-    'Jul',
-    'Agu',
-    'Sep',
-    'Okt',
-    'Nov',
-    'Des',
-  ];
-
-  // Fungsi untuk memformat tanggal
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const currentYear = new Date().getFullYear();
-
-    // Dapatkan tanggal dan nama bulan
-    const tanggal = date.getDate();
-    const bulan = namaBulan[date.getMonth()];
-    const tahun = date.getFullYear();
-
-    // Jika tahun sama dengan tahun saat ini, tampilkan hanya tanggal dan bulan
-    if (tahun === currentYear) {
-      return `${tanggal} ${bulan}`;
-    } else {
-      return `${tanggal} ${bulan} ${tahun}`;
-    }
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,7 +70,7 @@ const BioAnalyticsPage = ({ params }: BioAnalyticsPageProps) => {
           console.log('Clicks Data:', clicksData);
 
           const dates = clicksData.map((item: { date: string }) =>
-            formatDate(item.date),
+            formatEpochDate(Number(item.date), 'd MMM'),
           );
           const clicks = clicksData.map(
             (item: { bioPageClicks: number }) => item.bioPageClicks,

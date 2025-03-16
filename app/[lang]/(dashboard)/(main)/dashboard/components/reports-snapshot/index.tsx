@@ -4,6 +4,7 @@ import { getAnalytics } from '@/action/analytics-action';
 import ReportsChart from '@/app/[lang]/(dashboard)/(main)/dashboard/components/reports-snapshot/reports-chart';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { themes } from '@/config/thems';
+import { formatEpochDate } from '@/lib/utils';
 import { useThemeStore } from '@/store';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
@@ -12,22 +13,6 @@ import { useEffect, useState } from 'react';
 let cachedChartData: ApexAxisChartSeries = [{ data: [] }];
 let cachedCategories: string[] = [];
 let dataFetched = false;
-
-// Array nama bulan dalam bahasa Indonesia
-const namaBulan = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'Mei',
-  'Jun',
-  'Jul',
-  'Agu',
-  'Sep',
-  'Okt',
-  'Nov',
-  'Des',
-];
 
 const ReportsSnapshot = () => {
   const { theme: config, setTheme: setConfig } = useThemeStore();
@@ -42,26 +27,6 @@ const ReportsSnapshot = () => {
   const [chartCategories, setChartCategories] =
     useState<string[]>(cachedCategories);
   const [error, setError] = useState<string | null>(null);
-
-  // Fungsi untuk memformat tanggal
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const currentYear = new Date().getFullYear();
-
-    // Dapatkan tanggal dan nama bulan
-    const tanggal = date.getDate();
-    const bulan = namaBulan[date.getMonth()];
-    const tahun = date.getFullYear();
-
-    // Jika tahun sama dengan tahun saat ini, tampilkan hanya tanggal dan bulan
-    if (tahun === currentYear) {
-      // Format: DD Bulan (contoh: 15 Jun)
-      return `${tanggal} ${bulan}`;
-    } else {
-      // Format: DD Bulan YYYY (contoh: 15 Jun 2023)
-      return `${tanggal} ${bulan} ${tahun}`;
-    }
-  };
 
   useEffect(() => {
     // Reset cache jika kita mengubah parameter timeRange
@@ -113,15 +78,16 @@ const ReportsSnapshot = () => {
             console.log('Sorted data length:', sortedData.length);
 
             // Ambil data lengkap tanpa filter yang terlalu ketat
-            const totalClicksData = sortedData.map(
-              (day: { totalClicks: number }) =>
-                typeof day.totalClicks === 'number' ? day.totalClicks : 0,
+            const totalClicksData = sortedData.map((day) =>
+              typeof day.totalClicks === 'number' ? day.totalClicks : 0,
             );
 
             // Format tanggal sesuai kebutuhan
             const categories = sortedData
-              .map((day: { date: string }) =>
-                typeof day.date === 'string' ? formatDate(day.date) : '',
+              .map((day) =>
+                typeof day.date === 'string'
+                  ? formatEpochDate(Number(day.date), 'd MMM')
+                  : '',
               )
               .filter((date) => date !== '');
 

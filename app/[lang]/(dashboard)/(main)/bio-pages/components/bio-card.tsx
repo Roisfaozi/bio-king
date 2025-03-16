@@ -3,7 +3,7 @@ import DropdownBio from '@/app/[lang]/(dashboard)/(main)/bio-pages/components/dr
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { credentialsConfig } from '@/config/credentials.config';
-import { formatEpochRelative } from '@/lib/utils';
+import { formatEpochDate } from '@/lib/utils';
 import { BioPagesWithClicksResponse } from '@/models/bio-page-response';
 import { Calendar, Eye } from 'lucide-react';
 import Link from 'next/link';
@@ -12,7 +12,7 @@ interface BioPageProps {
   bio: BioPagesWithClicksResponse;
 }
 
-const BioCard = ({ bio }: BioPageProps) => {
+const BioCard = ({ bio }) => {
   /**
    * @description Bio card component
    * temporary avatar
@@ -72,9 +72,9 @@ const BioCard = ({ bio }: BioPageProps) => {
                 {bio?.created_at ? (
                   <time
                     dateTime={new Date(Number(bio.created_at)).toISOString()}
-                    title={new Date(Number(bio.created_at)).toLocaleString()}
+                    title={formatEpochDate(Number(bio.created_at), 'PPP')}
                   >
-                    Created {formatEpochRelative(Number(bio?.created_at))} ago
+                    {formatEpochDate(Number(bio.created_at), 'PP')}
                   </time>
                 ) : (
                   <span>&mdash;</span>

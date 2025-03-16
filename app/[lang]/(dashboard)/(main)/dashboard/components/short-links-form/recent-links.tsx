@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupText } from '@/components/ui/input-group';
 import { toast } from '@/components/ui/use-toast';
 import { credentialsConfig } from '@/config/credentials.config';
-import { copyToClipboard, formatEpochRelative } from '@/lib/utils';
+import { copyToClipboard, formatEpochDate } from '@/lib/utils';
 import { RecentLinkResponse } from '@/models/shortlink-response';
 import { Icon } from '@iconify/react';
 import { Copy, Eye } from 'lucide-react';
@@ -109,9 +109,9 @@ function LinkList({ link }: LinkListProps) {
           {link?.created_at ? (
             <time
               dateTime={new Date(Number(link.created_at)).toISOString()}
-              title={new Date(Number(link.created_at)).toLocaleString()}
+              title={formatEpochDate(Number(link.created_at), 'PPP')}
             >
-              Created {formatEpochRelative(Number(link?.created_at))} ago
+              {formatEpochDate(Number(link.created_at), 'PP')}
             </time>
           ) : (
             <span>&mdash;</span>

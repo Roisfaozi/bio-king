@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { credentialsConfig } from '@/config/credentials.config';
+import { formatEpochDate } from '@/lib/utils';
 import { ShortlinkWithClicksResponse } from '@/models/shortlink-response';
 import {
   Copy,
@@ -73,17 +74,6 @@ const ShortlinksPageView = ({
   const [linkToDelete, setLinkToDelete] =
     useState<ShortlinkWithClicksResponse | null>(null);
   const router = useRouter();
-
-  const formatDate = (timestamp: bigint | null) => {
-    if (!timestamp) return 'N/A';
-
-    const date = new Date(Number(timestamp));
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
 
   const getStatusBadge = (isActive: boolean | null) => {
     if (isActive === true) {
@@ -278,7 +268,7 @@ const ShortlinksPageView = ({
                       </span>
                     </TableCell>
                     <TableCell className='hidden md:table-cell'>
-                      {formatDate(link.created_at)}
+                      {formatEpochDate(Number(link.created_at), 'PPP')}
                     </TableCell>
                     <TableCell>{getClickCount(link)}</TableCell>
                     <TableCell>{getStatusBadge(link.is_active)}</TableCell>
