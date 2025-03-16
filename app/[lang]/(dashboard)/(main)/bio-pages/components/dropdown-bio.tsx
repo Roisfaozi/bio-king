@@ -65,7 +65,15 @@ const DropdownBio = ({ id }: DropdownBioProps) => {
         avoidCollisions
       >
         <DropdownMenuLabel>Option</DropdownMenuLabel>
-        <DropdownMenuItem>Statistic</DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => router.push(`/bio-pages/${id}/analytics`)}
+        >
+          <Icon
+            icon='heroicons:chart-bar'
+            className='mr-1 h-3.5 w-3.5 text-default-700'
+          />
+          Statistik
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push(`/bio-pages/${id}/edit`)}>
           <Icon
             icon='heroicons:pencil-square'

@@ -102,6 +102,8 @@ export interface AnalyticsResponse {
 export interface AnalyticsParams {
   timeRange?: string; // '7', '30', '60', '90', 'year'
   groupBy?: string; // 'daily', 'weekly', 'monthly'
+  bioId?: string; // ID bio page untuk filter analitik
+  shortlinkId?: string; // ID shortlink untuk filter analitik
 }
 
 export const getAnalytics = async (params?: AnalyticsParams) => {
@@ -117,6 +119,16 @@ export const getAnalytics = async (params?: AnalyticsParams) => {
 
     if (params?.groupBy) {
       queryParams.append('groupBy', params.groupBy);
+    }
+
+    // Tambahkan parameter bioId jika ada
+    if (params?.bioId) {
+      queryParams.append('bioId', params.bioId);
+    }
+
+    // Tambahkan parameter shortlinkId jika ada
+    if (params?.shortlinkId) {
+      queryParams.append('shortlinkId', params.shortlinkId);
     }
 
     // Buat URL dengan parameter query

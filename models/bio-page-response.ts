@@ -41,6 +41,7 @@ interface BioPagesWithClicksResponse extends BioPages {
   _count: {
     clicks: number;
   };
+  is_active: boolean;
 }
 
 export type {

@@ -200,3 +200,22 @@ export const deleteBio = async (id: string) => {
     return error.response.data;
   }
 };
+
+export const getBioById = async (id: string) => {
+  try {
+    const cookie = await getCookie('next-auth.session-token');
+    const response = await api.get(`/bio-pages/${id}`, {
+      headers: {
+        Cookie: `next-auth.session-token=${cookie}`,
+      },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    logError('Error fetching bio page:', error.response?.data || error);
+    return {
+      status: 'error',
+      message: error.response?.data?.message || 'Failed to fetch bio page',
+    };
+  }
+};
