@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: { short: string } },
 ) {
   const shortCode = params.short;
-  const headersList = headers();
+  const headersList = await headers();
   const pathname = headersList.get('x-next-pathname') || '';
   console.log('shottcode', shortCode);
 
@@ -19,6 +19,7 @@ export async function GET(
   const referer = headersList.get('referer') || '';
   const ip = headersList.get('x-forwarded-for') || '';
   const language = headersList.get('accept-language') || '';
+
   // Fetch geo data
   let geoData = null;
   if (ip && ip !== '::1') {
@@ -29,7 +30,6 @@ export async function GET(
       console.error('Error fetching geo data:', error);
     }
   }
-
   const noRLS = await bypassRLS();
   // Get the link
 
@@ -60,6 +60,8 @@ export async function GET(
   const { browser, os, device } = parseUserAgent(userAgent);
   const url = new URL(link.original_url);
   const searchParams = new URLSearchParams(url.search);
+  console.log('ini referer wanjay', referer);
+
   // Check if click is unique
   const existingClick = await noRLS.clicks.findFirst({
     where: {
@@ -127,7 +129,7 @@ export async function GET(
   revalidatePath('/dashboard');
   return NextResponse.redirect(link.original_url || '/', {
     headers: {
-      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Cache-Control': 'public, max-age=86400, immutable',
     },
   });
 }
