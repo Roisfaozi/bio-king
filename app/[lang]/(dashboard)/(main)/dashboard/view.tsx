@@ -1,4 +1,4 @@
-import { getAllBios } from '@/action/bio-action';
+import { getBiosWithClick } from '@/action/bio-action';
 import { getShortlinks } from '@/action/links-action';
 import { getRecentClicks } from '@/action/server-actions';
 import ActivityList from '@/app/[lang]/(dashboard)/(main)/dashboard/components/activity-list';
@@ -24,17 +24,16 @@ const getRecentShortLinks = async () => {
     }
     return [];
   } catch (error) {
-    console.error('Error fetching bio pages:', error);
+    console.error('Error fetching shortlinks:', error);
     return [];
   }
 };
 
 const getBioPages = async () => {
   try {
-    const data = await getAllBios(5);
+    const data = await getBiosWithClick(5);
     if (data.status === 'success') {
       const bio = data.data;
-
       return bio as BioPages[];
     }
     return [];

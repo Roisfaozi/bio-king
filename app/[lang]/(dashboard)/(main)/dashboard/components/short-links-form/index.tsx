@@ -2,10 +2,9 @@ import BulkShortlinkForm from '@/app/[lang]/(dashboard)/(main)/dashboard/compone
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { RecentLinkResponse } from '@/models/shortlink-response';
 import InputFormLink from './link-forms';
 import RecentLink from './recent-links';
-import RecentLinks from './recent-links';
-import { RecentLinkResponse } from '@/models/shortlink-response';
 
 interface DashboardPageViewProps {
   recentLinks: RecentLinkResponse[];

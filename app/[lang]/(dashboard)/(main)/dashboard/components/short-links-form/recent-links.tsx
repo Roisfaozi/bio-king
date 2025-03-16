@@ -2,6 +2,12 @@
 import { Web } from '@/components/svg';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupText } from '@/components/ui/input-group';
 import { toast } from '@/components/ui/use-toast';
@@ -9,14 +15,15 @@ import { credentialsConfig } from '@/config/credentials.config';
 import { copyToClipboard, formatEpochDate } from '@/lib/utils';
 import { RecentLinkResponse } from '@/models/shortlink-response';
 import { Icon } from '@iconify/react';
-import { Copy, Eye } from 'lucide-react';
-import DropdownLinks from './DropdownLinks';
+import { ChartBar, Copy, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface RecentLinkProps {
   recentLinks: RecentLinkResponse[];
 }
 
 const RecentLink = ({ recentLinks }: RecentLinkProps) => {
+  const router = useRouter();
   return (
     <Card>
       <CardHeader className='flex-row items-center justify-between border-none pb-0'>
@@ -46,6 +53,16 @@ interface LinkListProps {
 }
 
 function LinkList({ link }: LinkListProps) {
+  const router = useRouter();
+
+  const handleCopy = (url: string) => {
+    copyToClipboard(credentialsConfig.siteUrl + url, toast);
+  };
+
+  const handleDelete = (link: RecentLinkResponse) => {
+    // Implementasi penghapusan link
+  };
+
   return (
     <div className='space-y-3 px-4 py-[11px] hover:bg-default-50'>
       <div className='flex justify-between'>
@@ -56,37 +73,85 @@ function LinkList({ link }: LinkListProps) {
                 <div className='h-5 w-5 text-primary-200'>
                   <Web />
                 </div>
-                <p className='text-sm font-semibold text-primary'>
-                  {link.type}
-                </p>
+                <div className='flex flex-col'>
+                  <p className='text-sm font-semibold text-primary'>
+                    {link.title || 'Untitled'}
+                  </p>
+                  <p className='text-xs text-muted-foreground'>
+                    {link.type === 'bio'
+                      ? `@${link.url.split('/').pop()}`
+                      : link.type}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div className='flex items-start'>
-          <DropdownLinks />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <MoreHorizontal className='h-4 w-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              {link.type === 'shortlink' && (
+                <DropdownMenuItem
+                  onClick={() =>
+                    router.push(`/shortlinks/${link.url.slice(1)}/analytics`)
+                  }
+                >
+                  <ChartBar className='mr-2 h-4 w-4' />
+                  Statistik
+                </DropdownMenuItem>
+              )}
+              {link.type === 'bio' && (
+                <DropdownMenuItem
+                  onClick={() => router.push(`/bio-pages/${link.id}/analytics`)}
+                >
+                  <ChartBar className='mr-2 h-4 w-4' />
+                  Statistik
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                className='flex items-center gap-2'
+                onClick={() => handleCopy(link.url)}
+              >
+                <Copy className='h-4 w-4' />
+                Salin Link
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className='flex items-center gap-2 text-destructive'
+                onClick={() => handleDelete(link)}
+              >
+                <Trash2 className='h-4 w-4' />
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <div className='hidden gap-3 sm:flex'>
         <div
-          className={`rounded-md ${link.status === 'online' ? 'bg-success' : 'bg-destructive'} p-[2px]`}
+          className={`rounded-md ${link.status === 'online' ? 'bg-success' : 'bg-destructive'} px-2 py-1`}
         >
-          <p className='text-sm font-medium text-primary-foreground'>
+          <p className='text-xs font-medium text-primary-foreground'>
             {link.status}
           </p>
         </div>
-        <div className='flex items-center justify-center gap-2'>
+        <div className='flex items-center justify-center gap-2 text-xs text-muted-foreground'>
           <Eye className='h-4 w-4' />
           {link.visibility}
         </div>
       </div>
       <div className='flex gap-3'>
-        <div className={`rounded-md p-[2px]`}>
+        <div className={`rounded-md`}>
           <a
-            href={link.url}
+            href={credentialsConfig.siteUrl + link.url}
             target='_blank'
             rel='noopener noreferrer'
-            className='text-sm font-medium text-primary'
+            className='text-sm font-medium text-primary hover:underline'
           >
             {credentialsConfig.siteUrl + link.url}
           </a>
@@ -96,15 +161,13 @@ function LinkList({ link }: LinkListProps) {
             className='h-6 w-6'
             variant='ghost'
             size='icon'
-            onClick={() =>
-              copyToClipboard(credentialsConfig.siteUrl + link.url, toast)
-            }
+            onClick={() => handleCopy(link.url)}
           >
             <Copy className='h-4 w-4' />
           </Button>
         </div>
       </div>
-      <div className='flex w-full flex-wrap gap-2'>
+      <div className='flex w-full flex-wrap items-center gap-4 text-xs text-muted-foreground'>
         <p className='flex items-center gap-2'>
           {link?.created_at ? (
             <time

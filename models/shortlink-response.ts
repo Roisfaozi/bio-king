@@ -13,5 +13,5 @@ export interface RecentLinkResponse {
   visibility: 'public' | 'private';
   title: string;
   url: string;
-  created_at: Date | bigint;
+  created_at: bigint | null;
 }
