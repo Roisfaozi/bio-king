@@ -158,8 +158,8 @@ export function InteractiveBackground({
       baseOpacity: number;
 
       constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
+        this.x = Math.random() * (canvas?.width ?? 0);
+        this.y = Math.random() * (canvas?.height ?? 0);
         this.baseSize = 2 + Math.random() * 3;
         this.size = this.baseSize;
         this.color = colors[Math.floor(Math.random() * colors.length)];
@@ -174,10 +174,10 @@ export function InteractiveBackground({
         this.y += this.speedY;
 
         // Wrap around edges
-        if (this.x < 0) this.x = canvas.width;
-        else if (this.x > canvas.width) this.x = 0;
-        if (this.y < 0) this.y = canvas.height;
-        else if (this.y > canvas.height) this.y = 0;
+        if (this.x < 0) this.x = canvas?.width ?? 0;
+        else if (this.x > (canvas?.width ?? 0)) this.x = 0;
+        if (this.y < 0) this.y = canvas?.height ?? 0;
+        else if (this.y > (canvas?.height ?? 0)) this.y = 0;
 
         // Reset size and opacity
         this.size = this.baseSize;
@@ -205,6 +205,7 @@ export function InteractiveBackground({
       }
 
       draw() {
+        if (!ctx) return;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.opacity})`;

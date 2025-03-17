@@ -1,4 +1,3 @@
-import { Crown } from 'lucide-react';
 import Link from 'next/link';
 
 interface LogoProps {
@@ -30,13 +29,6 @@ export function Logo({ className, size = 'md' }: LogoProps) {
       href='/'
       className={`flex items-center gap-2 font-bold ${sizes[size]} ${className}`}
     >
-      <div
-        className={`${containerSizes[size]} shadow-glow relative flex items-center justify-center overflow-hidden rounded-lg bg-gradient-primary`}
-      >
-        <div className='absolute inset-0 bg-black/10'></div>
-        <div className='absolute inset-0 bg-gradient-radial from-white/20 to-transparent opacity-50'></div>
-        <Crown className={`${iconSizes[size]} relative z-10 text-white`} />
-      </div>
       <span className='flex items-center'>
         <span className='text-foreground'>Bio</span>
         <span className='gradient-text text-glow'>King</span>

@@ -135,10 +135,9 @@ export function GeometricShapesBackground({
       pulseSpeed: number;
       pulseAmount: number;
       pulsePhase: number;
-
       constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
+        this.x = Math.random() * (canvas?.width ?? 0);
+        this.y = Math.random() * (canvas?.height ?? 0);
         this.size = 20 + Math.random() * 60;
         this.color = colors[Math.floor(Math.random() * colors.length)];
         this.type = ['triangle', 'square', 'circle', 'hexagon'][
@@ -164,10 +163,10 @@ export function GeometricShapesBackground({
 
         // Wrap around edges with some padding
         const padding = this.size;
-        if (this.x < -padding) this.x = canvas.width + padding;
-        else if (this.x > canvas.width + padding) this.x = -padding;
-        if (this.y < -padding) this.y = canvas.height + padding;
-        else if (this.y > canvas.height + padding) this.y = -padding;
+        if (this.x < -padding && canvas) this.x = canvas.width + padding;
+        else if (this.x > (canvas?.width ?? 0) + padding) this.x = -padding;
+        if (this.y < -padding && canvas) this.y = canvas.height + padding;
+        else if (this.y > (canvas?.height ?? 0) + padding) this.y = -padding;
 
         // Pulse effect
         const pulseFactor =
@@ -179,6 +178,8 @@ export function GeometricShapesBackground({
 
       draw(pulseFactor: number) {
         const size = this.size * pulseFactor;
+
+        if (!ctx) return;
 
         ctx.save();
         ctx.translate(this.x, this.y);

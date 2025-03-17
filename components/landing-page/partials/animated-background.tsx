@@ -93,10 +93,9 @@ export function AnimatedBackground({
       speedX: number;
       speedY: number;
       color: string;
-
       constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
+        this.x = Math.random() * (canvas?.width || 0);
+        this.y = Math.random() * (canvas?.height || 0);
         this.size = Math.random() * 3 + 1;
         this.speedX = (Math.random() - 0.5) * speedFactor;
         this.speedY = (Math.random() - 0.5) * speedFactor;
@@ -107,13 +106,13 @@ export function AnimatedBackground({
         this.x += this.speedX;
         this.y += this.speedY;
 
-        if (this.x > canvas.width) this.x = 0;
-        else if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        else if (this.y < 0) this.y = canvas.height;
+        if (this.x > (canvas?.width ?? 0)) this.x = 0;
+        else if (this.x < 0) this.x = canvas?.width ?? 0;
+        if (this.y > (canvas?.height ?? 0)) this.y = 0;
+        else if (this.y < 0) this.y = canvas?.height ?? 0;
       }
-
       draw() {
+        if (!ctx) return;
         ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);

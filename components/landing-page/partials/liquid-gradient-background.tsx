@@ -137,12 +137,11 @@ export function LiquidGradientBackground({
         // Position points evenly around the canvas
         const slice = (Math.PI * 2) / pointCount;
         const angle = slice * index;
-
         // Position points outside the canvas for a full-screen effect
-        const radius = Math.max(canvas.width, canvas.height) * 0.7;
+        const radius = Math.max(canvas?.width || 0, canvas?.height || 0) * 0.7;
 
-        this.baseX = canvas.width / 2 + Math.cos(angle) * radius;
-        this.baseY = canvas.height / 2 + Math.sin(angle) * radius;
+        this.baseX = (canvas?.width || 0) / 2 + Math.cos(angle) * radius;
+        this.baseY = (canvas?.height || 0) / 2 + Math.sin(angle) * radius;
 
         this.x = this.baseX;
         this.y = this.baseY;

@@ -134,8 +134,8 @@ export function BubbleBackground({
       pulsePhase: number;
 
       constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = canvas.height + Math.random() * 100;
+        this.x = Math.random() * (canvas?.width ?? 0);
+        this.y = (canvas?.height ?? 0) + Math.random() * 100;
         this.radius = 5 + Math.random() * 20;
         this.color = colors[Math.floor(Math.random() * colors.length)];
         this.speedY = (0.2 + Math.random() * 0.8) * speedFactor;
@@ -152,14 +152,14 @@ export function BubbleBackground({
 
         // Reset bubble when it goes off screen
         if (this.y < -this.radius * 2) {
-          this.y = canvas.height + this.radius;
-          this.x = Math.random() * canvas.width;
+          this.y = (canvas?.height ?? 0) + this.radius;
+          this.x = Math.random() * (canvas?.width ?? 0);
         }
 
         // Bounce off walls
         if (this.x < -this.radius) {
-          this.x = canvas.width + this.radius;
-        } else if (this.x > canvas.width + this.radius) {
+          this.x = (canvas?.width ?? 0) + this.radius;
+        } else if (this.x > (canvas?.width ?? 0) + this.radius) {
           this.x = -this.radius;
         }
 
@@ -175,6 +175,8 @@ export function BubbleBackground({
         const radius = this.radius * pulseFactor;
 
         // Create gradient for bubble
+        if (!ctx) return;
+
         const gradient = ctx.createRadialGradient(
           this.x,
           this.y,
@@ -184,20 +186,22 @@ export function BubbleBackground({
           radius,
         );
 
-        gradient.addColorStop(
-          0,
-          `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.opacity})`,
-        );
-        gradient.addColorStop(
-          0.8,
-          `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.opacity * 0.5})`,
-        );
-        gradient.addColorStop(
-          1,
-          `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0)`,
-        );
+        if (gradient) {
+          gradient.addColorStop(
+            0,
+            `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.opacity})`,
+          );
+          gradient.addColorStop(
+            0.8,
+            `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.opacity * 0.5})`,
+          );
+          gradient.addColorStop(
+            1,
+            `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0)`,
+          );
 
-        ctx.fillStyle = gradient;
+          ctx.fillStyle = gradient;
+        }
         ctx.beginPath();
         ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
         ctx.fill();

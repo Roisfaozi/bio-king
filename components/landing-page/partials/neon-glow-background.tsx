@@ -129,8 +129,8 @@ export function NeonGlowBackground({
       opacity: number;
 
       constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
+        this.x = Math.random() * (canvas?.width ?? 0);
+        this.y = Math.random() * (canvas?.height ?? 0);
         this.radius = 100 + Math.random() * 150;
         this.color = colors[Math.floor(Math.random() * colors.length)];
         this.angle = Math.random() * Math.PI * 2;
@@ -152,10 +152,10 @@ export function NeonGlowBackground({
 
         // Wrap around edges with some padding
         const padding = this.radius;
-        if (this.x < -padding) this.x = canvas.width + padding;
-        else if (this.x > canvas.width + padding) this.x = -padding;
-        if (this.y < -padding) this.y = canvas.height + padding;
-        else if (this.y > canvas.height + padding) this.y = -padding;
+        if (this.x < -padding) this.x = (canvas?.width ?? 0) + padding;
+        else if (this.x > (canvas?.width ?? 0) + padding) this.x = -padding;
+        if (this.y < -padding) this.y = (canvas?.height ?? 0) + padding;
+        else if (this.y > (canvas?.height ?? 0) + padding) this.y = -padding;
 
         // Pulse effect
         const pulseFactor =
@@ -169,6 +169,7 @@ export function NeonGlowBackground({
         const radius = this.radius * pulseFactor;
 
         // Create gradient for neon glow
+        if (!ctx) return;
         const gradient = ctx.createRadialGradient(
           this.x,
           this.y,

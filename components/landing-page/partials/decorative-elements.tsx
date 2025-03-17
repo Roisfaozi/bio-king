@@ -116,7 +116,7 @@ export function DecorativeElements({
       // Set variant-specific styles
       let elementVariant = variant;
       if (variant === 'mixed') {
-        const variants = ['dots', 'lines', 'circles', 'squares'];
+        const variants = ['dots', 'lines', 'circles', 'squares'] as const;
         elementVariant = variants[Math.floor(Math.random() * variants.length)];
       }
 

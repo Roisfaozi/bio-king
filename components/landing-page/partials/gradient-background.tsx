@@ -1,21 +1,21 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-interface GradientBackgroundProps {
+interface InteractiveBackgroundProps {
   variant?: 'purple' | 'blue' | 'orange' | 'green' | 'pink' | 'rainbow';
   intensity?: 'light' | 'medium' | 'strong';
-  speed?: 'slow' | 'medium' | 'fast';
   className?: string;
 }
 
-export function GradientBackground({
+export function InteractiveBackground({
   variant = 'purple',
   intensity = 'medium',
-  speed = 'medium',
   className = '',
-}: GradientBackgroundProps) {
+}: InteractiveBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isMouseInCanvas, setIsMouseInCanvas] = useState(false);
 
   // Get colors based on variant
   const getColors = () => {
@@ -73,27 +73,13 @@ export function GradientBackground({
   const getOpacity = () => {
     switch (intensity) {
       case 'light':
-        return 0.15;
+        return 0.1;
       case 'medium':
-        return 0.25;
+        return 0.2;
       case 'strong':
-        return 0.35;
+        return 0.3;
       default:
-        return 0.25;
-    }
-  };
-
-  // Set animation speed
-  const getSpeedFactor = () => {
-    switch (speed) {
-      case 'slow':
-        return 0.001;
-      case 'medium':
-        return 0.002;
-      case 'fast':
-        return 0.004;
-      default:
-        return 0.002;
+        return 0.2;
     }
   };
 
@@ -113,64 +99,184 @@ export function GradientBackground({
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    const colors = getColors();
-    const opacity = getOpacity();
-    const speedFactor = getSpeedFactor();
+    // Mouse event handlers
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      setMousePosition({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      });
+    };
 
-    // Create gradient blobs
-    const blobs = colors.map((color, index) => {
-      return {
-        x: (canvas.width * (index + 1)) / (colors.length + 1),
-        y: canvas.height * (0.3 + Math.random() * 0.4),
-        radius:
-          Math.min(canvas.width, canvas.height) * (0.15 + Math.random() * 0.15),
-        color: { ...color },
-        angle: Math.random() * Math.PI * 2,
-        speed: speedFactor * (0.8 + Math.random() * 0.4),
-        range: Math.min(canvas.width, canvas.height) * 0.15,
-      };
-    });
+    const handleMouseEnter = () => {
+      setIsMouseInCanvas(true);
+    };
+
+    const handleMouseLeave = () => {
+      setIsMouseInCanvas(false);
+    };
+
+    // Touch event handlers for mobile
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect();
+        setMousePosition({
+          x: e.touches[0].clientX - rect.left,
+          y: e.touches[0].clientY - rect.top,
+        });
+        setIsMouseInCanvas(true);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      setIsMouseInCanvas(false);
+    };
+
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseenter', handleMouseEnter);
+    canvas.addEventListener('mouseleave', handleMouseLeave);
+    canvas.addEventListener('touchmove', handleTouchMove);
+    canvas.addEventListener('touchend', handleTouchEnd);
+
+    const colors = getColors();
+    const baseOpacity = getOpacity();
+
+    // Create particles
+    const particleCount = Math.floor((canvas.width * canvas.height) / 15000);
+    const particles: Particle[] = [];
+    const interactionRadius = 150;
+
+    class Particle {
+      x: number;
+      y: number;
+      size: number;
+      baseSize: number;
+      color: { r: number; g: number; b: number };
+      speedX: number;
+      speedY: number;
+      opacity: number;
+      baseOpacity: number;
+
+      constructor() {
+        this.x = Math.random() * (canvas?.width || 0);
+        this.y = Math.random() * (canvas?.height || 0);
+        this.baseSize = 2 + Math.random() * 3;
+        this.size = this.baseSize;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
+        this.baseOpacity = (0.3 + Math.random() * 0.7) * baseOpacity;
+        this.opacity = this.baseOpacity;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        // Wrap around edges
+        if (this.x < 0) this.x = canvas?.width || 0;
+        else if (this.x > (canvas?.width || 0)) this.x = 0;
+        if (this.y < 0) this.y = canvas?.height || 0;
+        else if (this.y > (canvas?.height || 0)) this.y = 0;
+
+        // Reset size and opacity
+        this.size = this.baseSize;
+        this.opacity = this.baseOpacity;
+
+        // Interact with mouse
+        if (isMouseInCanvas) {
+          const dx = this.x - mousePosition.x;
+          const dy = this.y - mousePosition.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < interactionRadius) {
+            // Calculate influence (stronger closer to mouse)
+            const influence = 1 - distance / interactionRadius;
+
+            // Move away from mouse
+            this.x += dx * 0.02 * influence;
+            this.y += dy * 0.02 * influence;
+
+            // Increase size and opacity based on proximity
+            this.size += this.baseSize * 2 * influence;
+            this.opacity += (1 - this.baseOpacity) * influence;
+          }
+        }
+      }
+
+      draw() {
+        if (!ctx) return;
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.opacity})`;
+        ctx.fill();
+      }
+    }
+
+    // Initialize particles
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
 
     // Animation loop
     let animationFrame: number;
-    let time = 0;
 
     const animate = () => {
-      time += 1;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Update and draw blobs
-      blobs.forEach((blob) => {
-        // Move blob in a circular pattern
-        blob.x =
-          blob.x + Math.cos(blob.angle + time * blob.speed) * blob.range * 0.02;
-        blob.y =
-          blob.y + Math.sin(blob.angle + time * blob.speed) * blob.range * 0.02;
+      // Update and draw particles
+      particles.forEach((particle) => {
+        particle.update();
+        particle.draw();
+      });
 
-        // Draw gradient blob
+      // Draw connections between particles
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 100) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(${particles[i].color.r}, ${particles[i].color.g}, ${particles[i].color.b}, ${particles[i].opacity * (1 - distance / 100) * 0.5})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw mouse interaction area
+      if (isMouseInCanvas) {
         const gradient = ctx.createRadialGradient(
-          blob.x,
-          blob.y,
+          mousePosition.x,
+          mousePosition.y,
           0,
-          blob.x,
-          blob.y,
-          blob.radius,
+          mousePosition.x,
+          mousePosition.y,
+          interactionRadius,
         );
 
+        const color = colors[0];
         gradient.addColorStop(
           0,
-          `rgba(${blob.color.r}, ${blob.color.g}, ${blob.color.b}, ${opacity})`,
+          `rgba(${color.r}, ${color.g}, ${color.b}, ${baseOpacity * 0.5})`,
         );
-        gradient.addColorStop(
-          1,
-          `rgba(${blob.color.r}, ${blob.color.g}, ${blob.color.b}, 0)`,
-        );
+        gradient.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`);
 
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(blob.x, blob.y, blob.radius, 0, Math.PI * 2);
+        ctx.arc(
+          mousePosition.x,
+          mousePosition.y,
+          interactionRadius,
+          0,
+          Math.PI * 2,
+        );
         ctx.fill();
-      });
+      }
 
       animationFrame = requestAnimationFrame(animate);
     };
@@ -179,15 +285,20 @@ export function GradientBackground({
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('mouseenter', handleMouseEnter);
+      canvas.removeEventListener('mouseleave', handleMouseLeave);
+      canvas.removeEventListener('touchmove', handleTouchMove);
+      canvas.removeEventListener('touchend', handleTouchEnd);
       cancelAnimationFrame(animationFrame);
     };
-  }, [variant, intensity, speed]);
+  }, [variant, intensity, mousePosition, isMouseInCanvas]);
 
   return (
     <canvas
       ref={canvasRef}
       className={`absolute inset-0 -z-10 ${className}`}
-      style={{ pointerEvents: 'none' }}
+      style={{ pointerEvents: 'auto', cursor: 'pointer' }}
     />
   );
 }

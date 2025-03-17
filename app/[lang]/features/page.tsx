@@ -1,5 +1,5 @@
 import { BubbleBackground } from '@/components/landing-page/partials/bubble-background';
-import { GradientBackground } from '@/components/landing-page/partials/gradient-background';
+import { LiquidGradientBackground } from '@/components/landing-page/partials/liquid-gradient-background';
 import { Logo } from '@/components/landing-page/partials/logo';
 import { PatternBackground } from '@/components/landing-page/partials/pattern-background';
 import { WaveBackground } from '@/components/landing-page/partials/wave-background';
@@ -782,7 +782,7 @@ export default function MarketingPage() {
         {/* CTA Section */}
         {/* Add the animated background to the CTA section */}
         <section className='bg-animated-gradient-purple relative w-full overflow-hidden py-12 md:py-24 lg:py-32'>
-          <GradientBackground
+          <LiquidGradientBackground
             variant='rainbow'
             intensity='medium'
             speed='slow'
