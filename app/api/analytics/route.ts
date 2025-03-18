@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const timeRange = searchParams.get('timeRange') || '30'; // Default 30 hari
     const groupBy = searchParams.get('groupBy') || 'daily'; // Default daily
+    const includePages = searchParams.get('includePages') === 'true'; // Untuk menampilkan data tracking halaman
 
     // Tentukan rentang waktu berdasarkan parameter timeRange
     const endDate = new Date();
@@ -567,6 +568,78 @@ export async function GET(request: NextRequest) {
       take: 20,
     });
 
+    // Tambahkan query untuk page tracking
+    let pageTrackingData: any = null;
+    if (includePages) {
+      // Ambil statistik dari setiap jenis halaman
+      const pageTypeStats = await dbBypass.clicks.groupBy({
+        by: ['platform'],
+        where: {
+          platform: {
+            in: ['page', 'feature', 'pricing', 'tinder'],
+          },
+          created_at: {
+            gte: startTimestamp,
+            lte: endTimestamp,
+          },
+        },
+        _count: true,
+        orderBy: {
+          _count: {
+            platform: 'desc',
+          },
+        },
+      });
+
+      // Ambil trends kunjungan halaman berdasarkan waktu
+      const pageTrends = await Promise.all(
+        ['page', 'feature', 'pricing', 'tinder'].map(async (pageType) => {
+          const dailyVisits = await dbBypass.clicks.groupBy({
+            by: ['created_at'],
+            where: {
+              platform: pageType,
+              created_at: {
+                gte: startTimestamp,
+                lte: endTimestamp,
+              },
+            },
+            _count: true,
+          });
+
+          return {
+            pageType,
+            visits: dailyVisits.map((item) => ({
+              date: getFormattedDate(item.created_at || BigInt(0), groupBy),
+              count: item._count,
+            })),
+          };
+        }),
+      );
+
+      // Buat array tanggal untuk semua data
+      const datesArray = generateDateArray(startDate, endDate, groupBy);
+
+      // Format data untuk chart
+      const pageVisitsByDate = datesArray.map((dateObj) => {
+        const result: any = { date: dateObj.date };
+
+        pageTrends.forEach((trend) => {
+          const matchingData = trend.visits.find(
+            (v) => v.date === dateObj.date,
+          );
+          result[trend.pageType] = matchingData ? matchingData.count : 0;
+        });
+
+        return result;
+      });
+
+      // Simpan data ke response
+      pageTrackingData = {
+        pageTypeStats,
+        pageVisitsByDate,
+      };
+    }
+
     return NextResponse.json(
       {
         status: 'success',
@@ -598,6 +671,7 @@ export async function GET(request: NextRequest) {
             countries: countryData,
             recent: recentVisitors,
           },
+          pages: pageTrackingData,
           timeRange,
           groupBy,
         },

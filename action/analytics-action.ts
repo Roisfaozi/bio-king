@@ -97,6 +97,18 @@ export interface AnalyticsResponse {
         } | null;
       }>;
     };
+    pages?: {
+      pageTypeStats: Array<{
+        platform: string;
+        _count: number;
+      }>;
+      pageVisitsByDate: Array<{
+        date: string;
+        [key: string]: number | string;
+      }>;
+    };
+    timeRange: string;
+    groupBy: string;
   };
 }
 
@@ -105,6 +117,7 @@ export interface AnalyticsParams {
   groupBy?: string; // 'daily', 'weekly', 'monthly'
   bioId?: string; // ID bio page untuk filter analitik
   shortlinkId?: string; // ID shortlink untuk filter analitik
+  includePages?: boolean;
 }
 
 export const getAnalytics = async (params?: AnalyticsParams) => {
@@ -130,6 +143,11 @@ export const getAnalytics = async (params?: AnalyticsParams) => {
     // Tambahkan parameter shortlinkId jika ada
     if (params?.shortlinkId) {
       queryParams.append('shortlinkId', params.shortlinkId);
+    }
+
+    // Tambahkan parameter includePages jika ada
+    if (params?.includePages) {
+      queryParams.append('includePages', 'true');
     }
 
     // Buat URL dengan parameter query

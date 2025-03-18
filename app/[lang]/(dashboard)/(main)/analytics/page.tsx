@@ -11,8 +11,8 @@ interface AnalyticsPageProps {
 const AnalyticsPage = async ({ params: { lang } }: AnalyticsPageProps) => {
   const trans = await getDictionary(lang);
 
-  // Fetch analytics data
-  const response = await getAnalytics();
+  // Fetch analytics data with page tracking enabled
+  const response = await getAnalytics({ includePages: true });
 
   return <AnalyticsView trans={trans} analytics={response} />;
 };

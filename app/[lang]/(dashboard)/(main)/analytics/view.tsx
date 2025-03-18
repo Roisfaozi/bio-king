@@ -3,6 +3,7 @@
 import { AnalyticsResponse } from '@/action/analytics-action';
 import Analitycs from '@/app/[lang]/(dashboard)/(main)/analytics/components/analitycs';
 import Maps from '@/app/[lang]/(dashboard)/(main)/analytics/components/maps';
+import PageTracking from '@/app/[lang]/(dashboard)/(main)/analytics/components/page-tracking';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -50,6 +51,7 @@ const AnalyticsView = ({ trans, analytics }: AnalyticsViewProps) => {
           <TabsTrigger value='charts'>Charts</TabsTrigger>
           <TabsTrigger value='visitors'>Visitors</TabsTrigger>
           <TabsTrigger value='map'>Map</TabsTrigger>
+          <TabsTrigger value='pages'>Pages</TabsTrigger>
         </TabsList>
 
         <TabsContent value='overview' className='space-y-4'>
@@ -413,6 +415,22 @@ const AnalyticsView = ({ trans, analytics }: AnalyticsViewProps) => {
             </Card>
           ) : (
             <Maps analytics={analytics} />
+          )}
+        </TabsContent>
+
+        <TabsContent value='pages' className='space-y-4'>
+          {!hasData ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>No Data Available</CardTitle>
+                <CardDescription>
+                  {(analytics as { message: string }).message ||
+                    'Failed to load analytics data'}
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          ) : (
+            <PageTracking analytics={analytics as AnalyticsResponse} />
           )}
         </TabsContent>
       </Tabs>
