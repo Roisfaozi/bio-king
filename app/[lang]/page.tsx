@@ -1,19 +1,16 @@
 'use client';
 import Header from '@/components/landing-page/header';
-import { BubbleBackground } from '@/components/landing-page/partials/bubble-background';
 import { CTASection } from '@/components/landing-page/partials/cta-section';
 import { DecorativeElementsOptimized } from '@/components/landing-page/partials/decorative-elements-optimized';
 import { FloatingElementsBackground } from '@/components/landing-page/partials/floating-elements-background';
-import { GeometricShapesBackground } from '@/components/landing-page/partials/geometric-shapes-background';
 import { GradientText } from '@/components/landing-page/partials/gradient-text';
-import { InteractiveBackground } from '@/components/landing-page/partials/interactive-background';
-import { LiquidGradientBackground } from '@/components/landing-page/partials/liquid-gradient-background';
 import { NeonGlowBackground } from '@/components/landing-page/partials/neon-glow-background';
-import { PatternBackground } from '@/components/landing-page/partials/pattern-background';
-import { StatsCard } from '@/components/landing-page/partials/stats-card';
-import { WaveBackground } from '@/components/landing-page/partials/wave-background';
+import { OptimizedBackground } from '@/components/landing-page/partials/optimized-background';
+import Stats from '@/components/landing-page/stats';
 import logo from '@/public/images/logo/logo-2.png';
 import constructionImage from '@/public/images/utility/construction-light.png';
+import { motion } from 'framer-motion';
+
 import {
   ArrowRight,
   BarChart3,
@@ -277,59 +274,85 @@ const HomePage = () => {
       </section>
 
       {/* Brands Section - Using WaveBackground */}
-      <section className='shadow-brands relative w-full border-y bg-muted/30 py-8'>
-        <WaveBackground variant='blue' intensity='medium' speed='medium' />
-        <div className='container px-4 md:px-6'>
-          <div className='flex flex-col items-center justify-center space-y-4 text-center'>
-            <p className='text-sm text-muted-foreground'>
-              TRUSTED BY LEADING CREATORS AND BRANDS
-            </p>
-            <div className='flex flex-wrap justify-center gap-8 md:gap-12 lg:gap-16'>
-              {brands.map((brand, i) => (
-                <div key={brand} className='flex items-center justify-center'>
-                  <span
-                    className='animate-fade-in text-xl font-semibold text-muted-foreground/70 transition-colors hover:text-primary'
-                    style={{ animationDelay: `${i * 0.1}s` }}
-                  >
-                    {brand}
-                  </span>
-                </div>
-              ))}
+      <section className='relative overflow-hidden py-24 sm:py-32'>
+        {/* Animated background elements */}
+        <div className='absolute inset-0 -z-10 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.05),transparent_25%),radial-gradient(circle_at_70%_60%,rgba(120,119,198,0.1),transparent_25%)]' />
+        <div className='absolute -right-40 -top-40 h-80 w-80 rounded-full bg-purple-200/20 blur-3xl' />
+        <div className='absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-blue-200/20 blur-3xl' />
+
+        <div className='container relative px-4 md:px-6'>
+          <div className='flex flex-col items-center justify-center space-y-16'>
+            {/* Header with animated underline */}
+            <div className='relative text-center'>
+              <motion.span
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className='text-sm font-medium tracking-widest text-muted-foreground'
+              >
+                POWERING INNOVATION ACROSS THE GLOBE
+              </motion.span>
+              <motion.h2
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className='mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl'
+              >
+                Trusted by Industry Leaders
+              </motion.h2>
+              <motion.div
+                initial={{ width: '0%' }}
+                animate={{ width: '100%' }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className='mx-auto mt-4 h-1 w-24 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-500'
+              />
+            </div>
+
+            {/* 3D rotating brand carousel */}
+            <div className='mx-auto w-full max-w-6xl'>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+                className='relative py-10'
+              >
+                <motion.div
+                  animate={{ x: [0, -1500] }}
+                  transition={{
+                    duration: 40,
+                    repeat: Infinity,
+                    repeatType: 'loop',
+                    ease: 'linear',
+                  }}
+                  className='flex space-x-16'
+                >
+                  {/* First set of brands */}
+                  {brands.concat(brands).map((brand, i) => (
+                    <motion.div
+                      key={`brand-${i}`}
+                      whileHover={{ scale: 1.1, y: -5 }}
+                      className='group flex-shrink-0'
+                    >
+                      <div className='relative flex h-20 w-40 items-center justify-center overflow-hidden rounded-xl border border-foreground/5 bg-background/50 px-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-primary/20 hover:shadow-primary/10'>
+                        <span className='bg-gradient-to-r from-foreground to-foreground bg-clip-text text-xl font-bold text-transparent transition-all duration-300 group-hover:from-primary group-hover:to-blue-500'>
+                          {brand}
+                        </span>
+                        <div className='absolute inset-0 rounded-xl ring-1 ring-inset ring-foreground/5 group-hover:ring-primary/20' />
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </motion.div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Stats Section - Using GradientBackground */}
-      <section className='relative py-24'>
-        <LiquidGradientBackground
-          variant='rainbow'
-          intensity='medium'
-          speed='medium'
-          className='absolute inset-0'
-        />
-        <div className='container mx-auto'>
-          <div className='mx-auto grid max-w-4xl grid-cols-1 gap-8 md:grid-cols-3'>
-            {stats.map((stat, index) => (
-              <StatsCard
-                key={index}
-                number={stat.value}
-                label={stat.label}
-                color={index === 0 ? 'purple' : index === 1 ? 'blue' : 'green'}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+      <Stats stats={stats} />
 
       {/* Features Section - Using LiquidGradientBackground instead of OptimizedBackground */}
       <section className='shadow-features relative w-full py-12 md:py-24 lg:py-32'>
-        <LiquidGradientBackground
-          variant='rainbow'
-          intensity='medium'
-          speed='medium'
-          className='absolute inset-0'
-        />
         <div className='container px-4 md:px-6'>
           <div className='scroll-fade-in mb-12 flex flex-col items-center justify-center space-y-4 text-center'>
             <div className='bg-gradient-primary/10 inline-flex items-center space-x-2 rounded-full px-3 py-1 text-sm font-medium text-primary'>
@@ -374,7 +397,6 @@ const HomePage = () => {
 
       {/* Product Showcase Section - Using BubbleBackground */}
       <section className='relative bg-muted/30 px-6 py-20 lg:px-10'>
-        <BubbleBackground variant='rainbow' intensity='medium' speed='slow' />
         <div className='container relative z-10 mx-auto'>
           <div className='flex flex-col items-center gap-16 lg:flex-row'>
             <div className='w-full lg:w-1/2'>
@@ -431,10 +453,15 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
+      <OptimizedBackground
+        variant='particles'
+        color='purple'
+        intensity='light'
+        speed='slow'
+        className='!w-full'
+      />
       {/* Analytics Section - Using InteractiveBackground */}
       <section className='relative w-full py-12 md:py-24 lg:py-32'>
-        <InteractiveBackground variant='rainbow' intensity='medium' />
         <div className='container relative z-10 mx-auto px-4 md:px-6'>
           <div className='scroll-fade-in-left flex flex-col justify-center space-y-4'>
             <div className='inline-flex items-center space-x-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary'>
@@ -512,11 +539,12 @@ const HomePage = () => {
 
       {/* Testimonials Section - Using GeometricShapesBackground */}
       <section className='shadow-testimonials relative w-full py-12 md:py-24 lg:py-32'>
-        <GeometricShapesBackground
-          variant='rainbow'
+        <OptimizedBackground
+          variant='particles'
+          color='blue'
           intensity='medium'
-          speed='medium'
         />
+
         <div className='container relative z-10 px-4 md:px-6'>
           <div className='scroll-fade-in mb-12 flex flex-col items-center justify-center space-y-4 text-center'>
             <div className='inline-flex items-center space-x-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary'>
@@ -592,12 +620,6 @@ const HomePage = () => {
 
       {/* Footer - Using PatternBackground */}
       <footer className='shadow-footer relative w-full border-t bg-background/80 backdrop-blur-sm'>
-        <PatternBackground
-          variant='hexagons'
-          intensity='medium'
-          className='absolute inset-0'
-          animated
-        />
         <div className='container relative z-10 px-4 py-12 md:px-6'>
           <div className='grid gap-8 md:grid-cols-2 lg:grid-cols-4'>
             <div className='space-y-4'>

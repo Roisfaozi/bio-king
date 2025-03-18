@@ -113,7 +113,7 @@ export function OptimizedBackground({
     if (lowPerformanceMode) {
       return 10;
     }
-
+    if (variant === 'liquid') return 20;
     return variant === 'particles' ? 30 : 15;
   };
 
@@ -254,6 +254,10 @@ export function OptimizedBackground({
           // Adjust target FPS if performance is poor
           if (fps < 30 && targetFps > 30) {
             targetFps = 30;
+            fpsInterval = 1000 / targetFps;
+          } else if (fps > 50 && !lowPerformanceMode) {
+            // If device can handle it, increase quality
+            targetFps = 60;
             fpsInterval = 1000 / targetFps;
           }
         }
@@ -536,7 +540,7 @@ export function OptimizedBackground({
     baseOpacity: number,
     speedFactor: number,
   ) {
-    const pointCount = 8;
+    const pointCount = 12;
     const points = [];
 
     for (let i = 0; i < pointCount; i++) {
@@ -545,7 +549,7 @@ export function OptimizedBackground({
       const angle = slice * i;
 
       // Position points outside the canvas for a full-screen effect
-      const radius = Math.max(canvas.width, canvas.height) * 0.7;
+      const radius = Math.max(canvas.width, canvas.height) * 0.8;
 
       const baseX = canvas.width / 2 + Math.cos(angle) * radius;
       const baseY = canvas.height / 2 + Math.sin(angle) * radius;

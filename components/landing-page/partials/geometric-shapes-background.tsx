@@ -103,11 +103,17 @@ export function GeometricShapesBackground({
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    const shapes: Shape[] = [];
 
     // Set canvas dimensions
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      // Memastikan semua bentuk diperbarui setelah ukuran canvas diubah
+      shapes.forEach((shape) => {
+        shape.x = Math.random() * canvas.width;
+        shape.y = Math.random() * canvas.height;
+      });
     };
 
     resizeCanvas();
@@ -119,7 +125,6 @@ export function GeometricShapesBackground({
 
     // Create shapes
     const shapeCount = 30;
-    const shapes: Shape[] = [];
 
     class Shape {
       x: number;
