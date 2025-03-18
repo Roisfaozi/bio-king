@@ -1,12 +1,10 @@
 'use client';
 
+import SharedLayout from '../shared-layout';
 import {
   ComparisonTableSection,
-  CTASection,
   FAQSection,
-  Footer,
   GuaranteeSection,
-  Header,
   PriceHeroSection,
   PricingPlansSection,
   TestimonialsSection,
@@ -14,18 +12,13 @@ import {
 
 export default function PricingPage() {
   return (
-    <div className='flex min-h-screen flex-col bg-gradient-to-b from-background to-background/60'>
-      <Header />
-      <main className='flex-1'>
-        <PriceHeroSection />
-        <PricingPlansSection />
-        <ComparisonTableSection />
-        <TestimonialsSection />
-        <FAQSection />
-        <GuaranteeSection />
-        <CTASection />
-      </main>
-      <Footer />
-    </div>
+    <SharedLayout>
+      <PriceHeroSection />
+      <PricingPlansSection />
+      <ComparisonTableSection />
+      <TestimonialsSection />
+      <FAQSection />
+      <GuaranteeSection />
+    </SharedLayout>
   );
 }
