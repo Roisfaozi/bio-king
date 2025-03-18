@@ -1,5 +1,6 @@
 'use client';
 
+import { TrackPageView } from '@/components/tracking/track-page-view';
 import { Button } from '@/components/ui/button';
 import {
   AnimatePresence,
@@ -784,6 +785,9 @@ export default function HomePage() {
           </Link>
         </div>
       </div>
+
+      {/* TrackPageView component */}
+      <TrackPageView pageType='tinder' />
     </div>
   );
 }

@@ -12,6 +12,7 @@ type SharedLayoutProps = {
   decorativeElements?: ReactNode;
   backgroundElements?: ReactNode;
   className?: string;
+  includeCTA?: boolean;
 };
 
 export default function SharedLayout({
@@ -19,6 +20,7 @@ export default function SharedLayout({
   decorativeElements,
   backgroundElements,
   className = 'flex min-h-screen flex-col bg-gradient-to-b from-background to-background/60',
+  includeCTA = true,
 }: SharedLayoutProps) {
   return (
     <div className={`relative ${className}`}>
@@ -26,7 +28,7 @@ export default function SharedLayout({
       <Header />
       <main className='flex-1'>{children}</main>
       {backgroundElements}
-      <CTAWithBackgroundSection />
+      {includeCTA && <CTAWithBackgroundSection />}
 
       <FooterSection />
     </div>

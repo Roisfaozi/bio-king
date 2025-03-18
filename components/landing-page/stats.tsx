@@ -1,5 +1,4 @@
-// In components/landing-page/stats.tsx
-
+'use client';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { StatsCard } from './partials/stats-card';
