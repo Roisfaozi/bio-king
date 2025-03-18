@@ -8,7 +8,6 @@ import { NeonGlowBackground } from '@/components/landing-page/partials/neon-glow
 import { OptimizedBackground } from '@/components/landing-page/partials/optimized-background';
 import Stats from '@/components/landing-page/stats';
 import logo from '@/public/images/logo/logo-2.png';
-import constructionImage from '@/public/images/utility/construction-light.png';
 import { motion } from 'framer-motion';
 
 import {
@@ -122,10 +121,11 @@ const HomePage = () => {
     'FACEBOOK',
   ];
 
-  const stats = [
-    { label: 'Users', value: '20K+' },
-    { label: 'Bio Pages Created', value: '100K+' },
-    { label: 'Monthly Visitors', value: '5M+' },
+  const stats: any = [
+    { label: 'Bio Links Created', value: '7M+', color: 'purple' },
+    { label: 'Total Clicks', value: '100M+', color: 'blue' },
+    { label: 'Countries Reached', value: '110+', color: 'green' },
+    { label: 'Uptime', value: '99.9%', color: 'primary' },
   ];
 
   const socials = [
@@ -226,17 +226,17 @@ const HomePage = () => {
               <div className='animate-fade-in mt-6 flex items-center gap-4'>
                 <div className='flex -space-x-2'>
                   {[
-                    'https://randomuser.me/api/portraits/women/17.jpg',
-                    'https://randomuser.me/api/portraits/men/32.jpg',
-                    'https://randomuser.me/api/portraits/women/63.jpg',
-                    'https://randomuser.me/api/portraits/men/91.jpg',
+                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=faces',
+                    'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=faces',
+                    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces',
+                    'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=faces',
                   ].map((avatar, i) => (
                     <div
                       key={i}
                       className='size-8 overflow-hidden rounded-full border-2 border-background shadow-sm'
                     >
-                      <img
-                        src={avatar}
+                      <Image
+                        src={avatar || '/placeholder.svg'}
                         alt={`User ${i + 1}`}
                         width={32}
                         height={32}
@@ -256,9 +256,11 @@ const HomePage = () => {
               <div className='shadow-hero card-3d relative aspect-video w-full max-w-[500px] animate-float overflow-hidden rounded-xl border bg-background transition-all hover:shadow-xl'>
                 <div className='absolute -inset-0.5 rounded-xl bg-gradient-primary opacity-20 blur-sm'></div>
                 <Image
-                  src={constructionImage}
+                  src='https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=600&h=500&fit=crop'
                   alt='Bio King preview on mobile and desktop'
                   className='relative z-10 h-full w-full rounded-xl object-cover'
+                  width={600}
+                  height={500}
                 />
                 <div className='absolute inset-0 z-20 bg-gradient-to-t from-black/40 to-transparent'></div>
                 <div className='absolute bottom-4 left-4 right-4 z-30 text-white'>
@@ -403,9 +405,11 @@ const HomePage = () => {
               <div className='shadow-hero card-3d relative aspect-video w-full max-w-[500px] animate-float overflow-hidden rounded-xl border bg-background transition-all hover:shadow-xl'>
                 <div className='absolute -inset-0.5 rounded-xl bg-gradient-primary opacity-20 blur-sm'></div>
                 <Image
-                  src={constructionImage}
+                  src='https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=600&h=500&fit=crop'
                   alt='Bio King Dashboard'
                   className='relative z-10 h-full w-full rounded-xl object-cover'
+                  width={600}
+                  height={500}
                 />
               </div>
             </div>
@@ -527,9 +531,11 @@ const HomePage = () => {
               <div className='shadow-hero card-3d relative aspect-video w-full max-w-[500px] animate-float overflow-hidden rounded-xl border bg-background transition-all hover:shadow-xl'>
                 <div className='absolute -inset-0.5 rounded-xl bg-gradient-primary opacity-20 blur-sm'></div>
                 <Image
-                  src={constructionImage}
+                  src='https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=600&h=500&fit=crop'
                   alt='Bio King Analytics'
                   className='relative z-10 h-full w-full rounded-xl object-cover'
+                  width={600}
+                  height={500}
                 />
               </div>
             </div>
@@ -628,6 +634,8 @@ const HomePage = () => {
                   src={logo}
                   alt='Bio King'
                   className='h-full w-full object-cover'
+                  width={600}
+                  height={500}
                 />
               </div>
               <p className='text-sm text-muted-foreground'>
