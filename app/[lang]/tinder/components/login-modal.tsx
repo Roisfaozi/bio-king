@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, Loader2, Mail, X } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, Phone, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -13,21 +13,47 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const [showEmailForm, setShowEmailForm] = useState(false);
+  // Form view states
+  const [formView, setFormView] = useState<'social' | 'email' | 'phone'>(
+    'social',
+  );
+
+  // Email form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
+  // Phone form states
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [showVerificationInput, setShowVerificationInput] = useState(false);
+
+  // Shared states
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Validation functions
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
 
+  const validatePhone = (phone: string) => {
+    // Basic validation - at least 10 digits
+    const re = /^\+?[0-9]{10,15}$/;
+    return re.test(phone.replace(/\s+/g, ''));
+  };
+
+  const validateVerificationCode = (code: string) => {
+    // Verification code should be 6 digits
+    return /^\d{6}$/.test(code);
+  };
+
+  // Input handlers
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
     if (emailError) setEmailError(null);
@@ -40,6 +66,25 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     if (error) setError(null);
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Allow only numbers, spaces, and + sign
+    const value = e.target.value.replace(/[^\d\s+]/g, '');
+    setPhoneNumber(value);
+    if (phoneError) setPhoneError(null);
+    if (error) setError(null);
+  };
+
+  const handleVerificationCodeChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    // Allow only numbers
+    const value = e.target.value.replace(/[^\d]/g, '');
+    setVerificationCode(value);
+    if (codeError) setCodeError(null);
+    if (error) setError(null);
+  };
+
+  // Form submission handlers
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -88,18 +133,98 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     }
   };
 
+  const handlePhoneLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Reset errors
+    setPhoneError(null);
+    setError(null);
+
+    // Validate phone number
+    if (!phoneNumber) {
+      setPhoneError('Phone number is required');
+      return;
+    } else if (!validatePhone(phoneNumber)) {
+      setPhoneError('Please enter a valid phone number');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Simulate API call to send verification code
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Show verification code input
+      setShowVerificationInput(true);
+      console.log('Verification code sent to:', phoneNumber);
+    } catch (err) {
+      setError('Failed to send verification code. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Reset errors
+    setCodeError(null);
+    setError(null);
+
+    // Validate verification code
+    if (!verificationCode) {
+      setCodeError('Verification code is required');
+      return;
+    } else if (!validateVerificationCode(verificationCode)) {
+      setCodeError('Please enter a valid 6-digit code');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Simulate API call to verify code
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // For demo purposes, always succeed
+      console.log('Phone verification successful:', {
+        phoneNumber,
+        verificationCode,
+      });
+
+      // Close modal after successful login
+      onClose();
+    } catch (err) {
+      setError('Verification failed. Please check the code and try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reset form and go back to social login options
   const resetForm = () => {
+    // Reset email form
     setEmail('');
     setPassword('');
     setEmailError(null);
     setPasswordError(null);
+
+    // Reset phone form
+    setPhoneNumber('');
+    setPhoneError(null);
+    setVerificationCode('');
+    setCodeError(null);
+    setShowVerificationInput(false);
+
+    // Reset shared states
     setError(null);
     setIsLoading(false);
   };
 
   const handleBackToOptions = () => {
     resetForm();
-    setShowEmailForm(false);
+    setFormView('social');
   };
 
   return (
@@ -137,7 +262,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <X className='h-6 w-6' />
               </button>
 
-              {showEmailForm ? (
+              {formView === 'email' && (
                 <>
                   {/* Back button */}
                   <button
@@ -236,7 +361,146 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                     </div>
                   </div>
                 </>
-              ) : (
+              )}
+
+              {formView === 'phone' && (
+                <>
+                  {/* Back button */}
+                  <button
+                    onClick={handleBackToOptions}
+                    className='absolute left-0 top-0 text-gray-400 transition-colors hover:text-white'
+                  >
+                    <ArrowLeft className='h-6 w-6' />
+                  </button>
+
+                  {/* Phone login form */}
+                  <div className='mt-8'>
+                    <h2 className='mb-6 text-center text-[28px] font-bold text-white'>
+                      {showVerificationInput
+                        ? 'Enter verification code'
+                        : 'Log in with phone'}
+                    </h2>
+
+                    {error && (
+                      <div className='mb-4 rounded-md bg-red-900/30 p-3'>
+                        <p className='text-sm text-red-300'>{error}</p>
+                      </div>
+                    )}
+
+                    {!showVerificationInput ? (
+                      <form onSubmit={handlePhoneLogin} className='space-y-4'>
+                        <div>
+                          <label
+                            htmlFor='phone'
+                            className='mb-1 block text-sm text-gray-400'
+                          >
+                            Phone Number
+                          </label>
+
+                          <input
+                            type='tel'
+                            id='phone'
+                            value={phoneNumber}
+                            onChange={handlePhoneChange}
+                            className={`w-full border bg-[#1a1a1a] ${
+                              phoneError ? 'border-red-500' : 'border-gray-700'
+                            } rounded-md px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#fe3c72]`}
+                            placeholder='+1 234 567 8900'
+                            disabled={isLoading}
+                          />
+                          {phoneError && (
+                            <p className='mt-1 text-xs text-red-500'>
+                              {phoneError}
+                            </p>
+                          )}
+                        </div>
+
+                        <Button
+                          type='submit'
+                          className='h-[52px] w-full rounded-[4px] bg-gradient-to-r from-pink-500 to-rose-500 py-6 text-base font-semibold text-white hover:from-pink-600 hover:to-rose-600'
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <span className='flex items-center justify-center'>
+                              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                              Sending code...
+                            </span>
+                          ) : (
+                            'Send verification code'
+                          )}
+                        </Button>
+                      </form>
+                    ) : (
+                      <form onSubmit={handleVerifyCode} className='space-y-4'>
+                        <div>
+                          <p className='mb-3 text-sm text-gray-400'>
+                            We've sent a 6-digit verification code to{' '}
+                            <span className='text-white'>{phoneNumber}</span>
+                          </p>
+                          <label
+                            htmlFor='code'
+                            className='mb-1 block text-sm text-gray-400'
+                          >
+                            Verification Code
+                          </label>
+                          <input
+                            type='text'
+                            id='code'
+                            value={verificationCode}
+                            onChange={handleVerificationCodeChange}
+                            className={`w-full border bg-[#1a1a1a] ${
+                              codeError ? 'border-red-500' : 'border-gray-700'
+                            } rounded-md px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#fe3c72]`}
+                            placeholder='123456'
+                            maxLength={6}
+                            disabled={isLoading}
+                          />
+                          {codeError && (
+                            <p className='mt-1 text-xs text-red-500'>
+                              {codeError}
+                            </p>
+                          )}
+                        </div>
+
+                        <Button
+                          type='submit'
+                          className='h-[52px] w-full rounded-[4px] bg-gradient-to-r from-pink-500 to-rose-500 py-6 text-base font-semibold text-white hover:from-pink-600 hover:to-rose-600'
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <span className='flex items-center justify-center'>
+                              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                              Verifying...
+                            </span>
+                          ) : (
+                            'Verify'
+                          )}
+                        </Button>
+
+                        <div className='flex items-center justify-between text-sm'>
+                          <button
+                            type='button'
+                            className='text-[#3991f1] hover:underline'
+                            onClick={() => setShowVerificationInput(false)}
+                          >
+                            Change phone number
+                          </button>
+                          <button
+                            type='button'
+                            className='text-[#3991f1] hover:underline'
+                            onClick={handlePhoneLogin}
+                            disabled={isLoading}
+                          >
+                            Resend code
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {formView === 'social' && (
                 <>
                   {/* Tinder Logo */}
                   <div className='mb-6 flex justify-center'>
@@ -317,20 +581,16 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                     <Button
                       variant='outline'
                       className='h-[52px] w-full rounded-[4px] border border-white/20 bg-transparent text-base font-medium text-white hover:bg-white/5'
+                      onClick={() => setFormView('phone')}
                     >
-                      <svg
-                        viewBox='0 0 24 24'
-                        className='mr-2 h-5 w-5 fill-current'
-                      >
-                        <path d='M16.5 11.5c0 2.5-1.5 4.5-4.5 4.5-2 0-4.5-2-4.5-4.5C7.5 9 9.5 7 12 7s4.5 2 4.5 4.5zm-4.5 6c3.5 0 6.5-2 6.5-6.5S15.5 5 12 5 5.5 7 5.5 11.5 9 17.5 12 17.5z' />
-                      </svg>
+                      <Phone className='mr-2 h-5 w-5' />
                       Log in with phone number
                     </Button>
 
                     <Button
                       variant='outline'
                       className='h-[52px] w-full rounded-[4px] border border-white/20 bg-transparent text-base font-medium text-white hover:bg-white/5'
-                      onClick={() => setShowEmailForm(true)}
+                      onClick={() => setFormView('email')}
                     >
                       <Mail className='mr-2 h-5 w-5' />
                       Log in with email
