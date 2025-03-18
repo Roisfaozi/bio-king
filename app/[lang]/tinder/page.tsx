@@ -8,17 +8,24 @@ import {
   useTransform,
 } from 'framer-motion';
 import {
+  AlertCircle,
+  Diamond,
   Facebook,
+  Home,
   Instagram,
+  MapPin,
+  MessageCircle,
+  Search,
   TwitterIcon as TikTok,
   Twitter,
+  User,
   Youtube,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import GPSTracker from './components/gps-tracker';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import LoadingScreen from './components/loading-screen';
+import LocationPermissionModal from './components/location-permision-modal';
 import LoginModal from './components/login-modal';
 import TestimonialCarousel from './components/testimonial-carousel';
 
@@ -104,12 +111,35 @@ const profiles = [
   },
 ];
 
-export default function Home() {
+// Testimonials data
+const testimonials = [
+  {
+    id: 1,
+    names: 'Kenneth and Elliot',
+    text: 'I honestly had been on many Tinder dates and was absolutely sure I was meeting a fling to get a free meal and have some fun ... 3 years and sooo many dates and memories later, I am married to my Tinder guy, Kenny!',
+  },
+  {
+    id: 2,
+    names: 'Victoria & Louise ❤️',
+    text: 'THANK YOU for making it possible for me to meet my soulmate. Five minutes into our first conversation, my now-wife mentioned how we would have an amazing wedding.',
+  },
+  {
+    id: 3,
+    names: 'Ryan & Lindsey',
+    text: '... just had a bad break-up and created a Tinder account to keep my mind off the break-up. After about a week of talking, we decided to meet up at a local bar for drinks ... we decided to tie the knot in an 18-person ceremony in New Jersey on 27 June 2020.',
+  },
+];
+
+export default function HomePage() {
   const [showCookieBanner, setShowCookieBanner] = useState(true);
   const [isClient, setIsClient] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [locationEnabled, setLocationEnabled] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [contentLoaded, setContentLoaded] = useState(false);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const navbarRef = useRef<HTMLElement>(null);
   const testimonialsRef = useRef<HTMLElement>(null);
@@ -117,6 +147,149 @@ export default function Home() {
 
   const titleOpacity = useTransform(scrollY, [0, 200, 400], [1, 0.5, 0]);
   const buttonOpacity = useTransform(scrollY, [0, 300, 500], [1, 0.3, 0]);
+
+  // Function to get current position with better error handling
+  const getCurrentPosition = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationError("Your browser doesn't support geolocation");
+      return Promise.reject(new Error('Geolocation not supported'));
+    }
+
+    setLocationError(null);
+
+    return new Promise<GeolocationPosition>((resolve, reject) => {
+      try {
+        const successCallback = (position: GeolocationPosition) => {
+          console.log('Successfully got position:', position);
+          resolve(position);
+        };
+
+        const errorCallback = (error: GeolocationPositionError) => {
+          console.error('Geolocation error:', error);
+
+          let errorMessage = 'Something went wrong with location tracking.';
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage =
+                'Location access was denied. Please enable location in your browser settings.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage =
+                "We couldn't access your location. Please check your device settings.";
+              break;
+            case error.TIMEOUT:
+              errorMessage =
+                'Location request timed out. Please check your connection.';
+              break;
+          }
+
+          setLocationError(errorMessage);
+          reject(error);
+        };
+
+        const options = {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0,
+        };
+
+        navigator.geolocation.getCurrentPosition(
+          successCallback,
+          errorCallback,
+          options,
+        );
+      } catch (err) {
+        console.error('Unexpected error in getCurrentPosition:', err);
+        setLocationError(
+          'An unexpected error occurred while trying to get your location.',
+        );
+        reject(err);
+      }
+    });
+  }, []);
+
+  // Check if location is already granted
+  const checkLocationPermission = useCallback(() => {
+    console.log('Checking location permission...');
+
+    if (!navigator.geolocation) {
+      console.error('Geolocation not supported');
+      setLocationError("Your browser doesn't support geolocation");
+      return;
+    }
+
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions
+        .query({ name: 'geolocation' as PermissionName })
+        .then((result) => {
+          console.log('Permission state:', result.state);
+
+          if (result.state === 'granted') {
+            // Get current position to confirm it works
+            getCurrentPosition()
+              .then(() => {
+                console.log(
+                  'Location permission granted and position obtained',
+                );
+                setLocationEnabled(true);
+              })
+              .catch((err) => {
+                console.error(
+                  'Error getting position even with permission granted:',
+                  err,
+                );
+                // If there's an error getting position even with permission granted
+                setShowLocationModal(true);
+              });
+          } else {
+            // If permission is not granted, show the modal
+            console.log('Permission not granted, showing modal');
+            setShowLocationModal(true);
+          }
+
+          // Listen for permission changes
+          result.onchange = () => {
+            console.log('Permission state changed to:', result.state);
+            if (result.state === 'granted') {
+              getCurrentPosition()
+                .then(() => {
+                  setLocationEnabled(true);
+                  setShowLocationModal(false);
+                })
+                .catch((err) => {
+                  console.error('Error after permission change:', err);
+                });
+            }
+          };
+        })
+        .catch((err) => {
+          console.error('Error querying permissions:', err);
+          // Fallback if permissions API is not supported
+          setShowLocationModal(true);
+        });
+    } else {
+      // If permissions API is not supported, show the modal
+      console.log('Permissions API not supported, showing modal');
+      setShowLocationModal(true);
+    }
+  }, [getCurrentPosition]);
+
+  // Handle successful location permission
+  const handleLocationSuccess = useCallback(() => {
+    console.log('Location permission granted, getting position...');
+    getCurrentPosition()
+      .then(() => {
+        console.log('Successfully got position after permission granted');
+        setLocationEnabled(true);
+        setShowLocationModal(false);
+        setLocationError(null);
+      })
+      .catch((error) => {
+        // If there's still an error after permission is granted
+        console.error('Error after permission granted:', error);
+        // Keep the modal open to show the error
+      });
+  }, [getCurrentPosition]);
 
   useEffect(() => {
     setIsClient(true);
@@ -131,6 +304,9 @@ export default function Home() {
     // Simulate loading time
     const timer = setTimeout(() => {
       setIsLoading(false);
+
+      // Mark content as loaded
+      setContentLoaded(true);
     }, 2000);
 
     return () => {
@@ -138,6 +314,18 @@ export default function Home() {
       clearTimeout(timer);
     };
   }, []);
+
+  // Show location modal after content is loaded
+  useEffect(() => {
+    if (contentLoaded) {
+      // Wait a short delay after content loads before checking location permission
+      const locationTimer = setTimeout(() => {
+        checkLocationPermission();
+      }, 1500);
+
+      return () => clearTimeout(locationTimer);
+    }
+  }, [contentLoaded, checkLocationPermission]);
 
   // Parallax effect for background and navbar position
   useEffect(() => {
@@ -196,7 +384,7 @@ export default function Home() {
   return (
     <div className='relative min-h-screen overflow-hidden'>
       {/* Background with fixed position */}
-      <div className='fixed inset-0 z-0'>
+      <div className='fixed inset-0 z-0' ref={backgroundRef}>
         <div className='relative h-full w-full'>
           {/* Desktop background */}
           <div className='absolute inset-0 hidden md:block'>
@@ -226,7 +414,7 @@ export default function Home() {
       </div>
 
       {/* Navbar that becomes fixed when scrolled to testimonials */}
-      <header ref={navbarRef} className='navbar static z-[9999] w-full'>
+      <header ref={navbarRef} className='navbar sticky top-0 z-50 w-full'>
         <div className='bg-gradient-to-b from-black/80 via-black/60 to-transparent'>
           <div className='flex w-full items-center justify-between px-4 py-3 md:px-8 lg:px-16'>
             <div className='flex items-center'>
@@ -245,49 +433,63 @@ export default function Home() {
               <nav className='ml-8 hidden space-x-6 md:flex'>
                 <Link
                   href='#'
-                  className='text-base text-white transition hover:text-white/80'
+                  className='text-white transition hover:text-white/80'
                 >
                   Products
                 </Link>
                 <Link
                   href='#'
-                  className='text-base text-white transition hover:text-white/80'
+                  className='text-white transition hover:text-white/80'
                 >
                   Learn
                 </Link>
                 <Link
                   href='#'
-                  className='text-base text-white transition hover:text-white/80'
+                  className='text-white transition hover:text-white/80'
                 >
                   Safety
                 </Link>
                 <Link
                   href='#'
-                  className='text-base text-white transition hover:text-white/80'
+                  className='text-white transition hover:text-white/80'
                 >
                   Support
                 </Link>
                 <Link
                   href='#'
-                  className='text-base text-white transition hover:text-white/80'
+                  className='text-white transition hover:text-white/80'
                 >
                   Download
                 </Link>
                 <Link
                   href='#'
-                  className='text-base text-white transition hover:text-white/80'
+                  className='text-white transition hover:text-white/80'
                 >
                   Gift Cards
                 </Link>
               </nav>
             </div>
             <div className='flex items-center space-x-4'>
-              <button className='hidden items-center text-base text-white transition hover:text-white/80 md:flex'>
+              {locationEnabled && (
+                <div className='mr-2 flex items-center text-white'>
+                  <MapPin className='mr-1 h-4 w-4 text-pink-500' />
+                  <span className='hidden text-sm md:inline'>
+                    Location Active
+                  </span>
+                </div>
+              )}
+              {locationError && (
+                <div className='mr-2 hidden items-center text-red-400 md:flex'>
+                  <AlertCircle className='mr-1 h-4 w-4' />
+                  <span className='text-sm'>Location Error</span>
+                </div>
+              )}
+              <button className='hidden items-center text-white transition hover:text-white/80 md:flex'>
                 <span className='mr-1'>🌐</span>
                 Language
               </button>
               <Button
-                className='rounded-full bg-white px-6 text-base font-medium text-black hover:bg-white/90'
+                className='rounded-full bg-white px-6 font-medium text-black hover:bg-white/90'
                 onClick={() => setShowLoginModal(true)}
               >
                 Log in
@@ -313,20 +515,6 @@ export default function Home() {
           </motion.div>
         </div>
       </main>
-
-      {/* GPS Tracker Section */}
-      <section className='relative z-20 px-4 py-16'>
-        <div className='mx-auto max-w-3xl'>
-          <h2 className='mb-8 text-center text-3xl font-bold text-white'>
-            Find Matches Nearby
-          </h2>
-          <p className='mb-8 text-center text-white/80'>
-            Enable location services to discover potential matches in your area.
-            Our new GPS tracking feature helps you connect with people nearby.
-          </p>
-          <GPSTracker />
-        </div>
-      </section>
 
       {/* Testimonials section with carousel */}
       <section
@@ -523,15 +711,19 @@ export default function Home() {
             transition={{ duration: 0.3 }}
           >
             <div className='mx-auto flex max-w-6xl flex-col items-center justify-between md:flex-row'>
-              <p className='mb-4 text-sm text-gray-700 md:mb-0 md:mr-4'>
-                We value your privacy. We and our partners use trackers to
-                measure the audience of our website and to provide you with
-                offers and improve our own Tinder marketing operations.
+              <div className='mb-4 text-sm text-gray-700 md:mb-0 md:mr-4'>
+                <span>
+                  We value your privacy. We and our partners use trackers to
+                  measure the audience of our website and to provide you with
+                  offers and improve our own Tinder marketing operations.
+                </span>
                 <Link href='#' className='ml-1 font-medium underline'>
                   More info on cookies and providers we use
                 </Link>
-                . You can withdraw your consent at any time in your settings.
-              </p>
+                <span>
+                  . You can withdraw your consent at any time in your settings.
+                </span>
+              </div>
               <div className='flex flex-wrap justify-center gap-2'>
                 <Button
                   variant='outline'
@@ -559,10 +751,39 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Login Modal */}
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
       />
+
+      {/* Location Permission Modal - Now non-dismissible */}
+      <LocationPermissionModal
+        isOpen={showLocationModal}
+        onAllow={handleLocationSuccess}
+      />
+
+      {/* Bottom navigation bar with profile link */}
+      <div className='fixed bottom-0 left-0 right-0 z-50 border-t border-gray-800 bg-black'>
+        <div className='flex h-16 items-center justify-around'>
+          <Link href='/' className='flex flex-col items-center p-2'>
+            <Home className='h-6 w-6 text-gray-400' />
+          </Link>
+          <Link href='#' className='flex flex-col items-center p-2'>
+            <Search className='h-6 w-6 text-gray-400' />
+          </Link>
+          <Link href='#' className='flex flex-col items-center p-2'>
+            <Diamond className='h-6 w-6 text-gray-400' />
+          </Link>
+          <Link href='#' className='flex flex-col items-center p-2'>
+            <MessageCircle className='h-6 w-6 text-gray-400' />
+          </Link>
+          <Link href='/profile' className='flex flex-col items-center p-2'>
+            <User className='h-6 w-6 text-gray-400' />
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
