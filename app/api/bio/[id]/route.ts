@@ -6,6 +6,8 @@ import { editBioPageSchema } from '@/validation/bio';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+export const dynamic = 'force-dynamic';
+
 // GET by ID
 export async function GET(
   request: NextRequest,

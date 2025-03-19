@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth';
 import { withRLS } from '@/lib/db';
-import { z } from 'zod';
 import { logError } from '@/lib/helper';
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {

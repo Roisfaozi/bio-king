@@ -2,7 +2,6 @@ import { bypassRLS } from '@/lib/db';
 import { trackPageView } from '@/lib/tracking';
 import { getCurrentEpoch } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
-import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -11,9 +10,7 @@ export async function GET(
   { params }: { params: { short: string } },
 ) {
   const shortCode = params.short;
-  const headersList = await headers();
-  const pathname = headersList.get('x-next-pathname') || '';
-  console.log('shottcode', shortCode);
+  const pathname = req.headers.get('x-next-pathname') || '';
 
   // Menggunakan stealth tracking utility
   await trackPageView({

@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      - DATABASE_URL=postgres://bio:biopassword@db:5432/bio_db?sslmode=disable
+      - AUTH_SECRET=44701d4cea71dda7a51cf998408533d1
+      - NEXT_PUBLIC_SITE_URL=http://localhost:3000
+    volumes:
+      - app-data:/app
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=bio
+      - POSTGRES_PASSWORD=biopassword
+      - POSTGRES_DB=bio_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  app-data:
+  postgres-data:
