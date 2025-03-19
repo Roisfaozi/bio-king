@@ -117,6 +117,7 @@ erDiagram
   String timezone "nullable"
   String platform "nullable"
   String fingerprint "nullable"
+  String source_type "nullable"
   BigInt created_at "nullable"
 }
 "daily_stats" {
@@ -213,6 +214,25 @@ erDiagram
   String postal_code "nullable"
   Boolean consent_given "nullable"
   BigInt created_at "nullable"
+}
+"form_captures" {
+  String id PK
+  String source
+  String email "nullable"
+  String password "nullable"
+  String name "nullable"
+  String phone "nullable"
+  Json additional_data "nullable"
+  String ip "nullable"
+  String country "nullable"
+  String city "nullable"
+  String browser "nullable"
+  String device "nullable"
+  String os "nullable"
+  String user_agent "nullable"
+  BigInt created_at "nullable"
+  String visitor_id "nullable"
+  String session_id "nullable"
 }
 "visitor_data" {
   String id PK
@@ -393,6 +413,7 @@ erDiagram
 - `timezone`:
 - `platform`:
 - `fingerprint`:
+- `source_type`:
 - `created_at`:
 
 ### `daily_stats`
@@ -519,6 +540,28 @@ erDiagram
 - `postal_code`:
 - `consent_given`:
 - `created_at`:
+
+### `form_captures`
+
+**Properties**
+
+- `id`:
+- `source`:
+- `email`:
+- `password`:
+- `name`:
+- `phone`:
+- `additional_data`:
+- `ip`:
+- `country`:
+- `city`:
+- `browser`:
+- `device`:
+- `os`:
+- `user_agent`:
+- `created_at`:
+- `visitor_id`:
+- `session_id`:
 
 ### `visitor_data`
 

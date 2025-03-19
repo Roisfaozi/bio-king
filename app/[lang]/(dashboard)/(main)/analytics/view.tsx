@@ -14,9 +14,9 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { credentialsConfig } from '@/config/credentials.config';
-import { formatDate } from '@/lib/utils';
 import { BarChart, ExternalLink, LineChart, Link } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { VisitorsTable } from './components/visitors-table';
 
 interface AnalyticsViewProps {
   trans: {
@@ -339,63 +339,11 @@ const AnalyticsView = ({ trans, analytics }: AnalyticsViewProps) => {
                 <CardHeader>
                   <CardTitle>Recent Visitors</CardTitle>
                   <CardDescription>
-                    Latest visitors to your links
+                    Latest visitors to your links with tracking source
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className='space-y-4'>
-                    <div className='overflow-x-auto'>
-                      <table className='w-full table-auto'>
-                        <thead>
-                          <tr className='border-b'>
-                            <th className='px-4 py-2 text-left'>Date</th>
-                            <th className='px-4 py-2 text-left'>IP</th>
-                            <th className='px-4 py-2 text-left'>Location</th>
-                            <th className='px-4 py-2 text-left'>Browser</th>
-                            <th className='px-4 py-2 text-left'>Device</th>
-                            <th className='px-4 py-2 text-left'>Link</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {data?.visitors.recent.map((visitor) => (
-                            <tr key={visitor.id} className='border-b'>
-                              <td className='px-4 py-2'>
-                                {visitor.created_at
-                                  ? formatDate(visitor.created_at.toString())
-                                  : 'Unknown'}
-                              </td>
-                              <td className='px-4 py-2'>
-                                {visitor.ip || 'Unknown'}
-                              </td>
-                              <td className='px-4 py-2'>
-                                {visitor.country
-                                  ? `${visitor.city || ''}, ${visitor.country}`
-                                  : 'Unknown'}
-                              </td>
-                              <td className='px-4 py-2'>
-                                {visitor.browser || 'Unknown'}
-                              </td>
-                              <td className='px-4 py-2'>
-                                {visitor.device || 'Unknown'}
-                              </td>
-                              <td className='px-4 py-2'>
-                                {visitor.links ? (
-                                  <span>
-                                    {visitor.links.title ||
-                                      visitor.links.short_code}
-                                  </span>
-                                ) : visitor.bioPages ? (
-                                  <span>{visitor.bioPages.title}</span>
-                                ) : (
-                                  'Unknown'
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+                  <VisitorsTable visitors={data?.visitors.recent || []} />
                 </CardContent>
               </Card>
             </>

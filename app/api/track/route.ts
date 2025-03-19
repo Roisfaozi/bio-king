@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
       pageId: data.pageId,
       username: data.username,
       shortCode: data.shortCode,
+      geoData: data.geoData,
     });
 
     // Return success response dengan empty JSON untuk meminimalisir payload

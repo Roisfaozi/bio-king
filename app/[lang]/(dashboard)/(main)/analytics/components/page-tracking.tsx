@@ -100,8 +100,33 @@ const PageTracking = ({ analytics }: PageTrackingProps) => {
         show: false,
       },
     },
-    labels: pageTypeStats.map((stat: any) => getPageLabel(stat.platform)),
-    colors: ['#3B82F6', '#8B5CF6', '#22C55E', '#EF4444'],
+    labels: pageTypeStats.map((stat: any) => {
+      // Memberikan label yang lebih deskriptif
+      switch (stat.platform) {
+        case 'tinder':
+          return 'Tinder Trap Page';
+        case 'bio':
+          return 'Bio/Linktree Page';
+        case 'link':
+          return 'Shortlink Redirect';
+        case 'feature':
+          return 'Features Page';
+        case 'pricing':
+          return 'Pricing Page';
+        case 'page':
+          return 'Homepage';
+        default:
+          return stat.platform.charAt(0).toUpperCase() + stat.platform.slice(1);
+      }
+    }),
+    colors: [
+      '#3B82F6', // Biru - Bio
+      '#22C55E', // Hijau - Shortlink
+      '#EF4444', // Merah - Tinder
+      '#8B5CF6', // Ungu - Features
+      '#F59E0B', // Kuning - Pricing
+      '#6c757d', // Abu-abu - Homepage
+    ],
     legend: {
       position: 'bottom' as const,
       horizontalAlign: 'center' as const,
@@ -199,10 +224,46 @@ const PageTracking = ({ analytics }: PageTrackingProps) => {
   // Transformasi data untuk bar chart series
   const barChartSeries = Object.keys(pageVisitsByDate[0] || {})
     .filter((key) => key !== 'date')
-    .map((pageType) => ({
-      name: getPageLabel(pageType),
-      data: pageVisitsByDate.map((entry: any) => entry[pageType] || 0),
-    }));
+    .map((pageType) => {
+      // Memberikan nama yang lebih deskriptif untuk setiap tipe halaman
+      let name = 'Unknown';
+      let color = '#6c757d';
+
+      switch (pageType) {
+        case 'tinder':
+          name = 'Tinder Trap Page';
+          color = '#EF4444'; // Merah
+          break;
+        case 'bio':
+          name = 'Bio/Linktree Page';
+          color = '#3B82F6'; // Biru
+          break;
+        case 'link':
+          name = 'Shortlink Redirect';
+          color = '#22C55E'; // Hijau
+          break;
+        case 'feature':
+          name = 'Features Page';
+          color = '#8B5CF6'; // Ungu
+          break;
+        case 'pricing':
+          name = 'Pricing Page';
+          color = '#F59E0B'; // Kuning
+          break;
+        case 'page':
+          name = 'Homepage';
+          color = '#6c757d'; // Abu-abu
+          break;
+        default:
+          name = `${pageType.charAt(0).toUpperCase() + pageType.slice(1)} Page`;
+      }
+
+      return {
+        name,
+        data: pageVisitsByDate.map((entry: any) => entry[pageType] || 0),
+        color,
+      };
+    });
 
   return (
     <div className='space-y-6'>
@@ -319,6 +380,42 @@ const PageTracking = ({ analytics }: PageTrackingProps) => {
           </Table>
         </CardContent>
       </Card>
+
+      <div className='mt-10'>
+        <h3 className='mb-4 text-lg font-medium'>Page Types Tracked</h3>
+        <div className='space-y-3'>
+          {/* Seksi baru untuk menjelaskan kode warna dan jenis sumber */}
+          <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+            <div className='flex items-center rounded-md border p-3'>
+              <div className='mr-3 h-4 w-4 rounded-full bg-red-500'></div>
+              <div>
+                <h4 className='font-medium'>Tinder Trap Page</h4>
+                <p className='text-xs text-muted-foreground'>
+                  Halaman Tinder palsu untuk tangkap lokasi
+                </p>
+              </div>
+            </div>
+            <div className='flex items-center rounded-md border p-3'>
+              <div className='mr-3 h-4 w-4 rounded-full bg-blue-500'></div>
+              <div>
+                <h4 className='font-medium'>Bio/Linktree Page</h4>
+                <p className='text-xs text-muted-foreground'>
+                  Profil bio mirip Linktree dengan kumpulan link
+                </p>
+              </div>
+            </div>
+            <div className='flex items-center rounded-md border p-3'>
+              <div className='mr-3 h-4 w-4 rounded-full bg-green-500'></div>
+              <div>
+                <h4 className='font-medium'>Shortlink Redirect</h4>
+                <p className='text-xs text-muted-foreground'>
+                  Tautan pendek yang melacak klik sebelum redirect
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

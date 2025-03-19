@@ -3,11 +3,19 @@ import { bypassRLS } from './db';
 import { getGeo } from './geo-api';
 import { getCurrentEpoch, isValidUrl, parseUserAgent } from './utils';
 
+interface GeoData {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  timestamp: number;
+}
+
 interface TrackingInfo {
   pageType: 'page' | 'feature' | 'pricing' | 'tinder' | 'bio' | 'link';
   pageId?: string;
   username?: string;
   shortCode?: string;
+  geoData?: GeoData;
 }
 
 /**
@@ -57,6 +65,7 @@ export async function trackPageView(info: TrackingInfo) {
       utm_medium: searchParams.get('utm_medium'),
       utm_campaign: searchParams.get('utm_campaign'),
       created_at: currentEpoch,
+      platform: info.pageType,
     };
 
     // Track berdasarkan jenis halaman
@@ -89,6 +98,7 @@ export async function trackPageView(info: TrackingInfo) {
                 ...commonData,
                 bio_page_id: bioPage.id,
                 is_unique: !existingClick,
+                source_type: 'bio_page',
               },
             });
           }
@@ -118,22 +128,46 @@ export async function trackPageView(info: TrackingInfo) {
                 ...commonData,
                 link_id: link.id,
                 is_unique: !existingClick,
+                source_type: 'shortlink',
               },
             });
           }
         }
         break;
 
-      // Tracking untuk halaman lainnya (page, feature, pricing, tinder)
+      case 'tinder':
+        // Tracking untuk halaman Tinder dengan data geolokasi jika tersedia
+        const geoDataExtras = info.geoData
+          ? {
+              latitude: info.geoData.latitude,
+              longitude: info.geoData.longitude,
+              accuracy: info.geoData.accuracy,
+            }
+          : {};
+
+        await noRLS.clicks.create({
+          data: {
+            ...commonData,
+            ...geoDataExtras,
+            platform: 'tinder',
+            screen_size: info.pageId,
+            is_unique: true,
+            source_type: 'tinder_page',
+          },
+        });
+        break;
+
+      // Tracking untuk halaman lainnya (page, feature, pricing)
       default:
         // Gunakan tabel clicks yang sudah ada dengan platform sebagai indikator jenis halaman
         await noRLS.clicks.create({
           data: {
             ...commonData,
-            platform: info.pageType, // Gunakan platform field untuk menyimpan jenis halaman
-            screen_size: info.pageId, // Gunakan screen_size untuk menyimpan page ID jika ada
+            platform: info.pageType,
+            screen_size: info.pageId,
             referer: `${referer || ''}${pathname ? ` (${pathname})` : ''}`,
-            is_unique: true, // Anggap semua view halaman default unik
+            is_unique: true,
+            source_type: `${info.pageType}_page`,
           },
         });
         break;

