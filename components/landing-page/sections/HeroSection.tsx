@@ -10,7 +10,7 @@ const HeroSection = () => {
   return (
     <section className='relative w-full overflow-hidden py-12 md:py-24 lg:py-32 xl:py-48'>
       <NeonGlowBackground variant='rainbow' intensity='medium' speed='medium' />
-      <div className='pointer-events-none absolute inset-0 bg-grid-pattern opacity-[0.03]'></div>
+      <div className='bg-grid-pattern pointer-events-none absolute inset-0 opacity-[0.03]'></div>
       <div className='absolute left-0 right-0 top-0 h-1 bg-gradient-primary'></div>
       <div className='container relative px-4 md:px-6'>
         <div className='grid gap-6 lg:grid-cols-2 lg:gap-12 xl:grid-cols-2'>

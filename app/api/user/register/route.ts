@@ -1,6 +1,6 @@
 import db from '@/lib/db';
 import { createUserSchema } from '@/validation/auth-validation';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest, response: any) {
   try {

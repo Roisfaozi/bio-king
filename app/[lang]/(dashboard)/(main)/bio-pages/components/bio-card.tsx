@@ -12,7 +12,7 @@ interface BioPageProps {
   bio: BioPagesWithClicksResponse;
 }
 
-const BioCard = ({ bio }) => {
+const BioCard = ({ bio }: BioPageProps) => {
   /**
    * @description Bio card component
    * temporary avatar

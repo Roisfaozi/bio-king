@@ -3,7 +3,7 @@
 export default function ComparisonTableSection() {
   return (
     <section className='relative w-full bg-muted/30 py-12 md:py-24 lg:py-32'>
-      <div className='pointer-events-none absolute inset-0 bg-dot-pattern opacity-[0.03]'></div>
+      <div className='bg-dot-pattern pointer-events-none absolute inset-0 opacity-[0.03]'></div>
       <div className='container px-4 md:px-6'>
         <div className='mb-12 flex flex-col items-center justify-center space-y-4 text-center'>
           <h2 className='text-3xl font-bold tracking-tighter sm:text-4xl'>

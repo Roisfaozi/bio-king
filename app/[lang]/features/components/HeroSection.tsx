@@ -7,7 +7,7 @@ export default function HeroSection() {
   return (
     <section className='bg-colorful-mesh-purple relative w-full overflow-hidden py-12 md:py-24 lg:py-32'>
       <WaveBackground variant='purple' intensity='medium' />
-      <div className='pointer-events-none absolute inset-0 bg-grid-pattern opacity-[0.03]'></div>
+      <div className='bg-grid-pattern pointer-events-none absolute inset-0 opacity-[0.03]'></div>
       <div className='absolute left-0 right-0 top-0 h-1 bg-gradient-primary'></div>
       <div className='absolute -right-40 -top-40 h-80 w-80 animate-pulse-slow rounded-full bg-gradient-radial from-primary/20 to-transparent opacity-30 blur-3xl'></div>
       <div className='absolute -bottom-40 -left-40 h-80 w-80 animate-pulse-slow rounded-full bg-gradient-radial from-purple-500/20 to-transparent opacity-30 blur-3xl'></div>

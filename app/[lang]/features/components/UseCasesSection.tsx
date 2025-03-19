@@ -80,7 +80,7 @@ export default function UseCasesSection() {
   return (
     <section className='bg-colorful-mesh-green relative w-full py-12 md:py-24 lg:py-32'>
       <BubbleBackground variant='green' intensity='light' />
-      <div className='pointer-events-none absolute inset-0 bg-dot-pattern opacity-[0.03]'></div>
+      <div className='bg-dot-pattern pointer-events-none absolute inset-0 opacity-[0.03]'></div>
       <div className='container px-4 md:px-6'>
         <div className='mb-12 flex flex-col items-center justify-center space-y-4 text-center'>
           <div className='inline-flex items-center space-x-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary'>

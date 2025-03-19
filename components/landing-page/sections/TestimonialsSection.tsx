@@ -70,7 +70,7 @@ const TestimonialsSection = () => {
                 "{testimonial.quote}"
               </p>
               <div className='flex items-center space-x-4'>
-                <div className='size-12 border-glow overflow-hidden rounded-full border-2 border-primary/20'>
+                <div className='border-glow size-12 overflow-hidden rounded-full border-2 border-primary/20'>
                   <img
                     src={testimonial.image}
                     alt={testimonial.author}

@@ -54,7 +54,7 @@ const FooterSection = () => {
                   href={social.link}
                   className='text-muted-foreground transition-colors hover:text-primary'
                 >
-                  <div className='size-8 border-glow flex items-center justify-center rounded-full border transition-colors hover:border-primary/50'>
+                  <div className='border-glow size-8 flex items-center justify-center rounded-full border transition-colors hover:border-primary/50'>
                     {social.icon}
                   </div>
                 </Link>
