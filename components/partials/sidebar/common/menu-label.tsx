@@ -1,4 +1,3 @@
-import React from 'react';
 import { cn, translate } from '@/lib/utils';
 
 const MenuLabel = ({

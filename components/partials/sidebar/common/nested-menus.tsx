@@ -1,15 +1,10 @@
 'use client';
-import React, { useState } from 'react';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import { cn, getDynamicPath, isLocationMatch } from '@/lib/utils';
+import { usePathname } from 'next/navigation';
 import MultiMenuHandler from './multi-menu-handler';
 import MultiNestedMenu from './multi-nested-menu';
 import SubMenuItem from './sub-menu-item';
-import { usePathname } from 'next/navigation';
-import { isLocationMatch, cn, getDynamicPath } from '@/lib/utils';
 
 const NestedSubMenu = ({
   activeSubmenu,

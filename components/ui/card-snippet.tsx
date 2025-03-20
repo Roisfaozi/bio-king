@@ -1,14 +1,27 @@
 'use client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { themes } from '@/config/thems';
-import { hslToHex } from '@/lib/utils';
-import { useThemeStore } from '@/store';
-import { useTheme } from 'next-themes';
-import React, { useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { themes } from '@/config/thems';
+import { useTheme } from 'next-themes';
+import { hslToHex, hexToRGB } from '@/lib/utils';
+import { useThemeStore } from '@/store';
 
 interface CardSnippetProps {
   title?: string;
@@ -37,19 +50,16 @@ const CardSnippet = ({ title, code, children }: CardSnippetProps) => {
   const hexPrimary2 = hslToHex(hslPrimary2);
   return (
     <Card>
-      {title && code && (
-        <CardHeader className='flex flex-row items-center'>
-          {title && (
-            <CardTitle className='flex-1 leading-normal'> {title}</CardTitle>
-          )}
-          {code && (
-            <div className='flex-none'>
-              <Switch id='airplane-mode' onClick={toggle} />
-            </div>
-          )}
-        </CardHeader>
-      )}
-
+      <CardHeader className='flex flex-row items-center'>
+        {title && (
+          <CardTitle className='flex-1 leading-normal'> {title}</CardTitle>
+        )}
+        {code && (
+          <div className='flex-none'>
+            <Switch id='airplane-mode' onClick={toggle} />
+          </div>
+        )}
+      </CardHeader>
       <CardContent>
         {children}
         <Collapsible open={show}>

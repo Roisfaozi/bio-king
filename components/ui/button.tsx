@@ -1,11 +1,11 @@
-import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none   focus-visible:ring-0  disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-0   disabled:opacity-50  whitespace-nowrap disabled:pointer-events-none',
   {
     variants: {
       color: {
@@ -17,12 +17,12 @@ const buttonVariants = cva(
         info: 'bg-info text-info-foreground hover:bg-info/80',
         warning: 'bg-warning text-warning-foreground hover:bg-warning/80',
         secondary:
-          'bg-secondary text-muted-foreground hover:bg-secondary/80 dark:text-default-950',
+          'bg-secondary text-muted-foreground dark:text-default-950 hover:bg-secondary/80',
         dark: 'bg-accent-foreground text-accent hover:bg-accent-foreground/80',
       },
       variant: {
         outline:
-          'border border-current  bg-transparent hover:text-primary-foreground',
+          'border border-current bg-transparent hover:text-primary-foreground',
         soft: ' bg-opacity-10  hover:text-primary-foreground',
         ghost: 'bg-transparent text-current hover:text-primary-foreground',
       },
@@ -41,25 +41,25 @@ const buttonVariants = cva(
         variant: 'outline',
         color: 'destructive',
         className:
-          'text-destructive hover:border-destructive hover:bg-destructive hover:text-destructive-foreground',
+          'text-destructive hover:text-destructive-foreground hover:border-destructive hover:bg-destructive',
       },
       {
         variant: 'outline',
         color: 'success',
         className:
-          'text-success hover:border-success hover:bg-success hover:text-success-foreground',
+          'text-success hover:text-success-foreground hover:border-success hover:bg-success',
       },
       {
         variant: 'outline',
         color: 'info',
         className:
-          'text-info hover:border-info hover:bg-info hover:text-info-foreground',
+          'text-info hover:text-info-foreground hover:border-info hover:bg-info',
       },
       {
         variant: 'outline',
         color: 'warning',
         className:
-          'text-warning hover:border-warning hover:bg-warning hover:text-warning-foreground',
+          'text-warning hover:text-warning-foreground hover:border-warning hover:bg-warning',
       },
       {
         variant: 'outline',
@@ -70,13 +70,13 @@ const buttonVariants = cva(
         variant: 'outline',
         color: 'secondary',
         className:
-          'border-default-500 text-muted-foreground hover:bg-default-500  dark:bg-transparent dark:hover:bg-default-500/50',
+          'text-muted-foreground dark:bg-transparent hover:bg-default-500  dark:hover:bg-default-500/50 border-default-500',
       },
       {
         variant: 'outline',
         color: 'default',
         className:
-          'text-primary  hover:border-primary hover:bg-primary hover:text-primary-foreground',
+          'text-primary  hover:text-primary-foreground hover:border-primary hover:bg-primary',
       },
       {
         variant: 'outline',
@@ -107,7 +107,7 @@ const buttonVariants = cva(
         variant: 'soft',
         color: 'secondary',
         className:
-          'text-muted-foreground hover:bg-default-500/50  dark:bg-opacity-50  dark:hover:bg-opacity-100',
+          'text-muted-foreground dark:bg-opacity-50  hover:bg-default-500/50  dark:hover:bg-opacity-100',
       },
       {
         variant: 'soft',
@@ -123,7 +123,7 @@ const buttonVariants = cva(
         variant: 'ghost',
         color: 'secondary',
         className:
-          ' text-muted-foreground hover:bg-default-500/50 dark:bg-transparent  dark:hover:bg-default-500/50',
+          ' text-muted-foreground dark:bg-transparent hover:bg-default-500/50  dark:hover:bg-default-500/50',
       },
       {
         variant: 'ghost',

@@ -9,14 +9,7 @@ export const getYAxisConfig = (
   },
 });
 
-export const getXAxisConfig = (
-  colors: string,
-): {
-  categories: string[];
-  labels: { style: { colors: string; fontFamily: string } };
-  axisBorder: { show: boolean };
-  axisTicks: { show: boolean };
-} => ({
+export const getXAxisConfig = (colors: string): {} => ({
   categories: [
     'Jan',
     'Feb',
@@ -40,9 +33,7 @@ export const getXAxisConfig = (
   },
 });
 
-export const getLabel = (
-  colors: any,
-): { style: { colors: string; fontFamily: string } } => ({
+export const getLabel = (colors: any): {} => ({
   style: {
     colors: colors,
     fontFamily: 'Inter',

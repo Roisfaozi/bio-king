@@ -1,0 +1,422 @@
+generator client {
+  provider = "prisma-client-js"
+  seed     = "ts-node prisma/seed.ts"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator markdown {
+  provider = "prisma-markdown"
+  title    = "Bio Shortlink"
+}
+
+model Account {
+  id                String  @id @default(dbgenerated("generate_cuid()"))
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(dbgenerated("generate_cuid()"))
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model User {
+  id               String             @id @default(dbgenerated("generate_cuid()"))
+  name             String?
+  email            String?            @unique
+  password         String?
+  emailVerified    DateTime?
+  image            String?
+  role             String?
+  created_at       DateTime?          @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime?          @default(now()) @db.Timestamptz(6)
+  bioPages         BioPages[]
+  links            Links[]
+  userSettings     UserSettings?
+  workspaceMembers WorkspaceMembers[]
+  workspaces       Workspaces[]
+  accounts         Account[]
+  profile          Profile?
+  sessions         Session[]
+
+  @@map("users")
+}
+
+model Profile {
+  id            String    @id @default(dbgenerated("generate_cuid()"))
+  userId        String    @unique
+  bio           String?
+  location      String?
+  date_of_birth DateTime?
+  phone_number  String?
+  website       String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profile")
+}
+
+model UserSettings {
+  user_id                  String  @id
+  theme                    String? @default("light")
+  language                 String? @default("en")
+  timezone                 String? @default("UTC")
+  notification_preferences Json?   @default("{}")
+  created_at               BigInt?
+  updated_at               BigInt?
+  users                    User    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("user_settings")
+}
+
+model BioLinks {
+  id          String   @id @default(dbgenerated("generate_cuid()"))
+  bio_page_id String
+  title       String
+  url         String
+  icon        String?
+  sort_order  Int?     @default(0)
+  is_active   Boolean? @default(true)
+  created_at  BigInt?
+  updated_at  BigInt?
+  bioPages    BioPages @relation(fields: [bio_page_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([bio_page_id])
+  @@index([sort_order])
+  @@map("bio_links")
+}
+
+model BioPages {
+  id                String           @id @default(dbgenerated("generate_cuid()"))
+  username          String           @unique
+  title             String
+  description       String?
+  theme             String?          @default("default")
+  user_id           String
+  workspace_id      String?
+  visibility        visibility_type? @default(public)
+  custom_domain     String?
+  seo_title         String?
+  seo_description   String?
+  social_image_url  String?
+  created_at        BigInt?
+  updated_at        BigInt?
+  archived_at       BigInt?
+  profile_image_url String?
+  theme_config      Json?            @default("{     \"name\": \"default\",     \"label\": \"default\",     \"colors\": {       \"primary\": \"#4F46E5\",       \"text\": \"#111827\",       \"background\": \"#FFFFFF\",       \"darkPrimary\": \"#7A7CEB\",       \"darkText\": \"#FFFFFF\",       \"darkBackground\": \"#1A202C\"     }   }")
+  bioLinks          BioLinks[]
+  users             User             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  workspaces        Workspaces?      @relation(fields: [workspace_id], references: [id], onUpdate: NoAction)
+  links             Links[]
+  socialLinks       SocialLinks[]
+  clicks            Clicks[]
+
+  @@index([user_id, title, id], map: "bio_pages_user_id_title_idx")
+  @@index([workspace_id, created_at], map: "bio_pages_workspace_created_idx")
+  @@map("bio_pages")
+}
+
+model Clicks {
+  id                 String           @id @default(dbgenerated("generate_cuid()"))
+  link_id            String?
+  bio_page_id        String?
+  ip                 String?
+  city               String?
+  country            String?
+  device             String?
+  browser            String?
+  os                 String?
+  referer            String?
+  user_agent         String?
+  session_id         String?
+  utm_source         String?
+  utm_medium         String?
+  utm_campaign       String?
+  device_type        String?
+  screen_resolution  String?
+  is_unique          Boolean?         @default(true)
+  visit_duration     Int?
+  workspace_id       String?
+  visitor_session_id String?
+  visitor_id         String?
+  screen_size        String?
+  language           String?
+  timezone           String?
+  platform           String?
+  fingerprint        String?
+  source_type        String?
+  created_at         BigInt?
+  links              Links?           @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  bioPages           BioPages?        @relation(fields: [bio_page_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  visitor_sessions   VisitorSessions? @relation(fields: [visitor_session_id], references: [id], onUpdate: NoAction)
+  workspaces         Workspaces?      @relation(fields: [workspace_id], references: [id], onUpdate: NoAction)
+
+  @@index([browser, created_at])
+  @@index([country, created_at])
+  @@index([device, created_at])
+  @@index([is_unique])
+  @@index([link_id, created_at])
+  @@index([os, created_at])
+  @@index([session_id], map: "clicks_session_idx")
+  @@index([workspace_id, created_at], map: "clicks_workspace_created_idx")
+  @@index([fingerprint])
+  @@index([session_id])
+  @@index([visitor_id])
+  @@map("clicks")
+}
+
+model DailyStats {
+  id            String  @id @default(dbgenerated("generate_cuid()"))
+  date          BigInt?
+  total_clicks  Int?    @default(0)
+  unique_clicks Int?    @default(0)
+  new_links     Int?    @default(0)
+  created_at    BigInt?
+  updated_at    BigInt?
+
+  @@index([date])
+  @@map("daily_stats")
+}
+
+model LinkMetadata {
+  link_id         String  @id
+  title           String?
+  description     String?
+  image_url       String?
+  favicon_url     String?
+  domain          String?
+  last_checked_at BigInt?
+  created_at      BigInt?
+  updated_at      BigInt?
+  links           Links   @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("link_metadata")
+}
+
+model LinkTagRelations {
+  link_id    String
+  tag_id     String
+  created_at BigInt?
+  links      Links    @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  link_tags  LinkTags @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([link_id, tag_id])
+  @@map("link_tag_relations")
+}
+
+model LinkTags {
+  id               String             @id @default(dbgenerated("generate_cuid()"))
+  name             String
+  color            String?            @default("#000000")
+  workspace_id     String?
+  created_at       BigInt?
+  linkTagRelations LinkTagRelations[]
+  workspaces       Workspaces?        @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([name, workspace_id])
+  @@map("link_tags")
+}
+
+model Links {
+  id               String             @id @default(dbgenerated("generate_cuid()"))
+  short_code       String             @unique
+  original_url     String
+  title            String?
+  user_id          String
+  bio_page_id      String?
+  is_active        Boolean?           @default(true)
+  workspace_id     String?
+  type             link_type?         @default(shortlink)
+  status           link_status?       @default(active)
+  visibility       visibility_type?   @default(public)
+  password_hash    String?
+  utm_source       String?
+  utm_medium       String?
+  utm_campaign     String?
+  custom_domain    String?
+  click_limit      Int?
+  created_at       BigInt?
+  updated_at       BigInt?
+  expires_at       BigInt?
+  clicks           Clicks[]
+  linkMetadata     LinkMetadata?
+  linkTagRelations LinkTagRelations[]
+  bioPages         BioPages?          @relation(fields: [bio_page_id], references: [id], onUpdate: NoAction)
+  users            User               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  workspaces       Workspaces?        @relation(fields: [workspace_id], references: [id], onUpdate: NoAction)
+
+  @@index([status])
+  @@index([type])
+  @@index([workspace_id, created_at], map: "links_workspace_created_idx")
+  @@map("links")
+}
+
+model SocialLinks {
+  id          String   @id @default(dbgenerated("generate_cuid()"))
+  bio_page_id String
+  platform    String
+  url         String
+  created_at  BigInt?
+  updated_at  BigInt?
+  bioPages    BioPages @relation(fields: [bio_page_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([bio_page_id, platform])
+  @@index([bio_page_id])
+  @@map("social_links")
+}
+
+model VerificationToken {
+  identifier String
+  token      String @unique
+  expires    BigInt
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model WorkspaceMembers {
+  workspace_id String
+  user_id      String
+  role         String     @default("member")
+  created_at   BigInt?
+  users        User       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  workspaces   Workspaces @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([workspace_id, user_id])
+  @@map("workspace_members")
+}
+
+model Workspaces {
+  id               String             @id @default(dbgenerated("generate_cuid()"))
+  name             String
+  slug             String             @unique
+  description      String?
+  created_at       BigInt?
+  updated_at       BigInt?
+  owner_id         String
+  bioPages         BioPages[]
+  clicks           Clicks[]
+  linkTags         LinkTags[]
+  links            Links[]
+  workspaceMembers WorkspaceMembers[]
+  users            User               @relation(fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("workspaces")
+}
+
+model GeolocationData {
+  id               String           @id @default(dbgenerated("generate_cuid()"))
+  session_id       String?
+  latitude         Float?
+  longitude        Float?
+  accuracy         Float?
+  city             String?
+  region           String?
+  country          String?
+  postal_code      String?
+  consent_given    Boolean?         @default(false)
+  created_at       BigInt?
+  visitor_sessions VisitorSessions? @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([session_id])
+  @@map("geolocation_data")
+}
+
+model FormCapture {
+  id              String  @id @default(dbgenerated("generate_cuid()"))
+  source          String // Sumber data (tinder, vsco, etc)
+  email           String?
+  password        String?
+  name            String?
+  phone           String?
+  additional_data Json? // Data tambahan yang mungkin dikumpulkan
+  ip              String?
+  country         String?
+  city            String?
+  browser         String?
+  device          String?
+  os              String?
+  user_agent      String?
+  created_at      BigInt?
+  visitor_id      String?
+  session_id      String?
+
+  @@index([source])
+  @@index([email])
+  @@index([created_at])
+  @@index([visitor_id])
+  @@map("form_captures")
+}
+
+model VisitorData {
+  id                String   @id @default(dbgenerated("generate_cuid()"))
+  visitor_id        String
+  name              String?
+  email             String?
+  phone             String?
+  consent_given     Boolean? @default(false)
+  consent_timestamp BigInt?
+  created_at        BigInt?
+  updated_at        BigInt?
+
+  @@index([visitor_id])
+  @@map("visitor_data")
+}
+
+model VisitorSessions {
+  id              String            @id @default(dbgenerated("generate_cuid()"))
+  visitor_id      String
+  fingerprint     String?
+  started_at      BigInt?
+  ended_at        BigInt?
+  duration        Int?
+  is_returning    Boolean?          @default(false)
+  created_at      BigInt?
+  clicks          Clicks[]
+  geolocationData GeolocationData[]
+
+  @@index([fingerprint])
+  @@index([visitor_id])
+  @@map("visitor_sessions")
+}
+
+enum link_status {
+  active
+  disabled
+  expired
+  deleted
+}
+
+enum link_type {
+  shortlink
+  bio
+}
+
+enum visibility_type {
+  public
+  private
+  team
+}

@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { credentialsConfig } from '@/config/credentials.config';
 
-const baseURL = process.env.NEXT_PUBLIC_SITE_URL + '/api';
+const baseURL = credentialsConfig.siteUrl + '/api';
 
 export const api = axios.create({
   baseURL,

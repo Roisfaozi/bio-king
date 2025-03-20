@@ -1,30 +1,152 @@
 'use client';
+import { AnalyticsResponse, getAnalytics } from '@/action/analytics-action';
 import { Eye, Session } from '@/components/svg';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Icon } from '@iconify/react';
+import { useEffect, useState } from 'react';
 
 const ReportsArea = () => {
+  const [analytics, setAnalytics] = useState<AnalyticsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        const response = await getAnalytics({ timeRange: '7' });
+        if (response.status === 'success') {
+          setAnalytics(response as AnalyticsResponse);
+        }
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
+  // Hitung persentase perubahan untuk klik
+  const calculateClicksChange = () => {
+    if (
+      !analytics?.data?.charts?.clicks ||
+      analytics.data.charts.clicks.length < 2
+    ) {
+      return { rate: '0', isUp: true };
+    }
+
+    const clicksData = analytics.data.charts.clicks;
+    const totalClicks = analytics.data.counts.totalClicks;
+
+    // Hitung total klik untuk 3 hari terakhir
+    const recentDays = clicksData.slice(-3);
+    const olderDays = clicksData.slice(-6, -3);
+
+    const recentTotal = recentDays.reduce(
+      (sum, day) => sum + day.totalClicks,
+      0,
+    );
+    const olderTotal = olderDays.reduce((sum, day) => sum + day.totalClicks, 0);
+
+    if (olderTotal === 0) return { rate: '0', isUp: true };
+
+    const percentChange = ((recentTotal - olderTotal) / olderTotal) * 100;
+    return {
+      rate: Math.abs(percentChange).toFixed(0),
+      isUp: percentChange >= 0,
+    };
+  };
+
+  // Hitung persentase perubahan untuk link/bio yang dibuat
+  const calculateLinksChange = () => {
+    if (
+      !analytics?.data?.charts?.created ||
+      analytics.data.charts.created.length < 2
+    ) {
+      return { rate: '0', isUp: true };
+    }
+
+    const createdData = analytics.data.charts.created;
+
+    // Hitung total link/bio untuk 3 hari terakhir
+    const recentDays = createdData.slice(-3);
+    const olderDays = createdData.slice(-6, -3);
+
+    const recentTotal = recentDays.reduce((sum, day) => sum + day.total, 0);
+    const olderTotal = olderDays.reduce((sum, day) => sum + day.total, 0);
+
+    if (olderTotal === 0) return { rate: '0', isUp: true };
+
+    const percentChange = ((recentTotal - olderTotal) / olderTotal) * 100;
+    return {
+      rate: Math.abs(percentChange).toFixed(0),
+      isUp: percentChange >= 0,
+    };
+  };
+
+  // Hitung klik hari ini
+  const getTodayClicks = () => {
+    if (
+      !analytics?.data?.charts?.clicks ||
+      analytics.data.charts.clicks.length === 0
+    ) {
+      return '0';
+    }
+
+    const today =
+      analytics.data.charts.clicks[analytics.data.charts.clicks.length - 1];
+    return today.totalClicks.toString();
+  };
+
+  // Hitung link/bio yang dibuat hari ini
+  const getTodayCreated = () => {
+    if (
+      !analytics?.data?.charts?.created ||
+      analytics.data.charts.created.length === 0
+    ) {
+      return '0';
+    }
+
+    const today =
+      analytics.data.charts.created[analytics.data.charts.created.length - 1];
+    return today.total.toString();
+  };
+
+  const clicksChange = calculateClicksChange();
+  const linksChange = calculateLinksChange();
+
   const reports = [
     {
       id: 1,
-      name: 'Sessions',
-      count: '6,132',
-      rate: '150',
-      isUp: true,
+      name: 'Links & Bio',
+      count: loading
+        ? '...'
+        : (
+            (analytics?.data?.counts?.shortlinks || 0) +
+            (analytics?.data?.counts?.bioPages || 0)
+          ).toLocaleString(),
+      rate: linksChange.rate,
+      today: getTodayCreated(),
+      isUp: linksChange.isUp,
       icon: <Session className='h-4 w-4' />,
       color: 'primary',
     },
     {
       id: 2,
-      name: 'Page Views',
-      count: '11,236',
-      rate: '202',
-      isUp: false,
+      name: 'Clicks',
+      count: loading
+        ? '...'
+        : (analytics?.data?.counts?.totalClicks || 0).toLocaleString(),
+      rate: clicksChange.rate,
+      today: getTodayClicks(),
+      isUp: clicksChange.isUp,
       icon: <Eye className='h-4 w-4' />,
       color: 'info',
     },
   ];
+
   return (
     <>
       {reports.map((item, index) => (
@@ -65,7 +187,7 @@ const ReportsArea = () => {
                 </>
               ) : (
                 <>
-                  <span className='text-destructive'>{item.rate}</span>
+                  <span className='text-destructive'>{item.rate}%</span>
                   <Icon
                     icon='heroicons:arrow-trending-down-16-solid'
                     className='text-xl text-destructive'
@@ -73,8 +195,8 @@ const ReportsArea = () => {
                 </>
               )}
             </div>
-            <div className='mt-1 text-xs text-default-600'>
-              vs Previous 30 Days
+            <div className='mt-1 text-sm text-default-600'>
+              <span className='text-primary'> +{item.today}</span> Hari Ini
             </div>
           </CardContent>
         </Card>

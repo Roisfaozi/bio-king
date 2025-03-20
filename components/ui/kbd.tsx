@@ -3,17 +3,17 @@ import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 const kbdVariants = cva(
-  ' inline-flex h-8 items-center space-x-0.5 rounded-xl border  border-default-300 bg-default-100 px-3  text-center font-medium    leading-none   text-default-600 [&>abbr]:leading-none',
+  ' px-3 h-8 inline-flex border leading-none [&>abbr]:leading-none  border-default-300 space-x-0.5 items-center  font-medium text-center    bg-default-100 leading-none   text-default-600 rounded-xl',
   {
     variants: {
       variant: {
         default: 'iam-default',
       },
       size: {
-        sm: ' h-7 rounded-lg text-xs [&>abbr]:text-sm',
+        sm: ' h-7 text-xs [&>abbr]:text-sm rounded-lg',
         md: ' text-sm [&>abbr]:text-lg',
-        lg: ' h-9 px-4  text-base [&>abbr]:text-xl',
-        xl: ' h-10 px-4  text-xl [&>abbr]:text-2xl',
+        lg: ' px-4 h-9  [&>abbr]:text-xl text-base',
+        xl: ' px-4 h-10  [&>abbr]:text-2xl text-xl',
       },
     },
     defaultVariants: {

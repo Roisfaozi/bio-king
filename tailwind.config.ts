@@ -2,7 +2,7 @@ import type { Config } from 'tailwindcss';
 const config = {
   darkMode: ['class'],
   content: [
-    './pages/**/*.{js,jsx,ts,tsx,css,,md,mdx}',
+    './pages/**/*.{js,jsx,ts,tsx,css,md,mdx}',
     './components/**/*.{js,jsx,ts,tsx,md,mdx}',
     './app/**/*.{js,jsx,ts,tsx,css,md,mdx}',
     './src/**/*.{js,jsx,ts,tsx,md,mdx}',
@@ -27,79 +27,85 @@ const config = {
     },
     extend: {
       colors: {
-        border: 'hsl(var(--border) / <alpha-value>)',
+        border: 'hsl(var(--border))',
         default: {
-          50: 'hsl(var(--default-50) / <alpha-value>)',
-          100: 'hsl(var(--default-100) / <alpha-value>)',
-          200: 'hsl(var(--default-200) / <alpha-value>)',
-          300: 'hsl(var(--default-300) / <alpha-value>)',
-          400: 'hsl(var(--default-400) / <alpha-value>)',
-          500: 'hsl(var(--default-500) / <alpha-value>)',
-          600: 'hsl(var(--default-600) / <alpha-value>)',
-          700: 'hsl(var(--default-700) / <alpha-value>)',
-          800: 'hsl(var(--default-800) / <alpha-value>)',
-          900: 'hsl(var(--default-900) / <alpha-value>)',
-          950: 'hsl(var(--default-950) / <alpha-value>)',
+          '50': 'hsl(var(--default-50) / <alpha-value>)',
+          '100': 'hsl(var(--default-100) / <alpha-value>)',
+          '200': 'hsl(var(--default-200) / <alpha-value>)',
+          '300': 'hsl(var(--default-300) / <alpha-value>)',
+          '400': 'hsl(var(--default-400) / <alpha-value>)',
+          '500': 'hsl(var(--default-500) / <alpha-value>)',
+          '600': 'hsl(var(--default-600) / <alpha-value>)',
+          '700': 'hsl(var(--default-700) / <alpha-value>)',
+          '800': 'hsl(var(--default-800) / <alpha-value>)',
+          '900': 'hsl(var(--default-900) / <alpha-value>)',
+          '950': 'hsl(var(--default-950) / <alpha-value>)',
         },
-
-        input: 'hsl(var(--input) / <alpha-value>)',
-        ring: 'hsl(var(--ring) / <alpha-value>)',
-        background: 'hsl(var(--background) / <alpha-value>)',
-        foreground: 'hsl(var(--foreground) / <alpha-value>)',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
         primary: {
-          50: 'hsl(var(--primary-50) / <alpha-value>)',
-          100: 'hsl(var(--primary-100) / <alpha-value>)',
-          200: 'hsl(var(--primary-200) / <alpha-value>)',
-          300: 'hsl(var(--primary-300) / <alpha-value>)',
-          400: 'hsl(var(--primary-400) / <alpha-value>)',
-          500: 'hsl(var(--primary-500) / <alpha-value>)',
-          600: 'hsl(var(--primary-600) / <alpha-value>)',
-          700: 'hsl(var(--primary-700) / <alpha-value>)',
-          800: 'hsl(var(--primary-800) / <alpha-value>)',
-          900: 'hsl(var(--primary-900) / <alpha-value>)',
-          950: 'hsl(var(--primary-950) / <alpha-value>)',
-          DEFAULT: 'hsl(var(--primary) / <alpha-value>)',
-          foreground: 'hsl(var(--primary-foreground) / <alpha-value>)',
+          '50': 'hsl(var(--primary-50) / <alpha-value>)',
+          '100': 'hsl(var(--primary-100) / <alpha-value>)',
+          '200': 'hsl(var(--primary-200) / <alpha-value>)',
+          '300': 'hsl(var(--primary-300) / <alpha-value>)',
+          '400': 'hsl(var(--primary-400) / <alpha-value>)',
+          '500': 'hsl(var(--primary-500) / <alpha-value>)',
+          '600': 'hsl(var(--primary-600) / <alpha-value>)',
+          '700': 'hsl(var(--primary-700) / <alpha-value>)',
+          '800': 'hsl(var(--primary-800) / <alpha-value>)',
+          '900': 'hsl(var(--primary-900) / <alpha-value>)',
+          '950': 'hsl(var(--primary-950) / <alpha-value>)',
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary) / <alpha-value>)',
-          foreground: 'hsl(var(--secondary-foreground) / <alpha-value>)',
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive) / <alpha-value>)',
-          700: '#be185d',
-          foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)',
+          '700': '#be185d',
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
         },
         success: {
+          '700': '#15803d',
           DEFAULT: 'hsl(var(--success) / <alpha-value>)',
-          700: '#15803d',
           foreground: 'hsl(var(--success-foreground) / <alpha-value>)',
         },
         info: {
+          '700': '#0f766e',
           DEFAULT: 'hsl(var(--info) / <alpha-value>)',
-          700: '#0f766e',
           foreground: 'hsl(var(--info-foreground) / <alpha-value>)',
         },
         warning: {
+          '700': '#a16207',
           DEFAULT: 'hsl(var(--warning) / <alpha-value>)',
-          700: '#a16207',
           foreground: 'hsl(var(--warning-foreground) / <alpha-value>)',
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted) / <alpha-value>)',
-          foreground: 'hsl(var(--muted-foreground) / <alpha-value>)',
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent) / <alpha-value>)',
-          foreground: 'hsl(var(--accent-foreground) / <alpha-value>)',
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover) / <alpha-value>)',
-          foreground: 'hsl(var(--popover-foreground) / <alpha-value>)',
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
         },
         card: {
-          DEFAULT: 'hsl(var(--card) / <alpha-value>)',
-          foreground: 'hsl(var(--card-foreground) / <alpha-value>)',
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+        chart: {
+          '1': 'hsl(var(--chart-1))',
+          '2': 'hsl(var(--chart-2))',
+          '3': 'hsl(var(--chart-3))',
+          '4': 'hsl(var(--chart-4))',
+          '5': 'hsl(var(--chart-5))',
         },
       },
       boxShadow: {
@@ -112,28 +118,60 @@ const config = {
       },
       keyframes: {
         'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
+          from: {
+            height: '0',
+          },
+          to: {
+            height: 'var(--radix-accordion-content-height)',
+          },
         },
         'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
+          from: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+          to: {
+            height: '0',
+          },
         },
         slideDownAndFade: {
-          from: { opacity: '0', transform: 'translateY(-2px)' },
-          to: { opacity: '1', transform: 'translateY(0)' },
+          from: {
+            opacity: '0',
+            transform: 'translateY(-2px)',
+          },
+          to: {
+            opacity: '1',
+            transform: 'translateY(0)',
+          },
         },
         slideLeftAndFade: {
-          from: { opacity: '0', transform: 'translateX(2px)' },
-          to: { opacity: '1', transform: 'translateX(0)' },
+          from: {
+            opacity: '0',
+            transform: 'translateX(2px)',
+          },
+          to: {
+            opacity: '1',
+            transform: 'translateX(0)',
+          },
         },
         slideUpAndFade: {
-          from: { opacity: '0', transform: 'translateY(2px)' },
-          to: { opacity: '1', transform: 'translateY(0)' },
+          from: {
+            opacity: '0',
+            transform: 'translateY(2px)',
+          },
+          to: {
+            opacity: '1',
+            transform: 'translateY(0)',
+          },
         },
         slideRightAndFade: {
-          from: { opacity: '0', transform: 'translateX(-2px)' },
-          to: { opacity: '1', transform: 'translateX(0)' },
+          from: {
+            opacity: '0',
+            transform: 'translateX(-2px)',
+          },
+          to: {
+            opacity: '1',
+            transform: 'translateX(0)',
+          },
         },
       },
       animation: {
@@ -146,6 +184,22 @@ const config = {
         slideUpAndFade: 'slideUpAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
         slideRightAndFade:
           'slideRightAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'pulse-slow': 'pulse-slow 3s ease-in-out infinite',
+        float: 'float 6s ease-in-out infinite',
+        'gradient-x': 'gradient-x 15s ease infinite alternate',
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic':
+          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-primary':
+          'linear-gradient(to right, #4f46e5, #8b5cf6, #d946ef)',
+        'gradient-secondary':
+          'linear-gradient(to right, #0ea5e9, #06b6d4, #14b8a6)',
+        'gradient-warm': 'linear-gradient(to right, #f59e0b, #f97316, #ef4444)',
+        'gradient-cool': 'linear-gradient(to right, #3b82f6, #6366f1, #8b5cf6)',
+        'gradient-pastel':
+          'linear-gradient(to right, #67e8f9, #a5b4fc, #f0abfc)',
       },
     },
   },

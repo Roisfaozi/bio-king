@@ -45,7 +45,7 @@ const circleVariants = cva('[&_[path-color]]:text-default-200 ', {
       xs: 'h-12 w-12',
       sm: 'h-14 w-14',
       md: 'h-20 w-20',
-      lg: ' h-24',
+      lg: ' h-24 h-24',
       xl: 'h-28 w-28',
     },
   },

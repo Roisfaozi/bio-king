@@ -1,16 +1,13 @@
 'use client';
-import React, { useState } from 'react';
-import { cn, isLocationMatch } from '@/lib/utils';
-import { useSidebar, useThemeStore } from '@/store';
-import SidebarLogo from '../common/logo';
-import { menusConfig } from '@/config/menus';
-import MenuLabel from '../common/menu-label';
-import { Separator } from '@/components/ui/separator';
+import MenuLabel from '@/components/partials/sidebar/common/menu-label';
+import SingleMenuItem from '@/components/partials/sidebar/mobile-sidebar/single-menu-item';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { menusConfig } from '@/config/menus';
+import { cn, isLocationMatch } from '@/lib/utils';
+import { useSidebar } from '@/store';
 import { usePathname } from 'next/navigation';
-import SingleMenuItem from './single-menu-item';
-import SubMenuHandler from './sub-menu-handler';
-import NestedSubMenu from '../common/nested-menus';
+import React, { useState } from 'react';
+import SidebarLogo from '../common/logo';
 const MobileSidebar = ({
   className,
   trans,
@@ -67,6 +64,7 @@ const MobileSidebar = ({
       setMobileMenu(false);
     }
   }, [locationName]);
+
   return (
     <>
       <div
@@ -100,39 +98,16 @@ const MobileSidebar = ({
               <li key={`menu_key_${i}`}>
                 {/* single menu  */}
 
-                {!item.child && !item.isHeader && (
+                {!item.isHeader && (
                   <SingleMenuItem item={item} collapsed={collapsed} />
                 )}
 
                 {/* menu label */}
-                {item.isHeader && !item.child && !collapsed && (
+                {item.isHeader && !collapsed && (
                   <MenuLabel item={item} trans={trans} />
                 )}
 
                 {/* sub menu */}
-                {item.child && (
-                  <>
-                    <SubMenuHandler
-                      item={item}
-                      toggleSubmenu={toggleSubmenu}
-                      index={i}
-                      activeSubmenu={activeSubmenu}
-                      collapsed={collapsed}
-                    />
-
-                    {!collapsed && (
-                      <NestedSubMenu
-                        toggleMultiMenu={toggleMultiMenu}
-                        activeMultiMenu={activeMultiMenu}
-                        activeSubmenu={activeSubmenu}
-                        item={item}
-                        index={i}
-                        title={''}
-                        trans={undefined}
-                      />
-                    )}
-                  </>
-                )}
               </li>
             ))}
           </ul>

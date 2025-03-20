@@ -19,6 +19,7 @@
 .DS_Store
 *.pem
 
+.idea
 # debug
 npm-debug.log*
 yarn-debug.log*
@@ -30,6 +31,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+# cursosr
+.cursorrules
+.cursor
 # vscode
 .vscode
 .contentlayer
@@ -39,3 +43,6 @@ tsconfig.tsbuildinfo
 .env.local
 .env.production
 .env.stagging
+
+code_context.txt
+schema.txt

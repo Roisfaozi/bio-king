@@ -1,17 +1,14 @@
 'use client';
-import React, { useState } from 'react';
-import { cn, isLocationMatch, getDynamicPath } from '@/lib/utils';
-import { useSidebar, useThemeStore } from '@/store';
-import SidebarLogo from '../common/logo';
-import { menusConfig } from '@/config/menus';
-import MenuLabel from '../common/menu-label';
-import { Separator } from '@/components/ui/separator';
+import SingleMenuItem from '@/components/partials/sidebar/classic/single-menu-item';
+import AddBlock from '@/components/partials/sidebar/common/add-block';
+import MenuLabel from '@/components/partials/sidebar/common/menu-label';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { menusConfig } from '@/config/menus';
+import { cn, getDynamicPath, isLocationMatch } from '@/lib/utils';
+import { useSidebar, useThemeStore } from '@/store';
 import { usePathname } from 'next/navigation';
-import SingleMenuItem from './single-menu-item';
-import SubMenuHandler from './sub-menu-handler';
-import NestedSubMenu from '../common/nested-menus';
-import AddBlock from '../common/add-block';
+import React, { useState } from 'react';
+import SidebarLogo from '../common/logo';
 const ClassicSidebar = ({ trans }: { trans: string }) => {
   const { sidebarBg } = useSidebar();
   const [activeSubmenu, setActiveSubmenu] = useState<number | null>(null);
@@ -63,7 +60,6 @@ const ClassicSidebar = ({ trans }: { trans: string }) => {
     setActiveSubmenu(subMenuIndex);
     setMultiMenu(multiMenuIndex);
   }, [locationName]);
-
   return (
     <div
       onMouseEnter={() => setHovered(true)}
@@ -85,7 +81,6 @@ const ClassicSidebar = ({ trans }: { trans: string }) => {
       )}
 
       <SidebarLogo hovered={hovered} />
-
       <ScrollArea
         className={cn('sidebar-menu h-[calc(100%-80px)]', {
           'px-4': !collapsed || hovered,
@@ -102,7 +97,7 @@ const ClassicSidebar = ({ trans }: { trans: string }) => {
             <li key={`menu_key_${i}`}>
               {/* single menu  */}
 
-              {!item.child && !item.isHeader && (
+              {item && !item.isHeader && (
                 <SingleMenuItem
                   item={item}
                   collapsed={collapsed}
@@ -112,34 +107,8 @@ const ClassicSidebar = ({ trans }: { trans: string }) => {
               )}
 
               {/* menu label */}
-              {item.isHeader && !item.child && (!collapsed || hovered) && (
+              {item.isHeader && (!collapsed || hovered) && (
                 <MenuLabel item={item} trans={trans} />
-              )}
-
-              {/* sub menu */}
-              {item.child && (
-                <>
-                  <SubMenuHandler
-                    item={item}
-                    toggleSubmenu={toggleSubmenu}
-                    index={i}
-                    activeSubmenu={activeSubmenu}
-                    collapsed={collapsed}
-                    hovered={hovered}
-                    trans={trans}
-                  />
-
-                  {(!collapsed || hovered) && (
-                    <NestedSubMenu
-                      toggleMultiMenu={toggleMultiMenu}
-                      activeMultiMenu={activeMultiMenu}
-                      activeSubmenu={activeSubmenu}
-                      item={item}
-                      index={i}
-                      trans={trans}
-                    />
-                  )}
-                </>
               )}
             </li>
           ))}

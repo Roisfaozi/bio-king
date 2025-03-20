@@ -1,6 +1,20 @@
 import { type ClassValue, clsx } from 'clsx';
+import { format, formatDistanceToNow } from 'date-fns';
+import { customAlphabet } from 'nanoid';
+import { ChangeEvent } from 'react';
 import { twMerge } from 'tailwind-merge';
-
+import { UAParser } from 'ua-parser-js';
+import {
+  ExternalLink,
+  Facebook,
+  Github,
+  Instagram,
+  Linkedin,
+  Moon,
+  Sun,
+  Twitter,
+  Youtube,
+} from 'lucide-react';
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -30,7 +44,7 @@ export const RGBToHex = (r: number, g: number, b: number): string => {
 
 export function hslToHex(hsl: string): string {
   // Remove "hsla(" and ")" from the HSL string
-  const hslValues = hsl.replace('hsla(', '').replace(')', '');
+  let hslValues = hsl.replace('hsla(', '').replace(')', '');
 
   // Split the HSL string into an array of H, S, and L values
   const [h, s, l] = hslValues.split(' ').map((value) => {
@@ -166,4 +180,146 @@ export const translate = (title: string, trans: Translations): string => {
   }
 
   return title;
+};
+
+export function parseUserAgent(userAgent: string) {
+  try {
+    const parser = new UAParser(userAgent);
+    const result = parser.getResult();
+
+    return {
+      browser: result.browser.name || 'Unknown',
+      os: result.os.name || 'Unknown',
+      device: result.device.type || 'desktop',
+    };
+  } catch (error) {
+    console.error('Error parsing user agent:', error);
+    return {
+      browser: 'Unknown',
+      os: 'Unknown',
+      device: 'desktop',
+    };
+  }
+}
+
+export function calculateGrowth(current: number, previous: number): number {
+  if (previous === 0) return 100;
+  return ((current - previous) / previous) * 100;
+}
+
+// Generate a short code for links
+export function generateShortCode() {
+  const nanoid = customAlphabet(
+    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+    6,
+  );
+  return nanoid();
+}
+
+// Validate URL
+export function isValidUrl(url: string) {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Convert epoch timestamp (milliseconds) to Date object
+export function epochToDate(epoch: number): Date {
+  if (!epoch) return new Date();
+  return new Date(epoch);
+}
+
+// Convert Date object to epoch timestamp (milliseconds)
+export function dateToEpoch(date: Date): number {
+  return date.getTime();
+}
+
+// Format epoch timestamp to readable date string
+export function formatEpochDate(
+  epoch: number,
+  formatString: string = 'PPP',
+): string {
+  if (!epoch) return 'Unknown date';
+  try {
+    return format(epochToDate(epoch), formatString);
+  } catch (error) {
+    console.error('Error formatting epoch date:', error, epoch);
+    return 'Invalid date';
+  }
+}
+
+// Format epoch timestamp to relative time (e.g., "2 hours ago")
+export function formatEpochRelative(epoch: number): string {
+  if (!epoch) return 'Unknown time';
+  try {
+    return formatDistanceToNow(epochToDate(epoch), { addSuffix: true });
+  } catch (error) {
+    console.error('Error formatting relative epoch:', error, epoch);
+    return 'Invalid time';
+  }
+}
+
+// Get current time as epoch timestamp
+export function getCurrentEpoch(): number {
+  return Date.now();
+}
+
+// Check if an epoch timestamp is in the past
+export function isEpochInPast(epoch: number): boolean {
+  return epoch < getCurrentEpoch();
+}
+
+// Check if an epoch timestamp is in the future
+export function isEpochInFuture(epoch: number): boolean {
+  return epoch > getCurrentEpoch();
+}
+
+// Add days to an epoch timestamp
+export function addDaysToEpoch(epoch: number, days: number): number {
+  const date = epochToDate(epoch);
+  date.setDate(date.getDate() + days);
+  return dateToEpoch(date);
+}
+
+export function getImageData(event: ChangeEvent<HTMLInputElement>) {
+  // FileList is immutable, so we need to create a new one
+  const dataTransfer = new DataTransfer();
+
+  // Add newly uploaded images
+  Array.from(event.target.files!).forEach((image) =>
+    dataTransfer.items.add(image),
+  );
+
+  const files = dataTransfer.files;
+  const displayUrl = URL.createObjectURL(event.target.files![0]);
+
+  return { files, displayUrl };
+}
+
+export function toBase64(file: File) {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+
+    fileReader.readAsDataURL(file);
+
+    fileReader.onload = () => {
+      resolve(fileReader.result);
+    };
+
+    fileReader.onerror = (error) => {
+      reject(error);
+    };
+  });
+}
+
+export const copyToClipboard = (text: string, toast: any) => {
+  navigator.clipboard.writeText(text);
+  toast({
+    title: 'Copied to clipboard',
+    description: 'The URL has been copied to your clipboard.',
+    duration: 3000,
+  });
 };

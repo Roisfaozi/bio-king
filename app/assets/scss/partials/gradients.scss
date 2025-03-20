@@ -1,0 +1,113 @@
+/* Gradient Backgrounds */
+.bg-gradient-primary {
+  background: linear-gradient(to right, #7c3aed, #8b5cf6, #c026d3);
+}
+
+.bg-gradient-secondary {
+  background: linear-gradient(to right, #0ea5e9, #06b6d4, #14b8a6);
+}
+
+.bg-gradient-warm {
+  background: linear-gradient(to right, #f59e0b, #f97316, #ef4444);
+}
+
+.bg-gradient-cool {
+  background: linear-gradient(to right, #3b82f6, #6366f1, #8b5cf6);
+}
+
+.bg-gradient-pastel {
+  background: linear-gradient(to right, #67e8f9, #a5b4fc, #f0abfc);
+}
+
+.bg-gradient-hero {
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.05) 0%,
+    rgba(192, 38, 211, 0.05) 100%
+  );
+}
+
+.bg-gradient-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.7) 100%
+  );
+}
+
+.dark .bg-gradient-card {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 30, 46, 0.9) 0%,
+    rgba(30, 30, 46, 0.7) 100%
+  );
+}
+
+.bg-gradient-radial {
+  background: radial-gradient(var(--tw-gradient-stops));
+}
+
+.bg-gradient-conic {
+  background: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
+}
+
+/* Gradient Overlay Backgrounds */
+.bg-gradient-overlay-orange {
+  position: relative;
+}
+
+.bg-gradient-overlay-orange::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(249, 115, 22, 0.2) 0%,
+    rgba(239, 68, 68, 0.2) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bg-gradient-overlay-green {
+  position: relative;
+}
+
+.bg-gradient-overlay-green::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.2) 0%,
+    rgba(20, 184, 166, 0.2) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bg-gradient-overlay-pink {
+  position: relative;
+}
+
+.bg-gradient-overlay-pink::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(236, 72, 153, 0.2) 0%,
+    rgba(217, 70, 239, 0.2) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}

@@ -1,10 +1,8 @@
 'use client';
+import { Logo } from '@/components/landing-page/partials/logo';
 import ThemeButton from '@/components/partials/header/theme-button';
-import { SiteLogo } from '@/components/svg';
-import { Button } from '@/components/ui/button';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
-import { Icon } from '@iconify/react';
 import { ChevronDown, Menu } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -24,36 +22,26 @@ const Header = () => {
   if (!isDesktop) {
     return (
       <>
-        <div
-          className={
-            scroll
-              ? 'fixed left-0 top-0 z-50 w-full bg-card/50 py-3 shadow-sm backdrop-blur-lg dark:bg-card/70'
-              : 'fixed left-0 top-0 w-full py-3'
-          }
-        >
-          <nav className='container relative z-50 flex justify-between'>
-            <Link href='/' className='flex items-center gap-1'>
-              <SiteLogo className='h-8 w-8 text-primary' />
-              <span className='text-xl font-medium text-primary-500'>
-                DashTail
-              </span>
-            </Link>
+        <header className='shadow-header sticky top-0 z-50 flex h-16 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm lg:px-6'>
+          <nav className='container relative z-50 flex justify-between !p-0'>
+            <Logo />
 
-            <div className='flex items-center gap-6'>
+            <div className='flex items-center gap-2 md:gap-6'>
               <ThemeButton />
-              <Button asChild size='sm'>
+              <div className='flex gap-2 md:gap-4'>
                 <Link
-                  href='https://1.envato.market/dashtail-regular'
-                  target='__blank'
-                  className='text-sm font-semibold'
+                  href='/auth/login'
+                  className='btn-outline-gradient btn-hover-effect inline-flex h-8 items-center justify-center rounded-md border border-input px-2 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 md:h-9 md:px-3 md:text-sm'
                 >
-                  <Icon
-                    icon='heroicons:shopping-cart'
-                    className='mr-1.5 h-4 w-4'
-                  />
-                  Buy Now
+                  Log in
                 </Link>
-              </Button>
+                <Link
+                  href='/auth/signup'
+                  className='shadow-button btn-gradient btn-hover-effect inline-flex h-8 items-center justify-center rounded-md bg-gradient-primary px-2 text-xs font-medium text-primary-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 md:h-9 md:px-3 md:text-sm'
+                >
+                  Sign up
+                </Link>
+              </div>
               <button type='button'>
                 <Menu
                   className='h-6 w-6 cursor-pointer'
@@ -66,7 +54,7 @@ const Header = () => {
                 <ul className='space-y-1.5'>
                   {menus?.map((item, i) =>
                     item.child ? (
-                      <div key={`main-item-${i}`} className='space-y-1.5'>
+                      <div className='space-y-1.5'>
                         <div
                           className='group flex cursor-pointer items-center justify-between pr-4'
                           onClick={() => setShow(!show)}
@@ -116,43 +104,35 @@ const Header = () => {
               </div>
             )}
           </nav>
-        </div>
+        </header>
       </>
     );
   }
   return (
-    <div
-      className={
-        scroll
-          ? 'fixed left-0 top-0 z-30 w-full bg-card/50 py-3 shadow-xl backdrop-blur-lg dark:bg-card/70'
-          : 'fixed left-0 top-0 z-30 w-full py-3'
-      }
-    >
+    <header className='shadow-header sticky top-0 z-50 flex h-16 items-center justify-between border-b bg-card/80 px-4 backdrop-blur-sm lg:px-6'>
       <nav className='container flex justify-between'>
-        <Link
-          target='_blank'
-          href='/dashboard'
-          className='flex items-center gap-1'
-        >
-          <SiteLogo className='h-8 w-8 text-primary' />
-          <span className='text-xl font-medium text-primary-500'>DashTail</span>
-        </Link>
+        <Logo />
+
         <NavMenu />
-        <div className='flex items-center gap-6'>
+        <div className='flex items-center gap-2 md:gap-6'>
           <ThemeButton />
-          <Button asChild size='sm'>
+          <div className='gap-2 sm:flex md:gap-4'>
             <Link
-              href='https://1.envato.market/dashtail-regular'
-              target='__blank'
-              className='text-sm font-semibold'
+              href='/auth/login'
+              className='btn-outline-gradient btn-hover-effect inline-flex h-8 items-center justify-center rounded-md border border-input px-2 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 md:h-9 md:px-3 md:text-sm'
             >
-              <Icon icon='heroicons:shopping-cart' className='me-1.5 h-4 w-4' />
-              Buy Now
+              Log in
             </Link>
-          </Button>
+            <Link
+              href='/auth/signup'
+              className='shadow-button btn-gradient btn-hover-effect inline-flex h-8 items-center justify-center rounded-md bg-gradient-primary px-2 text-xs font-medium text-primary-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 md:h-9 md:px-3 md:text-sm'
+            >
+              Sign up
+            </Link>
+          </div>
         </div>
       </nav>
-    </div>
+    </header>
   );
 };
 

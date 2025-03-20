@@ -1,21 +1,20 @@
 'use client';
-import Header from './header';
-import ShowCase from './showcase';
-import Hero from './hero';
-import ColorSchemas from './color-schemas';
-import ProjectTools from './project-tools';
-import AllComponents from './all-components';
-import FigmaKit from './figma-kit';
-import CustomProject from './custom-project';
-import { useMounted } from '@/hooks/use-mounted';
 import LayoutLoader from '@/components/layout-loader';
+import { useMounted } from '@/hooks/use-mounted';
 import AboutDashtail from './about-dashtail';
-import Faq from './faq';
-import PricingPlan from './pricing-plan';
 import AboutUs from './about-us';
-import Stats from './stats';
+import AllComponents from './all-components';
+import ColorSchemas from './color-schemas';
 import Contact from './contact';
+import CustomProject from './custom-project';
+import Faq from './faq';
+import FigmaKit from './figma-kit';
 import Footer from './footer';
+import Header from './header';
+import Hero from './hero';
+import PricingPlan from './pricing-plan';
+import ProjectTools from './project-tools';
+import ShowCase from './showcase';
 const LandingPageView = () => {
   const mounted = useMounted();
   if (!mounted) {
@@ -25,7 +24,7 @@ const LandingPageView = () => {
     <div className='bg-background'>
       <Header />
       <Hero />
-      <Stats />
+      {/* <Stats /> */}
       <AllComponents />
       <ShowCase />
       <ColorSchemas />

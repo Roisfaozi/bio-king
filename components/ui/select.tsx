@@ -1,25 +1,25 @@
-import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { Check, ChevronDown } from 'lucide-react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { Check, ChevronDown } from 'lucide-react';
+import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 const selectVariants = cva(
-  ' flex  h-10 w-full items-center justify-between px-3 text-sm    transition duration-300  read-only:bg-background  disabled:cursor-not-allowed disabled:opacity-50  [&>svg]:h-5 [&>svg]:w-5 ',
+  ' w-full  px-3 h-10 text-sm flex [&>svg]:h-5 [&>svg]:w-5    justify-between items-center  read-only:bg-background  disabled:cursor-not-allowed disabled:opacity-50  transition duration-300 ',
   {
     variants: {
       color: {
         default:
-          'border-default-300 text-default-500 placeholder:text-accent-foreground/50 focus:border-default-500/50 focus:outline-none  disabled:bg-default-200 [&>svg]:stroke-default-600',
+          'border-default-300  focus:outline-none focus:border-default-500/50 disabled:bg-default-200  placeholder:text-accent-foreground/50 [&>svg]:stroke-default-600',
         primary:
-          'border-primary text-primary placeholder:text-primary/70 focus:border-primary-700 focus:outline-none disabled:bg-primary/30  disabled:placeholder:text-primary [&>svg]:stroke-primary',
-        info: 'border-info/50 text-info placeholder:text-info/70 focus:border-info-700 focus:outline-none disabled:bg-info/30  disabled:placeholder:text-info',
+          'border-primary text-primary focus:outline-none focus:border-primary-700 disabled:bg-primary/30 disabled:placeholder:text-primary  placeholder:text-primary/70 [&>svg]:stroke-primary',
+        info: 'border-info/50 text-info focus:outline-none focus:border-info-700 disabled:bg-info/30 disabled:placeholder:text-info  placeholder:text-info/70',
         warning:
-          'border-warning/50 text-warning placeholder:text-warning/70 focus:border-warning-700 focus:outline-none disabled:bg-warning/30  disabled:placeholder:text-info',
+          'border-warning/50 text-warning focus:outline-none focus:border-warning-700 disabled:bg-warning/30 disabled:placeholder:text-info  placeholder:text-warning/70',
         success:
-          'border-success/50 text-success placeholder:text-success/70 focus:border-success-700 focus:outline-none disabled:bg-success/30  disabled:placeholder:text-info',
+          'border-success/50 text-success focus:outline-none focus:border-success-700 disabled:bg-success/30 disabled:placeholder:text-info  placeholder:text-success/70',
         destructive:
-          'border-destructive/50 text-destructive placeholder:text-destructive/70 focus:border-destructive-700 focus:outline-none disabled:bg-destructive/30  disabled:placeholder:text-destructive',
+          'border-destructive/50 text-destructive focus:outline-none focus:border-destructive-700 disabled:bg-destructive/30 disabled:placeholder:text-destructive  placeholder:text-destructive/70',
       },
       variant: {
         flat: 'read-only:bg-default-500/10 ',
@@ -27,7 +27,7 @@ const selectVariants = cva(
         bordered: 'border',
         faded: 'border border-default-300 read-only:bg-default-100',
         ghost: 'border-0 focus:border',
-        'flat-underline': 'border-b read-only:bg-default-100',
+        'flat-underline': 'read-only:bg-default-100 border-b',
       },
       shadow: {
         none: 'shadow-none',
@@ -81,27 +81,27 @@ const selectVariants = cva(
       {
         variant: 'faded',
         color: 'primary',
-        className: 'border-primary/30 read-only:bg-primary/10',
+        className: 'read-only:bg-primary/10 border-primary/30',
       },
       {
         variant: 'faded',
         color: 'info',
-        className: 'border-info/30 read-only:bg-info/10',
+        className: 'read-only:bg-info/10 border-info/30',
       },
       {
         variant: 'faded',
         color: 'warning',
-        className: 'border-warning/30 read-only:bg-warning/10',
+        className: 'read-only:bg-warning/10 border-warning/30',
       },
       {
         variant: 'faded',
         color: 'success',
-        className: 'border-success/30 read-only:bg-success/10',
+        className: 'read-only:bg-success/10 border-success/30',
       },
       {
         variant: 'faded',
         color: 'destructive',
-        className: 'border-destructive/30 read-only:bg-destructive/10',
+        className: 'read-only:bg-destructive/10 border-destructive/30',
       },
     ],
     defaultVariants: {
@@ -246,11 +246,11 @@ SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
 export {
   Select,
-  SelectGroup,
-  SelectValue,
-  SelectTrigger,
   SelectContent,
-  SelectLabel,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectSeparator,
+  SelectTrigger,
+  SelectValue,
 };

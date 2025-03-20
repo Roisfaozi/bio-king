@@ -1,0 +1,52 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Next.js
+.next
+out
+
+# Testing
+coverage
+.nyc_output
+__tests__
+e2e
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Versioning & CI/CD
+.git
+.github
+.circleci
+.gitlab-ci.yml
+
+# Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project-specific
+README.md
+LICENSE
+*.md
+!ERD.md
+docs
+.husky
+.cursor
+
+# Pastikan prisma tidak diignore
+!prisma/
+!prisma/schema.prisma 

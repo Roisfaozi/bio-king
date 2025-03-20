@@ -41,7 +41,7 @@ interface CompoundVariant {
 }
 
 const dotVariants = cva(
-  '  flex h-4  w-4 items-center  justify-center rounded-full',
+  '  h-4 w-4  rounded-full flex  items-center justify-center',
   {
     variants: {
       color: {
@@ -55,7 +55,7 @@ const dotVariants = cva(
       },
       variant: {
         ghost: 'bg-transparent',
-        outline: 'border-2  border-current bg-transparent',
+        outline: 'bg-transparent  border-2 border-current',
         ping: 'tm-dot-ping',
       },
     },

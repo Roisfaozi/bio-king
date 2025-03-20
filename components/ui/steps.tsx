@@ -4,12 +4,12 @@ import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
 
 const stepVariants = cva(
-  ' flex   break-words [&_[step-box=completed]]:text-primary-foreground  [&_[step-box=current]]:bg-background [&_[step-box=current]]:text-primary [&_[step-box=disable]]:text-foreground/70 [&_[step-box]]:font-medium  ',
+  ' flex   break-words [&_[step-box]]:font-medium  [&_[step-box=disable]]:text-foreground/70 [&_[step-box=completed]]:text-primary-foreground [&_[step-box=current]]:text-primary [&_[step-box=current]]:bg-background  ',
   {
     variants: {
       variant: {
         default:
-          '[&_[step-bar-bg=completed]]:before:bg-primary [&_[step-bar-bg=current]]:before:bg-default-200 [&_[step-bar-bg=disable]]:before:bg-default-200 [&_[step-box=completed]]:bg-primary [&_[step-box=current]]:border-2 [&_[step-box=current]]:border-primary   [&_[step-box=disable]]:bg-default-200 [&_[step-box=error]]:bg-destructive [&_[step-box=error]]:text-destructive-foreground  ',
+          '[&_[step-bar-bg=disable]]:before:bg-default-200 [&_[step-bar-bg=current]]:before:bg-default-200 [&_[step-bar-bg=completed]]:before:bg-primary [&_[step-box=current]]:border-2 [&_[step-box=current]]:border-primary [&_[step-box=completed]]:bg-primary   [&_[step-box=disable]]:bg-default-200 [&_[step-box=error]]:bg-destructive [&_[step-box=error]]:text-destructive-foreground  ',
       },
       size: {
         sm: '[&_[step-box]]:h-5 [&_[step-box]]:w-5 [&_[step-box]]:text-[10px]',

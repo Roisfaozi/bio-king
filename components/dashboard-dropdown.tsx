@@ -1,5 +1,4 @@
 'use client';
-import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -8,7 +7,19 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-const DashboardDropdown = () => {
+import { MoreHorizontal, RefreshCw } from 'lucide-react';
+
+interface DashboardDropdownProps {
+  onRefresh?: () => void;
+  onViewAll?: () => void;
+  onDownload?: () => void;
+}
+
+const DashboardDropdown = ({
+  onRefresh,
+  onViewAll,
+  onDownload,
+}: DashboardDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -25,9 +36,23 @@ const DashboardDropdown = () => {
         side='bottom'
         avoidCollisions
       >
-        <DropdownMenuLabel>View All</DropdownMenuLabel>
-        <DropdownMenuItem>Download</DropdownMenuItem>
-        <DropdownMenuItem>Refresh</DropdownMenuItem>
+        {onViewAll && (
+          <DropdownMenuLabel onClick={onViewAll} className='cursor-pointer'>
+            View All
+          </DropdownMenuLabel>
+        )}
+        {onDownload && (
+          <DropdownMenuItem onClick={onDownload}>Download</DropdownMenuItem>
+        )}
+        {onRefresh && (
+          <DropdownMenuItem
+            onClick={onRefresh}
+            className='flex items-center gap-2'
+          >
+            <RefreshCw className='h-4 w-4' />
+            <span>Refresh</span>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

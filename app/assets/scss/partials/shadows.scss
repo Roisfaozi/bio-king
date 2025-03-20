@@ -1,0 +1,80 @@
+/* Shadow Effects */
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.2);
+}
+
+.dark .shadow-glow {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+}
+
+.shadow-card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.dark .shadow-card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-button {
+  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
+}
+
+.dark .shadow-button {
+  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.4);
+}
+
+.shadow-pricing {
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.1);
+}
+
+.dark .shadow-pricing {
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
+}
+
+.shadow-testimonial {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.dark .shadow-testimonial {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-cta {
+  box-shadow: 0 15px 30px rgba(124, 58, 237, 0.1);
+}
+
+.dark .shadow-cta {
+  box-shadow: 0 15px 30px rgba(124, 58, 237, 0.2);
+}
+
+.shadow-footer {
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.dark .shadow-footer {
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-header {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.dark .shadow-header {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-hero {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+}
+
+.dark .shadow-hero {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-stats {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.dark .shadow-stats {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}

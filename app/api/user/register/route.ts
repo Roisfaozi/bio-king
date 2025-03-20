@@ -1,32 +1,39 @@
-import { NextResponse, NextRequest } from 'next/server';
-import { user } from '../data';
-import avatar3 from '@/public/images/avatar/avatar-3.jpg';
+import db from '@/lib/db';
+import { createUserSchema } from '@/validation/auth-validation';
+import bcrypt from 'bcryptjs';
+import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest, response: any) {
   try {
-    const reqBody = await request.json();
-
-    const foundUser = user.find((u) => u.email === reqBody.email);
-
-    if (foundUser) {
+    const { name, email, password } = createUserSchema.parse(
+      await request.json(),
+    );
+    const existingUser = await db.user.findUnique({ where: { email } });
+    if (existingUser) {
       return NextResponse.json({
-        status: 'fail',
-        message: 'User already exists',
+        status: 400,
+        message: 'A user with the related email already exists',
       });
     }
 
-    reqBody.id = user.length + 1;
-
-    reqBody.image = avatar3;
-    user.push(reqBody);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await db.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: 'user',
+      },
+    });
+    console.log('user baru', newUser);
     return NextResponse.json({
-      status: 'success',
+      status: 201,
       message: 'User created successfully',
-      data: reqBody,
+      data: newUser,
     });
   } catch (e) {
     console.log('An error occurred:', e);
     return NextResponse.json({
-      status: 'fail',
+      status: 500,
       message: 'Something went wrong',
       data: e,
     });

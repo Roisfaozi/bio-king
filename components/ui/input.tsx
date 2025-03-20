@@ -1,25 +1,25 @@
-import * as React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
 import { InputColor, InputVariant, Radius, Shadow } from '@/lib/type';
+import { cn } from '@/lib/utils';
+import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 
 //py-[10px]
 export const inputVariants = cva(
-  ' dark:border-700   h-9  w-full border-default-300  bg-background px-3   text-sm  transition duration-300 file:border-0 file:bg-transparent  file:text-sm file:font-medium  read-only:bg-background read-only:leading-9  disabled:cursor-not-allowed disabled:opacity-50 ',
+  ' w-full   bg-background  border-default-300 dark:border-700  px-3 h-9   text-sm  file:border-0 file:bg-transparent file:text-sm file:font-medium  read-only:leading-9 read-only:bg-background  disabled:cursor-not-allowed disabled:opacity-50  transition duration-300 ',
   {
     variants: {
       color: {
         default:
-          'border-default-300 text-default-500 placeholder:text-accent-foreground/50 focus:border-primary focus:outline-none  disabled:bg-default-200',
+          'border-default-300 focus:outline-none focus:border-primary disabled:bg-default-200  placeholder:text-accent-foreground/50',
         primary:
-          'border-primary text-primary placeholder:text-primary/70 focus:border-primary-700 focus:outline-none disabled:bg-primary/30  disabled:placeholder:text-primary',
-        info: 'border-info/50 text-info placeholder:text-info/70 focus:border-info-700 focus:outline-none disabled:bg-info/30  disabled:placeholder:text-info',
+          'border-primary text-primary focus:outline-none focus:border-primary-700 disabled:bg-primary/30 disabled:placeholder:text-primary  placeholder:text-primary/70',
+        info: 'border-info/50 text-info focus:outline-none focus:border-info-700 disabled:bg-info/30 disabled:placeholder:text-info  placeholder:text-info/70',
         warning:
-          'border-warning/50 text-warning placeholder:text-warning/70 focus:border-warning-700 focus:outline-none disabled:bg-warning/30  disabled:placeholder:text-info',
+          'border-warning/50 text-warning focus:outline-none focus:border-warning-700 disabled:bg-warning/30 disabled:placeholder:text-info  placeholder:text-warning/70',
         success:
-          'border-success/50 text-success placeholder:text-success/70 focus:border-success-700 focus:outline-none disabled:bg-success/30  disabled:placeholder:text-info',
+          'border-success/50 text-success focus:outline-none focus:border-success-700 disabled:bg-success/30 disabled:placeholder:text-info  placeholder:text-success/70',
         destructive:
-          'border-destructive/50 text-destructive placeholder:text-destructive/70 focus:border-destructive-700 focus:outline-none disabled:bg-destructive/30  disabled:placeholder:text-destructive',
+          'border-destructive/50 text-destructive focus:outline-none focus:border-destructive-700 disabled:bg-destructive/30 disabled:placeholder:text-destructive  placeholder:text-destructive/70',
       },
       variant: {
         flat: 'bg-default-100 read-only:bg-default-100',
@@ -27,7 +27,7 @@ export const inputVariants = cva(
         bordered: 'border  ',
         faded: 'border border-default-300 bg-default-100',
         ghost: 'border-0 focus:border',
-        'flat-underline': 'border-b bg-default-100',
+        'flat-underline': 'bg-default-100 border-b',
       },
       shadow: {
         none: '',
@@ -80,27 +80,28 @@ export const inputVariants = cva(
       {
         variant: 'faded',
         color: 'primary',
-        className: 'border-primary/30 bg-primary/10 read-only:bg-primary/10',
+        className:
+          'bg-primary/10 border-primary/30 read-only:bg-primary/10 border-primary/30',
       },
       {
         variant: 'faded',
         color: 'info',
-        className: 'border-info/30 bg-info/10',
+        className: 'bg-info/10 border-info/30',
       },
       {
         variant: 'faded',
         color: 'warning',
-        className: 'border-warning/30 bg-warning/10',
+        className: 'bg-warning/10 border-warning/30',
       },
       {
         variant: 'faded',
         color: 'success',
-        className: 'border-success/30 bg-success/10',
+        className: 'bg-success/10 border-success/30',
       },
       {
         variant: 'faded',
         color: 'destructive',
-        className: 'border-destructive/30 bg-destructive/10',
+        className: 'bg-destructive/10 border-destructive/30',
       },
     ],
 

@@ -5,7 +5,7 @@ import React from 'react';
 const SidebarLogo = ({ hovered }: { hovered?: boolean }) => {
   const { sidebarType, setCollapsed, collapsed } = useSidebar();
   return (
-    <div className='p-4'>
+    <div className='px-4 py-4'>
       <div className='flex items-center'>
         <div className='flex flex-1 items-center gap-x-3'>
           <SiteLogo className='h-8 w-8 text-primary' />
