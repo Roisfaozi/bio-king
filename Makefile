@@ -2,6 +2,15 @@ create:
 	@powershell -Command "New-Item -Path $(word 1,$(filter-out $@,$(MAKECMDGOALS))) -Name $(word 2,$(filter-out $@,$(MAKECMDGOALS))) -ItemType File"
 
 # Docker commands
+docker-image:
+	docker build -t bio-king .
+
+docker-tag:
+	docker tag bio-king:latest bio-king:$(shell git describe --tags --abbrev=0)
+
+docker-tag-latest:
+	git tag -a "$(shell docker tag bio-king:latest)" -m "latest image"
+
 docker-build:
 	docker-compose build .
 
