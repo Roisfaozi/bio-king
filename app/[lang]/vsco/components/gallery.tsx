@@ -106,14 +106,20 @@ export default function Gallery({ onLoginRequired }: GalleryProps) {
   return (
     <div className='relative'>
       <div className='mb-8'>
-        <div className='mb-6 flex items-center justify-between'>
-          <h2 className='text-2xl font-bold'>Featured Photography</h2>
-          <div className='flex space-x-4'>
-            <button className='text-white hover:text-gray-300'>Popular</button>
+        <div className='mb-6 flex flex-col md:flex-row md:items-center md:justify-between'>
+          <h2 className='mb-4 text-2xl font-bold md:mb-0'>
+            Featured Photography
+          </h2>
+          <div className='no-scrollbar flex space-x-4 overflow-x-auto pb-2 md:pb-0'>
+            <button className='whitespace-nowrap text-white hover:text-gray-300'>
+              Popular
+            </button>
             <span className='text-gray-600'>|</span>
-            <button className='text-gray-400 hover:text-white'>Recent</button>
+            <button className='whitespace-nowrap text-gray-400 hover:text-white'>
+              Recent
+            </button>
             <span className='text-gray-600'>|</span>
-            <button className='text-gray-400 hover:text-white'>
+            <button className='whitespace-nowrap text-gray-400 hover:text-white'>
               Following
             </button>
           </div>

@@ -25,10 +25,10 @@ export default function VSCOLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className='min-h-screen flex-col text-white'>
+    <div className='min-h-screen w-full flex-col text-white'>
       <Navbar />
 
-      <div className='flex w-screen flex-grow items-center justify-center'>
+      <div className='flex w-full flex-grow items-start justify-start pt-0 md:w-screen md:items-center md:justify-center'>
         {children}
       </div>
 

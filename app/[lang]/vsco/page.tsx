@@ -1,11 +1,10 @@
 'use client';
 
+import CommunitySection from '@/app/[lang]/vsco/components/community-section';
+import FeatureCarousel from '@/app/[lang]/vsco/components/feature-carousel';
+import { featuresData } from '@/app/[lang]/vsco/components/features-data';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import CommunitySection from './components/community-section';
-import FeatureCarousel from './components/feature-carousel';
-import { featuresData } from './components/features-data';
-import Gallery from './components/gallery';
 import HeaderNav from './components/header-nav';
 import Hero from './components/hero';
 import LoadingScreen from './components/loading-screen';
@@ -122,25 +121,20 @@ export default function VSCOPage() {
   }
 
   return (
-    <div className='flex min-h-screen flex-col bg-[#111] pl-[164px] pt-[52px] text-white'>
+    <div className='flex min-h-screen max-w-screen-sm flex-col bg-[#111] pl-0 pt-0 text-white md:max-w-screen-md md:pl-[400px] lg:max-w-none'>
       <HeaderNav />
 
-      <Hero />
+      <div className='w-full overflow-x-hidden'>
+        <Hero />
 
-      {/* Features Carousel */}
-      <FeatureCarousel features={featuresData} />
+        <FeatureCarousel features={featuresData} />
 
-      <section className='px-4 py-12 md:px-8'>
-        <div className='mx-auto max-w-[1650px]'>
-          <Gallery onLoginRequired={handleLoginRequired} />
-        </div>
-      </section>
+        <PlansSection />
 
-      <PlansSection />
+        <PhotoToolsSection />
 
-      <PhotoToolsSection />
-
-      <CommunitySection />
+        <CommunitySection />
+      </div>
 
       {/* Location Modal */}
       <LocationPermissionModal

@@ -11,15 +11,21 @@ export default function SectionHeader({
   className = '',
 }: SectionHeaderProps) {
   return (
-    <div className={`mb-8 ${className}`}>
+    <div className={`mb-6 sm:mb-8 ${className}`}>
       {typeof title === 'string' ? (
         subtitle ? (
           <>
-            <h2 className='mb-2 text-3xl font-bold'>{title}</h2>
-            <h2 className='mb-6 text-3xl font-bold'>{subtitle}</h2>
+            <h2 className='mb-1 text-xl font-bold sm:mb-2 sm:text-2xl md:text-3xl'>
+              {title}
+            </h2>
+            <h2 className='mb-4 text-xl font-bold sm:mb-6 sm:text-2xl md:text-3xl'>
+              {subtitle}
+            </h2>
           </>
         ) : (
-          <h2 className='mb-6 text-3xl font-bold'>{title}</h2>
+          <h2 className='mb-4 text-xl font-bold sm:mb-6 sm:text-2xl md:text-3xl'>
+            {title}
+          </h2>
         )
       ) : (
         title

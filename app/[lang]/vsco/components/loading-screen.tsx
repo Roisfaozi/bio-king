@@ -5,7 +5,7 @@ export default function LoadingScreen() {
     <div className='flex min-h-screen w-full items-center justify-center bg-black'>
       <div className='animate-pulse'>
         <svg
-          className='h-16 w-16 text-white'
+          className='h-12 w-12 text-white sm:h-14 sm:w-14 md:h-16 md:w-16'
           viewBox='0 0 24 24'
           fill='none'
           xmlns='http://www.w3.org/2000/svg'

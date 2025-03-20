@@ -1,66 +1,61 @@
 'use client';
 
+import { FeatureItem } from '@/app/[lang]/vsco/components/features-data';
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
 interface Badge {
   text: string;
   color: string;
 }
 
 interface CarouselFeatureItemProps {
-  title: string;
-  image: string;
-  badge?: Badge;
-  overlay?: React.ReactNode;
+  features: FeatureItem;
+  className?: string;
 }
 
 export default function CarouselFeatureItem({
-  title,
-  image,
-  badge,
-  overlay,
+  features,
+  className,
 }: CarouselFeatureItemProps) {
+  console.log(features);
   return (
-    <div className='w-72 flex-none'>
-      <div className='group relative'>
-        <div className='aspect-[4/3] overflow-hidden rounded-lg bg-gray-800'>
-          <img
-            src={image}
-            alt={title}
-            className='h-full w-full object-cover'
-            onError={(e) => {
-              e.currentTarget.src = `https://placehold.co/400x300/111827/FFFFFF?text=${encodeURIComponent(title)}`;
-            }}
-          />
-
-          {badge && (
-            <div className='absolute right-3 top-3'>
-              <div
-                className={`bg-${badge.color} rounded px-2 py-1 text-xs text-white`}
-              >
-                {badge.text}
-              </div>
-            </div>
-          )}
-
-          {overlay}
-        </div>
-        <div className='mt-3 flex items-center justify-between'>
-          <h3 className='text-sm font-medium'>{title}</h3>
-          <svg
-            className='h-4 w-4'
-            viewBox='0 0 24 24'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
-          >
-            <path
-              d='M5 12H19M19 12L12 5M19 12L12 19'
-              stroke='currentColor'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
+    <motion.div
+      whileHover={{ y: -7, cursor: 'default' }}
+      transition={{ duration: 0.2 }}
+    >
+      <Card className={cn('rounded-none bg-[#111] text-white', className)}>
+        <CardContent className='p-0'>
+          <div className='w-full max-w-[300px] overflow-hidden rounded-t-md bg-[#111]'>
+            <Image
+              className='aspect-3/2 h-full w-full object-cover'
+              src={features.image}
+              alt='image'
+              width={200}
+              height={200}
+              layout='responsive'
             />
-          </svg>
-        </div>
-      </div>
-    </div>
+          </div>
+          <div className='flex items-center gap-2 bg-[#111] p-4'>
+            <p className='text-xs font-semibold text-white'>{features.title}</p>
+            <motion.svg
+              width='10'
+              height='10'
+              viewBox='0 0 10 10'
+              fill='none'
+              xmlns='http://www.w3.org/2000/svg'
+              whileHover={{ x: 5, y: -5 }}
+              transition={{ duration: 0.2, delay: 0.2 }}
+            >
+              <path
+                d='M9.203 6.434H7.851V3.34L1.988 9.203L1 8.228L6.902 2.339H3.756V1H9.203V6.434Z'
+                fill='currentColor'
+              ></path>
+            </motion.svg>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
