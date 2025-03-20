@@ -5,7 +5,7 @@ import Link from 'next/link';
 export default function Hero() {
   return (
     <div className='px-4 py-16 md:px-8'>
-      <div className='mx-auto max-w-screen-xl'>
+      <div className='max-w-[1650px] 2xl:mx-auto'>
         <h1 className='mb-4 text-5xl font-bold tracking-tight md:text-6xl'>
           YOUR HOME FOR PHOTOGRAPHY
         </h1>
@@ -16,7 +16,7 @@ export default function Hero() {
         <div className='mb-16 flex flex-wrap gap-4'>
           <Link
             href='#'
-            className='rounded-full bg-white px-8 py-3 font-medium text-black transition-colors hover:bg-gray-200'
+            className='rounded-full bg-white px-8 py-3 font-medium text-[#111] transition-colors hover:bg-gray-200'
           >
             TRY FOR FREE
           </Link>

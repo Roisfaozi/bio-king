@@ -10,19 +10,26 @@ import {
   User,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-interface NavbarProps {
-  onLoginClick: () => void;
-  onSignupClick: () => void;
-}
+export default function Navbar() {
+  const router = useRouter();
 
-export default function Navbar({ onLoginClick, onSignupClick }: NavbarProps) {
+  // Handlers untuk navigasi ke halaman login/signup
+  const openLoginPage = () => {
+    router.push('/vsco/user/login');
+  };
+
+  const openSignupPage = () => {
+    router.push('/vsco/user/signup');
+  };
+
   return (
-    <aside className='fixed bottom-0 left-0 top-0 z-50 flex w-[164px] flex-col justify-between border-r border-gray-800 bg-black'>
+    <aside className='fixed bottom-0 left-0 top-0 z-50 flex w-[164px] flex-col justify-between bg-[#111]'>
       <div className='flex flex-col'>
         {/* Logo */}
         <div className='p-6'>
-          <Link href='#' className='flex items-center space-x-2 text-white'>
+          <Link href='/vsco' className='flex items-center space-x-2 text-white'>
             <svg
               width='24'
               height='24'
@@ -163,13 +170,13 @@ export default function Navbar({ onLoginClick, onSignupClick }: NavbarProps) {
       {/* Login/Signup Buttons */}
       <div className='space-y-2 p-4'>
         <button
-          onClick={onSignupClick}
+          onClick={openSignupPage}
           className='w-full rounded-full bg-white px-3 py-2 text-sm font-medium text-black transition-colors hover:bg-gray-200'
         >
           SIGN UP
         </button>
         <button
-          onClick={onLoginClick}
+          onClick={openLoginPage}
           className='w-full rounded-full border border-gray-700 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800'
         >
           LOG IN

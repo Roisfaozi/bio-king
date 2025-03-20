@@ -19,7 +19,7 @@ interface FeatureCarouselProps {
 export default function FeatureCarousel({ features }: FeatureCarouselProps) {
   return (
     <div className='relative mb-16 px-4 md:px-8'>
-      <div className='mx-auto max-w-screen-xl'>
+      <div className='max-w-[1650px] 2xl:mx-auto'>
         <div className='no-scrollbar flex space-x-4 overflow-x-auto pb-8'>
           {features.map((feature, index) => (
             <CarouselFeatureItem

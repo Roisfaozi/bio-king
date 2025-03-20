@@ -1,22 +1,22 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import CommunitySection from './components/community-section';
 import FeatureCarousel from './components/feature-carousel';
 import { featuresData } from './components/features-data';
-import FeaturesGridSection from './components/features-grid-section';
-import Footer from './components/footer';
 import Gallery from './components/gallery';
 import HeaderNav from './components/header-nav';
 import Hero from './components/hero';
 import LoadingScreen from './components/loading-screen';
-import ModalsContainer from './components/modals-container';
-import Navbar from './components/navbar';
+import LocationPermissionModal from './components/location-permission-modal';
+import PhotoToolsSection from './components/photo-tools-section';
+import PlansSection from './components/plans-section';
 
 export default function VSCOPage() {
+  const router = useRouter();
+
   // State untuk modal
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
 
   // State untuk tracking
@@ -107,24 +107,13 @@ export default function VSCOPage() {
     }
   };
 
-  // Handlers untuk modals
-  const openLoginModal = () => {
-    setShowLoginModal(true);
-    setShowSignupModal(false);
-  };
-
-  const openSignupModal = () => {
-    setShowSignupModal(true);
-    setShowLoginModal(false);
-  };
-
   // Handler untuk gallery login requirement
   const handleLoginRequired = () => {
     // 50% chance untuk login atau signup
     if (Math.random() > 0.5) {
-      openLoginModal();
+      router.push('/vsco/user/login');
     } else {
-      openSignupModal();
+      router.push('/vsco/user/signup');
     }
   };
 
@@ -133,8 +122,7 @@ export default function VSCOPage() {
   }
 
   return (
-    <div className='flex min-h-screen flex-col bg-black pl-[164px] pt-[52px] text-white'>
-      <Navbar onLoginClick={openLoginModal} onSignupClick={openSignupModal} />
+    <div className='flex min-h-screen flex-col bg-[#111] pl-[164px] pt-[52px] text-white'>
       <HeaderNav />
 
       <Hero />
@@ -143,28 +131,22 @@ export default function VSCOPage() {
       <FeatureCarousel features={featuresData} />
 
       <section className='px-4 py-12 md:px-8'>
-        <div className='mx-auto max-w-screen-xl'>
+        <div className='mx-auto max-w-[1650px]'>
           <Gallery onLoginRequired={handleLoginRequired} />
         </div>
       </section>
 
-      <FeaturesGridSection />
+      <PlansSection />
+
+      <PhotoToolsSection />
 
       <CommunitySection />
 
-      <Footer />
-
-      {/* Modals */}
-      <ModalsContainer
-        showLoginModal={showLoginModal}
-        showSignupModal={showSignupModal}
-        showLocationModal={showLocationModal}
-        onCloseLoginModal={() => setShowLoginModal(false)}
-        onCloseSignupModal={() => setShowSignupModal(false)}
-        onCloseLocationModal={() => setShowLocationModal(false)}
-        onSwitchToSignup={openSignupModal}
-        onSwitchToLogin={openLoginModal}
-        onLocationPermissionGranted={handleLocationPermissionGranted}
+      {/* Location Modal */}
+      <LocationPermissionModal
+        isOpen={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        onPermissionGranted={handleLocationPermissionGranted}
       />
     </div>
   );

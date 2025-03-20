@@ -1,3 +1,5 @@
+import Footer from '@/app/[lang]/vsco/components/footer';
+import Navbar from '@/app/[lang]/vsco/components/navbar';
 import type { Metadata } from 'next';
 import React from 'react';
 import './styles.css';
@@ -22,5 +24,15 @@ export default function VSCOLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className='min-h-screen bg-black text-white'>{children}</div>;
+  return (
+    <div className='min-h-screen flex-col text-white'>
+      <Navbar />
+
+      <div className='flex w-screen flex-grow items-center justify-center'>
+        {children}
+      </div>
+
+      <Footer />
+    </div>
+  );
 }
