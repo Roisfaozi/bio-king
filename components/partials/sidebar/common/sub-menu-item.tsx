@@ -1,10 +1,10 @@
 'use client';
-import { cn, isLocationMatch, translate, getDynamicPath } from '@/lib/utils';
+import { cn, getDynamicPath, isLocationMatch, translate } from '@/lib/utils';
 import React from 'react';
 
 import { Badge } from '@/components/ui/badge';
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 function LockLink({
   href,
   children,

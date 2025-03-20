@@ -1,12 +1,7 @@
-import React from 'react';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { cn, isLocationMatch, translate, getDynamicPath } from '@/lib/utils';
-import { usePathname } from 'next/navigation';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import { cn, getDynamicPath, isLocationMatch, translate } from '@/lib/utils';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 const MultiNestedMenu = ({
   subItem,
   subIndex,
