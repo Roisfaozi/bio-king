@@ -343,7 +343,9 @@ const AnalyticsView = ({ trans, analytics }: AnalyticsViewProps) => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <VisitorsTable visitors={data?.visitors.recent || []} />
+                  <VisitorsTable
+                    visitors={data?.visitors.recent || ([] as any)}
+                  />
                 </CardContent>
               </Card>
             </>
