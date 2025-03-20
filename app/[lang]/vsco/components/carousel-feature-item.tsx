@@ -24,21 +24,27 @@ export default function CarouselFeatureItem({
     <motion.div
       whileHover={{ y: -7, cursor: 'default' }}
       transition={{ duration: 0.2 }}
+      className='w-full'
     >
-      <Card className={cn('rounded-none bg-[#111] text-white', className)}>
+      <Card
+        className={cn('w-full rounded-none bg-[#111] text-white', className)}
+      >
         <CardContent className='p-0'>
-          <div className='w-full max-w-[300px] overflow-hidden rounded-t-md bg-[#111]'>
+          <div className='w-full overflow-hidden rounded-t-md bg-[#111]'>
             <Image
-              className='aspect-3/2 h-full w-full object-cover'
+              className='aspect-3/2 w-full object-cover'
               src={features.image}
-              alt='image'
-              width={200}
-              height={200}
-              layout='responsive'
+              alt={features.title}
+              width={500}
+              height={333}
+              sizes='(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw'
+              priority
             />
           </div>
-          <div className='flex items-center gap-2 bg-[#111] p-4'>
-            <p className='text-xs font-semibold text-white'>{features.title}</p>
+          <div className='flex items-center justify-between gap-2 bg-[#111] p-4'>
+            <p className='text-xs font-semibold text-white sm:text-sm md:text-base'>
+              {features.title}
+            </p>
             <motion.svg
               width='10'
               height='10'
@@ -47,6 +53,7 @@ export default function CarouselFeatureItem({
               xmlns='http://www.w3.org/2000/svg'
               whileHover={{ x: 5, y: -5 }}
               transition={{ duration: 0.2, delay: 0.2 }}
+              className='flex-shrink-0'
             >
               <path
                 d='M9.203 6.434H7.851V3.34L1.988 9.203L1 8.228L6.902 2.339H3.756V1H9.203V6.434Z'
