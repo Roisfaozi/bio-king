@@ -1,22 +1,41 @@
-'use client';
+import SectionHeader from '@/app/[lang]/vsco/components/section-header';
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 export default function PhotoToolsSection() {
   return (
-    <div>
-      <h2 className='mb-6 text-2xl font-bold'>PHOTO TOOLS</h2>
-      <div className='mb-4 flex space-x-4'>
-        <div className='aspect-square w-1/4 rounded bg-gradient-to-br from-red-500 to-pink-500'></div>
-        <div className='aspect-square w-1/4 rounded bg-gradient-to-br from-yellow-500 to-orange-500'></div>
-        <div className='aspect-square w-1/4 rounded bg-gradient-to-br from-blue-500 to-purple-500'></div>
-        <div className='aspect-square w-1/4 rounded bg-gradient-to-br from-green-500 to-teal-500'></div>
+    <section className='bg-[#111] px-4 py-16'>
+      <div className='mx-auto max-w-[1650px]'>
+        <div className='grid grid-cols-1 gap-8 md:grid-cols-4'>
+          <div className='col-span-1'>
+            <SectionHeader title='PHOTO' subtitle='TOOLS' />
+            <p className='mb-4 text-sm text-gray-400'>
+              Professional editing tools with easy-to-use controls. Create your
+              unique style with our advanced presets and editing features.
+            </p>
+            <p className='mb-4 text-sm text-gray-400'>
+              Adjust exposure, contrast, saturation, and more with precision.
+              Apply film-inspired presets to achieve classic looks.
+            </p>
+            <p className='mb-6 text-sm text-gray-400'>
+              Save your favorite edits as recipes to apply to future photos,
+              ensuring a consistent style across your portfolio.
+            </p>
+            <Button variant='outline' size='sm' className='rounded-full'>
+              ABOUT PHOTO EDITING TOOLS
+            </Button>
+          </div>
+          <div className='col-span-1 md:col-span-3'>
+            <Image
+              src='https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=2070&auto=format&fit=crop'
+              alt='Photo Editing Tools'
+              width={600}
+              height={500}
+              className='w-full rounded-md object-cover'
+            />
+          </div>
+        </div>
       </div>
-      <p className='mb-4 text-gray-400'>
-        Create with premium presets and advanced editing tools designed for
-        photographers at all levels.
-      </p>
-      <button className='text-sm font-medium text-white hover:underline'>
-        EXPLORE PHOTO TOOLS →
-      </button>
-    </div>
+    </section>
   );
 }
