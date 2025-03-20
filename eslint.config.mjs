@@ -34,7 +34,7 @@ const config = [
       '**/next-env.d.ts',
       '**/next.config.ts',
       '**.config.ts',
-      '**/yarn.lock',
+      '**/pnpm-lock.yaml',
     ],
   },
   ...patchedConfig,

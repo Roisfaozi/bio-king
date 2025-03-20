@@ -35,7 +35,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'yarn dev',
+    command: 'pnpm dev',
     port: 3000,
     reuseExistingServer: !process.env.CI,
   },
