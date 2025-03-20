@@ -43,3 +43,6 @@ tsconfig.tsbuildinfo
 .env.local
 .env.production
 .env.stagging
+
+code_context.txt
+schema.txt
