@@ -15,15 +15,15 @@ export default function SectionHeader({
       {typeof title === 'string' ? (
         subtitle ? (
           <>
-            <h2 className='mb-1 text-xl font-bold sm:mb-2 sm:text-2xl md:text-3xl'>
+            <h2 className='mb-1 text-xl font-bold text-white sm:mb-2 sm:text-2xl md:text-3xl'>
               {title}
             </h2>
-            <h2 className='mb-4 text-xl font-bold sm:mb-6 sm:text-2xl md:text-3xl'>
+            <h2 className='mb-4 text-xl font-bold text-white sm:mb-6 sm:text-2xl md:text-3xl'>
               {subtitle}
             </h2>
           </>
         ) : (
-          <h2 className='mb-4 text-xl font-bold sm:mb-6 sm:text-2xl md:text-3xl'>
+          <h2 className='mb-4 text-xl font-bold text-white sm:mb-6 sm:text-2xl md:text-3xl'>
             {title}
           </h2>
         )

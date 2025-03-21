@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 export default function PhotoToolsSection() {
   return (
-    <section className='bg-black px-4 py-10 sm:px-6 sm:py-12 md:px-10 md:py-16 lg:px-16'>
+    <section className='bg-black px-4 py-10 text-white sm:px-6 sm:py-12 md:px-10 md:py-16 lg:px-16'>
       <div className='mx-auto max-w-5xl'>
         <div className='grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8'>
           <div>

@@ -32,7 +32,7 @@ export default function PlansSection() {
   ];
 
   return (
-    <section className='bg-[#000] px-4 py-10 sm:px-6 sm:py-12 md:px-10 md:py-16 lg:px-16'>
+    <section className='bg-[#000] px-4 py-10 text-white sm:px-6 sm:py-12 md:px-10 md:py-16 lg:px-16'>
       <div className='mx-auto max-w-5xl'>
         <div className='mb-8 flex flex-col gap-4 sm:mb-12 md:flex-row md:gap-8'>
           <div>
