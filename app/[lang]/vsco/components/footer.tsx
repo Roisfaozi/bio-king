@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className='bg-black px-4 py-10 sm:px-6 sm:py-12 md:px-10 md:py-16 lg:px-16'>
+    <footer className='bg-black px-4 py-10 text-white sm:px-6 sm:py-12 md:px-10 md:py-16 lg:px-16'>
       <div className='mx-auto max-w-5xl'>
         <div className='mb-8 grid w-screen grid-cols-1 gap-6 sm:grid-cols-2 md:mb-16 md:grid-cols-3 md:gap-10 lg:grid-cols-5'>
           {/* First column - SO YOU CAN MAKE IT */}
@@ -202,7 +202,7 @@ export default function Footer() {
               </Link>
             </div>
 
-            <div className='flex flex-col space-y-3 md:flex-row md:space-x-4 md:space-y-0'>
+            <div className='flex flex-col space-y-3 text-white md:flex-row md:space-x-4 md:space-y-0'>
               <Link
                 href='#'
                 className='inline-block rounded-full border border-white px-4 py-2 text-center text-xs font-medium transition-colors hover:bg-white hover:text-black md:px-6 md:py-2.5'
