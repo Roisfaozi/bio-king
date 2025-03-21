@@ -36,7 +36,7 @@ const Header = () => {
                   Log in
                 </Link>
                 <Link
-                  href='/auth/signup'
+                  href='/auth/register'
                   className='shadow-button btn-gradient btn-hover-effect inline-flex h-8 items-center justify-center rounded-md bg-gradient-primary px-2 text-xs font-medium text-primary-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 md:h-9 md:px-3 md:text-sm'
                 >
                   Sign up
@@ -124,7 +124,7 @@ const Header = () => {
               Log in
             </Link>
             <Link
-              href='/auth/signup'
+              href='/auth/register'
               className='shadow-button btn-gradient btn-hover-effect inline-flex h-8 items-center justify-center rounded-md bg-gradient-primary px-2 text-xs font-medium text-primary-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 md:h-9 md:px-3 md:text-sm'
             >
               Sign up
