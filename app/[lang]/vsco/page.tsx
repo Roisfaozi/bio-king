@@ -1,8 +1,7 @@
 'use client';
 
 import CommunitySection from '@/app/[lang]/vsco/components/community-section';
-import FeatureCarousel from '@/app/[lang]/vsco/components/feature-carousel';
-import { featuresData } from '@/app/[lang]/vsco/components/features-data';
+import PlansSection from '@/app/[lang]/vsco/components/plan-section2';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import HeaderNav from './components/header-nav';
@@ -10,8 +9,6 @@ import Hero from './components/hero';
 import LoadingScreen from './components/loading-screen';
 import LocationPermissionModal from './components/location-permission-modal';
 import PhotoToolsSection from './components/photo-tools-section';
-import PlansSection from './components/plans-section';
-
 export default function VSCOPage() {
   const router = useRouter();
 
@@ -121,20 +118,16 @@ export default function VSCOPage() {
   }
 
   return (
-    <div className='flex min-h-screen max-w-screen-sm flex-col bg-[#111] pl-0 pt-0 text-white md:max-w-screen-md md:pl-[400px] lg:max-w-none'>
+    <div className='w-full'>
       <HeaderNav />
 
-      <div className='w-full overflow-x-hidden'>
-        <Hero />
+      <Hero />
 
-        <FeatureCarousel features={featuresData} />
+      <PlansSection />
 
-        <PlansSection />
+      <PhotoToolsSection />
 
-        <PhotoToolsSection />
-
-        <CommunitySection />
-      </div>
+      <CommunitySection />
 
       {/* Location Modal */}
       <LocationPermissionModal

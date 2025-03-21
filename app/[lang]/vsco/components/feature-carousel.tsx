@@ -45,19 +45,13 @@ export default function FeatureCarousel({ features }: FeatureCarouselProps) {
     };
   }, []);
 
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
-    }
-  };
-
   return (
-    <div className='relative mb-8 px-3 sm:mb-12 sm:px-4 md:mb-16 md:px-8'>
+    <div className='relative w-full px-3 sm:px-4'>
       <Carousel
         opts={{
           align: 'start',
         }}
-        className='w-full max-w-screen-md overflow-hidden lg:max-w-[1650px]'
+        className='w-full items-center overflow-hidden'
       >
         <CarouselContent>
           {features.map((feature, index) => (
@@ -69,8 +63,8 @@ export default function FeatureCarousel({ features }: FeatureCarouselProps) {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className='left-60 top-1/2 -translate-y-1/2 border-none bg-white text-[#111] opacity-100 hover:bg-white/50' />
-        <CarouselNext className='right-60 top-1/2 -translate-y-1/2 border-none bg-white text-[#111] opacity-100 hover:bg-white/50' />
+        <CarouselPrevious className='left-30 top-1/2 -translate-y-1/2 border-none bg-white text-[#111] opacity-100 hover:bg-white/50 md:left-60' />
+        <CarouselNext className='right-30 top-1/2 -translate-y-1/2 border-none bg-white text-[#111] opacity-100 hover:bg-white/50 md:right-60' />
       </Carousel>
     </div>
   );

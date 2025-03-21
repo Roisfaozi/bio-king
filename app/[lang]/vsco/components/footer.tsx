@@ -4,8 +4,8 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className='min-w-screen bg-black pb-8 pt-8 text-white sm:px-6 md:mt-0 md:pl-[150px] md:pt-16'>
-      <div className='container mx-auto px-4 sm:px-6 md:px-4 lg:px-6'>
+    <footer className='bg-black px-4 py-10 sm:px-6 sm:py-12 md:px-10 md:py-16 lg:px-16'>
+      <div className='mx-auto max-w-5xl'>
         <div className='mb-8 grid w-screen grid-cols-1 gap-6 sm:grid-cols-2 md:mb-16 md:grid-cols-3 md:gap-10 lg:grid-cols-5'>
           {/* First column - SO YOU CAN MAKE IT */}
           <div className='mb-6 md:col-span-1 md:mb-0'>

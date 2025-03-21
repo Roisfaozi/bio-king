@@ -25,14 +25,21 @@ export default function VSCOLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className='min-h-screen w-full flex-col text-white'>
-      <Navbar />
+    <div className={`min-h-screen overflow-x-hidden`}>
+      <div className='flex min-h-screen flex-col'>
+        {/* Mobile Header - visible on small screens */}
+        <Navbar />
 
-      <div className='flex w-full flex-grow items-start justify-start pt-0 md:w-screen md:items-center md:justify-center'>
-        {children}
+        <div className='flex flex-1 flex-col md:flex-row'>
+          {/* Sidebar - hidden on mobile, shown on desktop */}
+
+          {/* Main Content */}
+          <main className='w-full flex-1 bg-[#111]'>{children}</main>
+        </div>
+
+        {/* Footer is included in each page where needed */}
+        <Footer />
       </div>
-
-      <Footer />
     </div>
   );
 }
