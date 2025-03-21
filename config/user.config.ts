@@ -9,10 +9,13 @@ type UserRegisterInput = {
 export async function registerUser(userData: UserRegisterInput) {
   try {
     const response = await api.post('/user/register', userData);
+    if (response.data) {
+      return response.data;
+    }
 
-    return response.data;
+    return response;
   } catch (error: any) {
-    console.error(error.response.data);
+    console.error('ini regist', error.response);
     return error.response;
   }
 }
