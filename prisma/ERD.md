@@ -170,6 +170,7 @@ erDiagram
   String utm_campaign "nullable"
   String custom_domain "nullable"
   Int click_limit "nullable"
+  String page_type "nullable"
   BigInt created_at "nullable"
   BigInt updated_at "nullable"
   BigInt expires_at "nullable"
@@ -482,6 +483,7 @@ erDiagram
 - `utm_campaign`:
 - `custom_domain`:
 - `click_limit`:
+- `page_type`:
 - `created_at`:
 - `updated_at`:
 - `expires_at`:

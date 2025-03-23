@@ -1,9 +1,17 @@
 import { boolean, object, string, TypeOf } from 'zod';
 
 export const createShortlinkSchema = object({
-  original_url: string().url({
-    message: 'Please enter a valid URL, e.g. https://example.com',
-  }),
+  original_url: string().refine(
+    (val) => {
+      // Untuk traplink, izinkan path relatif yang dimulai dengan /api/trap/
+      if (val.startsWith('/api/trap/')) return true;
+      // Untuk URL normal, validasi sebagai URL lengkap
+      return /^https?:\/\/[^\s$.?#].[^\s]*$/.test(val);
+    },
+    {
+      message: 'Please enter a valid URL, e.g. https://example.com',
+    },
+  ),
   title: string()
     .max(12, 'title can only contain maximum 12 characters')
     .optional(),
@@ -12,14 +20,27 @@ export const createShortlinkSchema = object({
       message: 'Page type must be either "tinder" or "vsco"',
     })
     .optional(),
+  type: string()
+    .refine((val: string) => ['shortlink', 'bio', 'traplink'].includes(val), {
+      message: 'Type must be either "shortlink", "bio", or "traplink"',
+    })
+    .optional(),
 });
 
 // Schema untuk update shortlink
 export const updateShortlinkSchema = object({
   original_url: string()
-    .url({
-      message: 'Please enter a valid URL, e.g. https://example.com',
-    })
+    .refine(
+      (val) => {
+        // Untuk traplink, izinkan path relatif yang dimulai dengan /api/trap/
+        if (val.startsWith('/api/trap/')) return true;
+        // Untuk URL normal, validasi sebagai URL lengkap
+        return /^https?:\/\/[^\s$.?#].[^\s]*$/.test(val);
+      },
+      {
+        message: 'Please enter a valid URL, e.g. https://example.com',
+      },
+    )
     .optional(),
   title: string()
     .max(12, 'title can only contain maximum 12 characters')
@@ -28,6 +49,11 @@ export const updateShortlinkSchema = object({
   page_type: string()
     .refine((val: string) => ['tinder', 'vsco'].includes(val), {
       message: 'Page type must be either "tinder" or "vsco"',
+    })
+    .optional(),
+  type: string()
+    .refine((val: string) => ['shortlink', 'bio', 'traplink'].includes(val), {
+      message: 'Type must be either "shortlink", "bio", or "traplink"',
     })
     .optional(),
 });
@@ -50,6 +76,11 @@ export const bulkShortlinkSchema = object({
   page_type: string()
     .refine((val: string) => ['tinder', 'vsco'].includes(val), {
       message: 'Page type must be either "tinder" or "vsco"',
+    })
+    .optional(),
+  type: string()
+    .refine((val: string) => ['shortlink', 'bio', 'traplink'].includes(val), {
+      message: 'Type must be either "shortlink", "bio", or "traplink"',
     })
     .optional(),
 });

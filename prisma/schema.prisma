@@ -263,6 +263,7 @@ model Links {
   utm_campaign     String?
   custom_domain    String?
   click_limit      Int?
+  page_type        String?
   created_at       BigInt?
   updated_at       BigInt?
   expires_at       BigInt?
