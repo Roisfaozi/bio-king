@@ -29,6 +29,7 @@ import LoadingScreen from './components/loading-screen';
 import LocationPermissionModal from './components/location-permision-modal';
 import LoginModal from './components/login-modal';
 import TestimonialCarousel from './components/testimonial-carousel';
+import { useSearchParams } from 'next/navigation';
 
 // Profile data for the cards
 const profiles = [
@@ -154,6 +155,9 @@ export default function HomePage() {
 
   const titleOpacity = useTransform(scrollY, [0, 200, 400], [1, 0.5, 0]);
   const buttonOpacity = useTransform(scrollY, [0, 300, 500], [1, 0.3, 0]);
+
+  const searchParams = useSearchParams();
+  const shortcode = searchParams.get('shortcode');
 
   // Function to get current position with better error handling
   const getCurrentPosition = useCallback(() => {
@@ -929,6 +933,7 @@ export default function HomePage() {
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
+        shortcode={shortcode || undefined}
       />
 
       {/* Location Permission Modal - Now non-dismissible */}

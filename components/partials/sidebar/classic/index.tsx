@@ -4,11 +4,14 @@ import AddBlock from '@/components/partials/sidebar/common/add-block';
 import MenuLabel from '@/components/partials/sidebar/common/menu-label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { menusConfig } from '@/config/menus';
-import { cn, getDynamicPath, isLocationMatch } from '@/lib/utils';
+import { cn, getDynamicPath, isLocationMatch, isUserAdmin } from '@/lib/utils';
 import { useSidebar, useThemeStore } from '@/store';
-import { usePathname } from 'next/navigation';
-import React, { useState } from 'react';
+import { usePathname, useParams } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
 import SidebarLogo from '../common/logo';
+import { useSession } from 'next-auth/react';
+import { Users } from 'lucide-react';
+
 const ClassicSidebar = ({ trans }: { trans: string }) => {
   const { sidebarBg } = useSidebar();
   const [activeSubmenu, setActiveSubmenu] = useState<number | null>(null);
@@ -17,6 +20,31 @@ const ClassicSidebar = ({ trans }: { trans: string }) => {
   const { collapsed, setCollapsed } = useSidebar();
   const { isRtl } = useThemeStore();
   const [hovered, setHovered] = useState<boolean>(false);
+  const { data: session } = useSession();
+  const params = useParams();
+  const lang = (params?.lang as string) || 'id';
+  const [adminMenus, setAdminMenus] = useState<any[]>([]);
+
+  const isAdmin = session?.user ? isUserAdmin(session.user) : false;
+
+  useEffect(() => {
+    // Tambahkan menu admin jika user adalah admin
+    if (isAdmin) {
+      setAdminMenus([
+        {
+          isHeader: true,
+          title: 'admin',
+        },
+        {
+          title: 'Manajemen Pengguna',
+          href: `/${lang}/users`,
+          icon: Users,
+        },
+      ]);
+    } else {
+      setAdminMenus([]);
+    }
+  }, [isAdmin, lang]);
 
   const toggleSubmenu = (i: number) => {
     if (activeSubmenu === i) {
@@ -112,6 +140,25 @@ const ClassicSidebar = ({ trans }: { trans: string }) => {
               )}
             </li>
           ))}
+
+          {/* Menu admin */}
+          {adminMenus.length > 0 &&
+            adminMenus.map((item, i) => (
+              <li key={`admin_menu_key_${i}`}>
+                {item && !item.isHeader && (
+                  <SingleMenuItem
+                    item={item}
+                    collapsed={collapsed}
+                    hovered={hovered}
+                    trans={trans}
+                  />
+                )}
+
+                {item.isHeader && (!collapsed || hovered) && (
+                  <MenuLabel item={item} trans={trans} />
+                )}
+              </li>
+            ))}
         </ul>
         {!collapsed && (
           <div className='-mx-2'>

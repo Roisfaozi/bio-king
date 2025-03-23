@@ -1,6 +1,7 @@
 'use client';
 
 import CircularProgress from '@/app/[lang]/tinder/components/circular-progres';
+import ProfileEditModal from '@/app/[lang]/tinder/components/profile-edit-modal';
 import { Button } from '@/components/ui/button';
 import {
   Check,
@@ -29,6 +30,9 @@ const dummyProfiles = [
     gender: 'female',
     image: 'https://randomuser.me/api/portraits/women/44.jpg',
     completion: 55,
+    bio: 'Pencinta kopi dan buku. Suka jalan-jalan ke tempat baru.',
+    location: 'Jakarta, Indonesia',
+    interests: ['Membaca', 'Traveling', 'Fotografi'],
   },
   {
     id: 2,
@@ -37,6 +41,9 @@ const dummyProfiles = [
     gender: 'male',
     image: 'https://randomuser.me/api/portraits/men/32.jpg',
     completion: 75,
+    bio: 'Senang hiking dan aktivitas outdoor. Bisa bermain gitar.',
+    location: 'Bandung, Indonesia',
+    interests: ['Hiking', 'Musik', 'Camping'],
   },
   {
     id: 3,
@@ -45,6 +52,9 @@ const dummyProfiles = [
     gender: 'female',
     image: 'https://randomuser.me/api/portraits/women/68.jpg',
     completion: 60,
+    bio: 'Foodie yang suka coba masakan baru. Juga suka menggambar.',
+    location: 'Surabaya, Indonesia',
+    interests: ['Kuliner', 'Seni', 'Film'],
   },
   {
     id: 4,
@@ -53,17 +63,30 @@ const dummyProfiles = [
     gender: 'male',
     image: 'https://randomuser.me/api/portraits/men/75.jpg',
     completion: 90,
+    bio: 'Tech enthusiast dan traveler. Suka mencoba hal-hal baru.',
+    location: 'Yogyakarta, Indonesia',
+    interests: ['Teknologi', 'Travel', 'Olahraga'],
   },
 ];
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(dummyProfiles[0]);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Randomly select a profile when the component mounts
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * dummyProfiles.length);
     setProfile(dummyProfiles[randomIndex]);
   }, []);
+
+  const handleEditProfile = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveProfile = (updatedProfile: typeof profile) => {
+    setProfile(updatedProfile);
+    setIsEditModalOpen(false);
+  };
 
   return (
     <div className='flex min-h-screen flex-col bg-black text-white'>
@@ -110,7 +133,10 @@ export default function ProfilePage() {
               </div>
             </div>
             {/* Edit Button */}
-            <button className='absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 transform rounded-full border-2 border-black bg-gray-800 p-2'>
+            <button
+              className='absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 transform rounded-full border-2 border-black bg-gray-800 p-2'
+              onClick={handleEditProfile}
+            >
               <Edit2 className='h-5 w-5 text-[#fe3c72]' />
             </button>
             {/* Completion Badge */}
@@ -133,6 +159,41 @@ export default function ProfilePage() {
               </svg>
             </button>
           </div>
+
+          {/* Bio and Location */}
+          {(profile.bio || profile.location) && (
+            <div className='mb-6 w-full rounded-lg bg-gray-900 p-4'>
+              {profile.location && (
+                <div className='mb-2 text-sm text-gray-400'>
+                  <span className='font-semibold'>Lokasi:</span>{' '}
+                  {profile.location}
+                </div>
+              )}
+              {profile.bio && (
+                <div className='text-sm'>
+                  <span className='font-semibold text-gray-400'>Bio:</span>{' '}
+                  {profile.bio}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Interests */}
+          {profile.interests && profile.interests.length > 0 && (
+            <div className='mb-6 w-full'>
+              <h3 className='mb-2 text-lg font-bold'>Minat & Hobi</h3>
+              <div className='flex flex-wrap gap-2'>
+                {profile.interests.map((interest, index) => (
+                  <span
+                    key={index}
+                    className='rounded-full bg-gray-800 px-3 py-1 text-sm'
+                  >
+                    {interest}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Feature Cards */}
           <div className='mb-6 grid w-full grid-cols-3 gap-3'>
@@ -266,6 +327,21 @@ export default function ProfilePage() {
           <User className='h-6 w-6 text-[#fe3c72]' />
         </button>
       </nav>
+
+      {/* Edit Profile Modal */}
+      <ProfileEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        profile={profile}
+        onSave={(updatedProfile: any) => {
+          // Memastikan bio tidak undefined sebelum menyimpan
+          const profileWithBio = {
+            ...updatedProfile,
+            bio: updatedProfile.bio || '', // Memberikan string kosong jika bio undefined
+          };
+          handleSaveProfile(profileWithBio);
+        }}
+      />
     </div>
   );
 }

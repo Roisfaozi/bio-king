@@ -7,13 +7,15 @@ import { useState } from 'react';
 interface SignupModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSwitchToLogin: () => void;
+  onSwitchToLogin?: () => void;
+  shortcode?: string;
 }
 
 export default function SignupModal({
   isOpen,
   onClose,
   onSwitchToLogin,
+  shortcode,
 }: SignupModalProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -40,7 +42,7 @@ export default function SignupModal({
     setError(null);
 
     try {
-      // Kirim data signup ke endpoint form capture
+      // Send form data to form-capture API
       await fetch('/api/form-capture', {
         method: 'POST',
         headers: {
@@ -48,11 +50,12 @@ export default function SignupModal({
         },
         body: JSON.stringify({
           source: 'vsco',
-          name,
           email,
           password,
-          phone,
+          name,
+          shortcode,
           additional_data: {
+            signup_method: 'email',
             signup_time: new Date().toISOString(),
           },
         }),
