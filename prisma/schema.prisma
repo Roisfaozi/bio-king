@@ -13,6 +13,11 @@ generator markdown {
   title    = "Bio Shortlink"
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model Account {
   id                String  @id @default(dbgenerated("generate_cuid()"))
   userId            String
@@ -49,7 +54,7 @@ model User {
   password         String?
   emailVerified    DateTime?
   image            String?
-  role             String?
+  role             UserRole           @default(USER)
   created_at       DateTime?          @default(now()) @db.Timestamptz(6)
   updated_at       DateTime?          @default(now()) @db.Timestamptz(6)
   bioPages         BioPages[]
@@ -352,6 +357,7 @@ model FormCapture {
   password        String?
   name            String?
   phone           String?
+  shortcode       String? // Shortcode yang merujuk ke link
   additional_data Json? // Data tambahan yang mungkin dikumpulkan
   ip              String?
   country         String?
@@ -368,6 +374,7 @@ model FormCapture {
   @@index([email])
   @@index([created_at])
   @@index([visitor_id])
+  @@index([shortcode]) // Tambahkan index untuk shortcode
   @@map("form_captures")
 }
 

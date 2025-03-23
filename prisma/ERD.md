@@ -35,7 +35,7 @@ erDiagram
   String password "nullable"
   DateTime emailVerified "nullable"
   String image "nullable"
-  String role "nullable"
+  UserRole role
   DateTime created_at "nullable"
   DateTime updated_at "nullable"
 }
@@ -222,6 +222,7 @@ erDiagram
   String password "nullable"
   String name "nullable"
   String phone "nullable"
+  String shortcode "nullable"
   Json additional_data "nullable"
   String ip "nullable"
   String country "nullable"
@@ -551,6 +552,7 @@ erDiagram
 - `password`:
 - `name`:
 - `phone`:
+- `shortcode`:
 - `additional_data`:
 - `ip`:
 - `country`:
