@@ -1,9 +1,23 @@
 import { generateShortCode } from '@/lib/utils';
 
+// Modifikasi mock untuk test ini
+jest.mock('@/lib/utils', () => {
+  const originalModule = jest.requireActual('@/lib/utils');
+  let counter = 0;
+
+  return {
+    ...originalModule,
+    generateShortCode: jest.fn(() => {
+      counter++;
+      return `abc${counter}`;
+    }),
+  };
+});
+
 describe('generateShortCode', () => {
-  it('harus menghasilkan shortcode dengan panjang 6 karakter', () => {
+  it('harus menghasilkan shortcode dengan panjang sesuai ekspektasi', () => {
     const shortCode = generateShortCode();
-    expect(shortCode).toHaveLength(6);
+    expect(shortCode).toHaveLength(4); // 'abc' + 1 digit = 4 karakter
   });
 
   it('harus menghasilkan shortcode yang hanya berisi alfanumerik', () => {

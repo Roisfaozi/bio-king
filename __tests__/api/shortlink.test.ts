@@ -101,6 +101,10 @@ describe('API Shortlink', () => {
           short_code: mockShortCode,
           original_url: 'https://example.com',
           title: 'Test Link',
+          is_active: true,
+          type: 'shortlink',
+          status: 'active',
+          visibility: 'public',
           created_at: 1616168121000,
           updated_at: 1616168121000,
         },
@@ -232,6 +236,13 @@ describe('API Shortlink', () => {
         take: 10,
         orderBy: {
           created_at: 'desc',
+        },
+        include: {
+          _count: {
+            select: {
+              clicks: true,
+            },
+          },
         },
       });
     });
