@@ -36,7 +36,7 @@ export const getBio = async (id: string) => {
 export const getBiosWithClick = async (limit: number = 10) => {
   try {
     const cookie = await getCookie('next-auth.session-token');
-    const response = await api.get<BioPages[]>(`/bio`, {
+    const response = await api.get(`/bio`, {
       headers: {
         Cookie: `next-auth.session-token=${cookie}`,
       },
@@ -45,7 +45,7 @@ export const getBiosWithClick = async (limit: number = 10) => {
         limit: limit,
       },
     });
-    console.log('get bios executed');
+
     return response.data;
   } catch (error: any) {
     logError('Error fetching all with clicks bio pages:', error.response.data);

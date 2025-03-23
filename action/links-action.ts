@@ -28,17 +28,14 @@ export const getShortlinks = async (limit: number = 10) => {
   try {
     const cookie = await getCookie('next-auth.session-token');
 
-    const response = await api.get<ShortlinkWithClicksResponse[]>(
-      '/shortlink',
-      {
-        headers: {
-          Cookie: `next-auth.session-token=${cookie}`,
-        },
-        params: {
-          limit: limit, // or any other value you want to set
-        },
+    const response = await api.get('/shortlink', {
+      headers: {
+        Cookie: `next-auth.session-token=${cookie}`,
       },
-    );
+      params: {
+        limit: limit,
+      },
+    });
 
     return response.data;
   } catch (error: any) {
