@@ -49,6 +49,7 @@ import {
   MoreHorizontal,
   Plus,
   Search,
+  Shield,
   Trash2,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -60,11 +61,13 @@ interface ShortlinksPageViewProps {
     [key: string]: string;
   };
   shortlinks: ShortlinkWithClicksResponse[];
+  isAdmin?: boolean;
 }
 
 const ShortlinksPageView = ({
   trans,
   shortlinks: initialShortlinks,
+  isAdmin = false,
 }: ShortlinksPageViewProps) => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -170,14 +173,31 @@ const ShortlinksPageView = ({
     <div className='space-y-6'>
       <div className='flex flex-col justify-between gap-4 md:flex-row md:items-center'>
         <div>
-          <h1 className='text-2xl font-bold tracking-tight'>Shortlinks</h1>
+          <h1 className='text-2xl font-bold tracking-tight'>
+            {trans?.shortlinks || 'Shortlinks'}
+            {isAdmin && (
+              <Badge
+                variant='outline'
+                className='ml-2 bg-yellow-100 text-yellow-800'
+              >
+                <Shield className='mr-1 h-3 w-3' />
+                Admin Mode
+              </Badge>
+            )}
+          </h1>
           <p className='text-muted-foreground'>
-            Manage and track all your shortened links
+            {isAdmin
+              ? 'Semua shortlink yang telah dibuat oleh semua pengguna dalam sistem.'
+              : 'Semua shortlink yang telah Anda buat untuk halaman bio dan tautan eksternal.'}
           </p>
         </div>
-        <Button className='gap-2' onClick={handleCreateShortlink}>
-          <Plus className='h-4 w-4' />
-          <span>Create Shortlink</span>
+
+        <Button
+          onClick={handleCreateShortlink}
+          size='sm'
+          className='flex items-center gap-1'
+        >
+          <Plus className='h-4 w-4' /> Buat Link Baru
         </Button>
       </div>
 
