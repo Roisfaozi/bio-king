@@ -20,6 +20,25 @@ export const createUserSchema = object({
   message: 'Passwords do not match',
 });
 
+export const createAdminSchema = object({
+  name: string({ required_error: 'Nama wajib diisi' }).min(
+    3,
+    'Nama minimal 3 karakter',
+  ),
+  email: string({ required_error: 'Email wajib diisi' })
+    .min(1, 'Email wajib diisi')
+    .email('Format email tidak valid'),
+  password: string({ required_error: 'Password wajib diisi' })
+    .min(1, 'Password wajib diisi')
+    .min(10, 'Password harus minimal 10 karakter')
+    .max(64, 'Password maksimal 64 karakter')
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      'Password harus mengandung huruf besar, huruf kecil, angka, dan karakter khusus',
+    ),
+  token: string().optional(),
+});
+
 export const loginUserSchema = object({
   email: string({ required_error: 'Email is required' })
     .min(1, 'Email is required')
@@ -32,3 +51,4 @@ export const loginUserSchema = object({
 
 export type LoginUserInput = TypeOf<typeof loginUserSchema>;
 export type CreateUserInput = TypeOf<typeof createUserSchema>;
+export type CreateAdminInput = TypeOf<typeof createAdminSchema>;

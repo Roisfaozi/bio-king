@@ -1,6 +1,7 @@
 import { authOptions } from '@/lib/auth';
 import { bypassRLS } from '@/lib/db';
 import { logError } from '@/lib/helper';
+import { isAdmin } from '@/lib/utils';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -15,6 +16,7 @@ export async function GET(request: NextRequest) {
     }
 
     const id = session.user.id;
+    const userIsAdmin = isAdmin(session);
     const dbBypass = bypassRLS();
 
     // Ambil parameter dari query string
@@ -51,40 +53,32 @@ export async function GET(request: NextRequest) {
     const startTimestamp = BigInt(startDate.getTime());
     const endTimestamp = BigInt(endDate.getTime());
 
+    // Buat where clause berdasarkan role
+    const shortlinksWhere = userIsAdmin ? {} : { user_id: id };
+    const bioPagesWhere = userIsAdmin ? {} : { user_id: id };
+    const shortlinkClicksWhere = userIsAdmin
+      ? { link_id: { not: null } }
+      : { links: { user_id: id }, link_id: { not: null } };
+    const bioPageClicksWhere = userIsAdmin
+      ? { bio_page_id: { not: null } }
+      : { bioPages: { user_id: id }, bio_page_id: { not: null } };
+
     // Hitung total shortlinks dan bio pages
     const shortlinksCount = await dbBypass.links.count({
-      where: {
-        user_id: id,
-      },
+      where: shortlinksWhere,
     });
 
     const bioPagesCount = await dbBypass.bioPages.count({
-      where: {
-        user_id: id,
-      },
+      where: bioPagesWhere,
     });
 
     // Hitung total klik
     const shortlinkClicks = await dbBypass.clicks.count({
-      where: {
-        links: {
-          user_id: id,
-        },
-        link_id: {
-          not: null,
-        },
-      },
+      where: shortlinkClicksWhere,
     });
 
     const bioPageClicks = await dbBypass.clicks.count({
-      where: {
-        bioPages: {
-          user_id: id,
-        },
-        bio_page_id: {
-          not: null,
-        },
-      },
+      where: bioPageClicksWhere,
     });
 
     const totalClicks = shortlinkClicks + bioPageClicks;
@@ -94,13 +88,16 @@ export async function GET(request: NextRequest) {
     recentDate.setDate(recentDate.getDate() - 7);
     const recentTimestamp = BigInt(recentDate.getTime());
 
-    const recentShortlinks = await dbBypass.links.count({
-      where: {
-        user_id: id,
-        created_at: {
-          gte: recentTimestamp,
-        },
+    // Buat where clause untuk aktivitas terbaru
+    const recentShortlinksWhere = {
+      ...shortlinksWhere,
+      created_at: {
+        gte: recentTimestamp,
       },
+    };
+
+    const recentShortlinks = await dbBypass.links.count({
+      where: recentShortlinksWhere,
     });
 
     const recentBioPages = await dbBypass.bioPages.count({

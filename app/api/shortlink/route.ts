@@ -1,7 +1,7 @@
 import { getAuthSession } from '@/lib/auth';
-import { withRLS } from '@/lib/db';
+import { bypassRLS, withRLS } from '@/lib/db';
 import { logError } from '@/lib/helper';
-import { generateShortCode, getCurrentEpoch } from '@/lib/utils';
+import { generateShortCode, getCurrentEpoch, isAdmin } from '@/lib/utils';
 import { createShortlinkSchema } from '@/validation/link';
 import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
@@ -51,10 +51,28 @@ export async function POST(req: NextRequest) {
         short_code: shortCode,
         original_url: validatedData.original_url,
         title: validatedData.title || null,
+        is_active: true,
+        type: 'shortlink',
+        status: 'active',
+        visibility: 'public',
         created_at: now,
         updated_at: now,
       },
     });
+
+    // Jika ada page_type, simpan di metadata terpisah
+    if (validatedData.page_type) {
+      // Simpan informasi page_type di tabel terpisah jika diperlukan
+      // Misalnya simpan di tabel FormCapture atau kita bisa membuat tabel LinkMetadata
+      await dbRls.linkMetadata.create({
+        data: {
+          link_id: result.id,
+          title: `Page Type: ${validatedData.page_type}`,
+          created_at: now,
+          updated_at: now,
+        },
+      });
+    }
     revalidatePath('/dashboard');
 
     return NextResponse.json(
@@ -91,36 +109,73 @@ export async function GET(req: NextRequest) {
     if (!session?.user) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-    const dbRls = withRLS(id);
 
+    const userIsAdmin = isAdmin(session);
     const searchParams = req.nextUrl.searchParams;
-
     const limit = searchParams.get('limit') || 10;
 
-    const shortlinks = await dbRls.links.findMany({
-      where: {
-        user_id: session.user.id,
-      },
-      orderBy: {
-        created_at: 'desc',
-      },
-      take: Number(limit),
-      include: {
-        _count: {
-          select: {
-            clicks: true,
+    if (userIsAdmin) {
+      // Admin dapat melihat semua shortlinks
+      const noRLS = await bypassRLS();
+
+      const shortlinks = await noRLS.links.findMany({
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: Number(limit),
+        include: {
+          _count: {
+            select: {
+              clicks: true,
+            },
+          },
+          users: {
+            select: {
+              name: true,
+              email: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return NextResponse.json(
-      {
-        status: 'success',
-        data: shortlinks,
-      },
-      { status: 200 },
-    );
+      return NextResponse.json(
+        {
+          status: 'success',
+          data: shortlinks,
+          isAdmin: true,
+        },
+        { status: 200 },
+      );
+    } else {
+      // User biasa hanya melihat shortlinks miliknya
+      const dbRls = withRLS(id);
+
+      const shortlinks = await dbRls.links.findMany({
+        where: {
+          user_id: session.user.id,
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: Number(limit),
+        include: {
+          _count: {
+            select: {
+              clicks: true,
+            },
+          },
+        },
+      });
+
+      return NextResponse.json(
+        {
+          status: 'success',
+          data: shortlinks,
+          isAdmin: false,
+        },
+        { status: 200 },
+      );
+    }
   } catch (error) {
     let res;
     if (error instanceof z.ZodError) {

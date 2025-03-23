@@ -1,6 +1,7 @@
 import { withRLS } from '@/lib/db';
 import { logError } from '@/lib/helper';
 import { getCurrentEpoch } from '@/lib/utils';
+import { bypassRLS } from '@/lib/db';
 
 export async function updateBioPageWithLinks(
   userId: string,
@@ -190,6 +191,56 @@ export async function getAllBioPages(userId: string, limit?: string | number) {
     });
 
     return bioPages;
+  } catch (error: any) {
+    logError('Unknown Error:', error.message);
+    throw new Error(error.message || 'An unexpected error occurred.');
+  }
+}
+
+export async function getAllBioPagesAdmin(
+  withClick: boolean,
+  limit?: string | number,
+) {
+  try {
+    // Gunakan bypassRLS karena admin perlu melihat semua data
+    const db = await bypassRLS();
+
+    if (withClick) {
+      const bioPages = await db.bioPages.findMany({
+        include: {
+          _count: {
+            select: { clicks: true },
+          },
+          users: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: Number(limit),
+      });
+      return bioPages;
+    } else {
+      const bioPages = await db.bioPages.findMany({
+        include: {
+          users: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: Number(limit),
+      });
+      return bioPages;
+    }
   } catch (error: any) {
     logError('Unknown Error:', error.message);
     throw new Error(error.message || 'An unexpected error occurred.');

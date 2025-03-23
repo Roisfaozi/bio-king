@@ -1,11 +1,12 @@
 import { getAuthSession } from '@/lib/auth';
-import { withRLS } from '@/lib/db';
+import { bypassRLS, withRLS } from '@/lib/db';
 import {
   getAllBioPages,
   getAllBioPagesWithClicks,
+  getAllBioPagesAdmin,
 } from '@/lib/db-transaction/bio';
 import { logError } from '@/lib/helper';
-import { getCurrentEpoch } from '@/lib/utils';
+import { getCurrentEpoch, isAdmin } from '@/lib/utils';
 import { createBioSchema } from '@/validation/bio';
 import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
@@ -86,19 +87,31 @@ export async function GET(request: NextRequest) {
 
   const withClickParam = searchParams.get('withclick');
   const withClick = withClickParam === 'true';
+  const userIsAdmin = isAdmin(session);
+
   try {
     let bioPages: any = [];
 
-    if (withClick) {
-      bioPages = await getAllBioPagesWithClicks(userId, limit);
-    }
-    if (!withClick) {
-      bioPages = await getAllBioPages(userId, limit);
+    if (userIsAdmin) {
+      // Admin dapat melihat semua bio pages
+      bioPages = await getAllBioPagesAdmin(withClick, limit);
+    } else {
+      // User biasa hanya melihat bio pages miliknya
+      if (withClick) {
+        bioPages = await getAllBioPagesWithClicks(userId, limit);
+      }
+      if (!withClick) {
+        bioPages = await getAllBioPages(userId, limit);
+      }
     }
 
     if (bioPages.length > 0) {
       return NextResponse.json(
-        { status: 'success', data: bioPages },
+        {
+          status: 'success',
+          data: bioPages,
+          isAdmin: userIsAdmin,
+        },
         { status: 200 },
       );
     } else {

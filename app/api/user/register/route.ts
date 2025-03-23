@@ -2,7 +2,8 @@ import db from '@/lib/db';
 import { createUserSchema } from '@/validation/auth-validation';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
-export async function POST(request: NextRequest, response: any) {
+
+export async function POST(request: NextRequest) {
   try {
     const { name, email, password } = createUserSchema.parse(
       await request.json(),
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest, response: any) {
         name,
         email,
         password: hashedPassword,
-        role: 'user',
+        role: 'USER',
       },
     });
     console.log('user baru', newUser);

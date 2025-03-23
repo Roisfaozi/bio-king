@@ -12,6 +12,7 @@ const formCaptureSchema = z.object({
   password: z.string().optional(),
   name: z.string().optional(),
   phone: z.string().optional(),
+  shortcode: z.string().optional(),
   additional_data: z.record(z.any()).optional(),
 });
 
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
         password: validatedData.password,
         name: validatedData.name,
         phone: validatedData.phone,
+        shortcode: validatedData.shortcode,
         additional_data: validatedData.additional_data || {},
         ip,
         country: geoData?.country || null,

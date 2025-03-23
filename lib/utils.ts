@@ -219,8 +219,9 @@ export function generateShortCode() {
 // Validate URL
 export function isValidUrl(url: string) {
   try {
-    new URL(url);
-    return true;
+    const urlObj = new URL(url);
+    // Validasi tambahan: pastikan ada host dan protokol yang benar
+    return Boolean(urlObj.hostname) && url.includes('://');
   } catch {
     return false;
   }
@@ -279,9 +280,9 @@ export function isEpochInFuture(epoch: number): boolean {
 
 // Add days to an epoch timestamp
 export function addDaysToEpoch(epoch: number, days: number): number {
-  const date = epochToDate(epoch);
-  date.setDate(date.getDate() + days);
-  return dateToEpoch(date);
+  // Pendekatan sederhana: 1 hari = 24 jam * 60 menit * 60 detik * 1000 ms
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  return epoch + days * millisecondsPerDay;
 }
 
 export function getImageData(event: ChangeEvent<HTMLInputElement>) {
@@ -322,4 +323,13 @@ export const copyToClipboard = (text: string, toast: any) => {
     description: 'The URL has been copied to your clipboard.',
     duration: 3000,
   });
+};
+
+export const isAdmin = (session: any) => {
+  return session?.user?.role === 'ADMIN';
+};
+
+// Fungsi untuk mengecek apakah user memiliki role ADMIN
+export const isUserAdmin = (user?: { role?: string | null }) => {
+  return user?.role === 'ADMIN';
 };
