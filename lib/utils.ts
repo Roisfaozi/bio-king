@@ -4,17 +4,6 @@ import { customAlphabet } from 'nanoid';
 import { ChangeEvent } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { UAParser } from 'ua-parser-js';
-import {
-  ExternalLink,
-  Facebook,
-  Github,
-  Instagram,
-  Linkedin,
-  Moon,
-  Sun,
-  Twitter,
-  Youtube,
-} from 'lucide-react';
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -332,4 +321,39 @@ export const isAdmin = (session: any) => {
 // Fungsi untuk mengecek apakah user memiliki role ADMIN
 export const isUserAdmin = (user?: { role?: string | null }) => {
   return user?.role === 'ADMIN';
+};
+
+export const serializeBigInt = <T>(data: T): T => {
+  // Handle null or undefined
+  if (data === null || data === undefined) {
+    return data;
+  }
+
+  // Handle basic types that aren't objects
+  if (typeof data !== 'object') {
+    return typeof data === 'bigint' ? (data.toString() as unknown as T) : data;
+  }
+
+  // Handle arrays
+  if (Array.isArray(data)) {
+    return data.map((item) => serializeBigInt(item)) as unknown as T;
+  }
+
+  // Handle objects
+  const result = {} as T;
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (typeof value === 'bigint') {
+      // Convert BigInt to string
+      result[key as keyof T] = value.toString() as unknown as T[keyof T];
+    } else if (typeof value === 'object' && value !== null) {
+      // Recursively handle nested objects and arrays
+      result[key as keyof T] = serializeBigInt(value);
+    } else {
+      // Keep other types as is
+      result[key as keyof T] = value;
+    }
+  });
+
+  return result;
 };

@@ -1,7 +1,12 @@
 import { getAuthSession } from '@/lib/auth';
 import { bypassRLS, withRLS } from '@/lib/db';
 import { logError } from '@/lib/helper';
-import { generateShortCode, getCurrentEpoch, isAdmin } from '@/lib/utils';
+import {
+  generateShortCode,
+  getCurrentEpoch,
+  isAdmin,
+  serializeBigInt,
+} from '@/lib/utils';
 import { createShortlinkSchema } from '@/validation/link';
 import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
@@ -78,7 +83,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         status: 'success',
-        data: result,
+        data: serializeBigInt(result),
       },
       { status: 201 },
     );
@@ -170,7 +175,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         {
           status: 'success',
-          data: shortlinks,
+          data: serializeBigInt(shortlinks),
           isAdmin: false,
         },
         { status: 200 },

@@ -17,6 +17,7 @@ export const createShortlink = async (data: CreateShortlinkInput) => {
         Cookie: `next-auth.session-token=${cookie}`,
       },
     });
+    console.log('response', response.data);
     return response.data;
   } catch (error: any) {
     logError('failed create bio', error.response.data);

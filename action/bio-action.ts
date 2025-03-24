@@ -36,6 +36,7 @@ export const getBio = async (id: string) => {
 export const getBiosWithClick = async (limit: number = 10) => {
   try {
     const cookie = await getCookie('next-auth.session-token');
+    console.log('cookie', cookie);
     const response = await api.get(`/bio`, {
       headers: {
         Cookie: `next-auth.session-token=${cookie}`,

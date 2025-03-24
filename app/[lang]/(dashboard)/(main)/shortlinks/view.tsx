@@ -1,18 +1,19 @@
 'use client';
 
 import {
-  deleteShortlinkByShortcode,
   createShortlink,
+  deleteShortlinkByShortcode,
+  getShortlinks,
 } from '@/action/links-action';
 import { ShortlinkWithClicksResponse } from '@/models/shortlink-response';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import ShortlinksHeader from './components/shortlinks-header';
-import ShortlinksFilter from './components/shortlinks-filter';
-import ShortlinksContent from './components/shortlinks-content';
-import DeleteDialog from './components/delete-dialog';
 import { CreateShortlinkDialog } from './components/create-shortlink-dialog';
+import DeleteDialog from './components/delete-dialog';
+import ShortlinksContent from './components/shortlinks-content';
+import ShortlinksFilter from './components/shortlinks-filter';
+import ShortlinksHeader from './components/shortlinks-header';
 
 interface ShortlinksPageViewProps {
   trans: {
@@ -175,13 +176,9 @@ const ShortlinksPageView = ({
     try {
       setIsLoading(true);
       // Dapatkan semua shortlinks dari API endpoint
-      const response = await fetch('/api/links');
-      if (!response.ok) {
-        throw new Error('Failed to fetch shortlinks');
-      }
-      const data = await response.json();
-      if (data.status === 'success' && data.data) {
-        setShortlinks(data.data);
+      const { status, data } = await getShortlinks();
+      if (status === 'success' && data) {
+        setShortlinks(data);
       }
     } catch (error) {
       console.error('Error fetching shortlinks:', error);

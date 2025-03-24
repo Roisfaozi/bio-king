@@ -2,6 +2,7 @@ import { getAuthSession } from '@/lib/auth';
 import { withRLS } from '@/lib/db';
 import { updateBioPageWithLinks } from '@/lib/db-transaction/bio';
 import { logError } from '@/lib/helper';
+import { serializeBigInt } from '@/lib/utils';
 import { editBioPageSchema } from '@/validation/bio';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -37,13 +38,13 @@ export async function GET(
         { status: 404 },
       );
     }
-    const serializedData = JSON.parse(
-      JSON.stringify(bioPage, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value,
-      ),
-    );
+    // const serializedData = JSON.parse(
+    //   JSON.stringify(bioPage, (key, value) =>
+    //     typeof value === 'bigint' ? value.toString() : value,
+    //   ),
+    // );
     return NextResponse.json(
-      { status: 'success', data: serializedData },
+      { status: 'success', data: serializeBigInt(bioPage) },
       { status: 200 },
     );
   } catch (error) {
@@ -77,7 +78,10 @@ export async function PATCH(
     const validatedData = editBioPageSchema.parse(data);
     const res = await updateBioPageWithLinks(userId, id, validatedData);
 
-    return NextResponse.json({ status: 'success', data: res }, { status: 200 });
+    return NextResponse.json(
+      { status: 'success', data: serializeBigInt(res) },
+      { status: 200 },
+    );
   } catch (error) {
     let res;
     if (error instanceof z.ZodError) {

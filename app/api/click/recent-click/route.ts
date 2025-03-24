@@ -1,6 +1,7 @@
 import { getAuthSession } from '@/lib/auth';
 import { withRLS } from '@/lib/db';
 import { logError } from '@/lib/helper';
+import { serializeBigInt } from '@/lib/utils';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -61,7 +62,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         status: 'success',
-        data: recentClicks,
+        data: serializeBigInt(recentClicks),
       },
       { status: 200 },
     );

@@ -1,12 +1,12 @@
 import { getAuthSession } from '@/lib/auth';
-import { bypassRLS, withRLS } from '@/lib/db';
+import { withRLS } from '@/lib/db';
 import {
   getAllBioPages,
-  getAllBioPagesWithClicks,
   getAllBioPagesAdmin,
+  getAllBioPagesWithClicks,
 } from '@/lib/db-transaction/bio';
 import { logError } from '@/lib/helper';
-import { getCurrentEpoch, isAdmin } from '@/lib/utils';
+import { getCurrentEpoch, isAdmin, serializeBigInt } from '@/lib/utils';
 import { createBioSchema } from '@/validation/bio';
 import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
@@ -46,12 +46,12 @@ export async function POST(request: NextRequest) {
       },
     });
     revalidatePath('/dashboard');
-
+    const serializedData = serializeBigInt(data);
     return NextResponse.json(
       {
         status: 'success',
         message: 'Bio created successfully',
-        data,
+        serializedData,
       },
       { status: 201 },
     );
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           status: 'success',
-          data: bioPages,
+          data: serializeBigInt(bioPages), // Serialize the
           isAdmin: userIsAdmin,
         },
         { status: 200 },

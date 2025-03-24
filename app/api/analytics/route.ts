@@ -675,6 +675,7 @@ export async function GET(request: NextRequest) {
           groupBy,
         },
       },
+
       { status: 200 },
     );
   } catch (error) {

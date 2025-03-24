@@ -1,6 +1,7 @@
 import { getAuthSession } from '@/lib/auth';
 import { bypassRLS, withRLS } from '@/lib/db';
 import { logError } from '@/lib/helper';
+import { serializeBigInt } from '@/lib/utils';
 import { updateShortlinkSchema } from '@/validation/link';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -54,7 +55,7 @@ export async function GET(
     return NextResponse.json(
       {
         status: 'success',
-        data: shortlink,
+        data: serializeBigInt(shortlink),
       },
       { status: 200 },
     );
