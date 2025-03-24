@@ -14,7 +14,7 @@
     "format:check": "prettier -c -w .",
     "clean": "rm -rf node_modules && rm -rf .next && rm -rf pnpm-lock.yaml && pnpm store prune && pnpm install",
     "prepare": "husky",
-    "postinstall": "NODE_ENV=development dotenv -e .env.local prisma generate",
+    "postinstall": "prisma generate",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
