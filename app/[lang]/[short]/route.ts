@@ -2,7 +2,6 @@ import { bypassRLS } from '@/lib/db';
 import { trackPageView } from '@/lib/tracking';
 import { getCurrentEpoch } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(

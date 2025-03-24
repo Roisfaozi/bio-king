@@ -420,6 +420,7 @@ enum link_status {
 
 enum link_type {
   shortlink
+  traplink
   bio
 }
 
