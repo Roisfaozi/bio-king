@@ -1,5 +1,6 @@
 import { getAuthSession } from '@/lib/auth';
 import db from '@/lib/db';
+import { UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    if (user.role !== 'admin' && user.id !== session.user.id) {
+    if (user.role !== UserRole.ADMIN && user.id !== session.user.id) {
       return NextResponse.json(
         { message: 'You do not have permission to access this resource' },
         { status: 403 },
@@ -59,7 +60,7 @@ export async function PUT(request: NextRequest, response: NextResponse) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    if (user.role !== 'admin' && user.id !== session.user.id) {
+    if (user.role !== UserRole.ADMIN && user.id !== session.user.id) {
       return NextResponse.json(
         { message: 'You do not have permission to access this resource' },
         { status: 403 },
@@ -105,7 +106,7 @@ export async function DELETE(request: NextRequest, response: NextResponse) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    if (user.role !== 'admin' && user.id !== session.user.id) {
+    if (user.role !== UserRole.ADMIN && user.id !== session.user.id) {
       return NextResponse.json(
         { message: 'You do not have permission to access this resource' },
         { status: 403 },
