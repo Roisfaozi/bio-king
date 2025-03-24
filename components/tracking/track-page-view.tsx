@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { trackPageView } from '@/action/tracking-action';
 
 interface TrackPageViewProps {
   pageType: 'page' | 'feature' | 'pricing' | 'tinder' | 'bio' | 'link';
@@ -20,20 +21,12 @@ export function TrackPageView({
   shortCode,
 }: TrackPageViewProps) {
   useEffect(() => {
-    // Kirim data track melalui API endpoint
-    fetch('/api/track', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        pageType,
-        pageId,
-        username,
-        shortCode,
-      }),
-      // Mode 'no-store' untuk memastikan request tidak di-cache
-      cache: 'no-store',
+    // Kirim data track melalui API endpoint menggunakan action
+    trackPageView({
+      pageType,
+      pageId,
+      username,
+      shortCode,
     }).catch(() => {
       // Silent fail - jangan tampilkan error apapun ke pengguna
     });

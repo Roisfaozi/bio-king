@@ -1,4 +1,5 @@
-import { trackPageView } from '@/lib/tracking';
+import { trackPageView } from '@/lib/db-transaction/tracking';
+import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -14,14 +15,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Ambil header untuk dipassing ke db transaction
+    const headersList = headers();
+    const headerData = {
+      ip: headersList.get('x-forwarded-for') || '',
+      userAgent: headersList.get('user-agent') || '',
+      referer: headersList.get('referer') || '',
+      language: headersList.get('accept-language') || '',
+      pathname: headersList.get('x-next-pathname') || '',
+    };
+
     // Jalankan fungsi tracking
-    await trackPageView({
-      pageType: data.pageType,
-      pageId: data.pageId,
-      username: data.username,
-      shortCode: data.shortCode,
-      geoData: data.geoData,
-    });
+    const result = await trackPageView(
+      {
+        pageType: data.pageType,
+        pageId: data.pageId,
+        username: data.username,
+        shortCode: data.shortCode,
+      },
+      headerData,
+    );
 
     // Return success response dengan empty JSON untuk meminimalisir payload
     return NextResponse.json({}, { status: 200 });

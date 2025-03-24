@@ -128,6 +128,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'tinder.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

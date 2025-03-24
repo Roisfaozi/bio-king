@@ -1,5 +1,6 @@
-import { getAuthSession } from '@/lib/auth';
+import { getFormCaptureData } from '@/lib/db-transaction/form-capture';
 import { bypassRLS } from '@/lib/db';
+import { getAuthSession } from '@/lib/auth';
 import { isAdmin } from '@/lib/utils';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -18,52 +19,41 @@ export async function GET(req: NextRequest) {
     const userId = session.user.id;
     const isUserAdmin = isAdmin(session);
 
-    // Dapatkan query parameters hanya untuk filter source dan shortcode
-    const searchParams = req.nextUrl.searchParams;
-    const filterSource = searchParams.get('source'); // tinder, vsco
-    const filterShortcode = searchParams.get('shortcode');
+    // Ambil parameter dari query
+    const url = new URL(req.url);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '10');
+    const source = url.searchParams.get('source') || undefined;
+    const startDate = url.searchParams.get('start_date') || undefined;
+    const endDate = url.searchParams.get('end_date') || undefined;
+    const shortcode = url.searchParams.get('shortcode') || undefined;
 
     // Gunakan bypass RLS untuk mengakses data
     const noRLS = await bypassRLS();
 
-    // Kondisi berbeda untuk admin dan user biasa
     if (isUserAdmin) {
       // Admin dapat melihat semua data
-      const whereCondition: any = {};
-
-      // Tambahkan filter spesifik jika disediakan
-      if (filterShortcode) {
-        whereCondition.shortcode = filterShortcode;
-      }
-
-      // Tambahkan filter berdasarkan source jika tersedia
-      if (filterSource) {
-        whereCondition.source = filterSource;
-      }
-
-      // Ambil form captures berdasarkan filter untuk admin
-      const formCaptures = await noRLS.formCapture.findMany({
-        where: whereCondition,
-        orderBy: {
-          created_at: 'desc',
-        },
-        // Batasi jumlah data yang diambil
-        take: 100,
+      const result = await getFormCaptureData({
+        page,
+        limit,
+        source,
+        start_date: startDate,
+        end_date: endDate,
       });
 
-      return NextResponse.json(
-        {
+      // Jika berhasil, kirim data
+      if (result.success) {
+        return NextResponse.json({
           status: 'success',
-          data: formCaptures,
+          data: result.data,
+          meta: result.meta,
           filters: {
-            shortcode: filterShortcode,
-            source: filterSource,
-            total: formCaptures.length,
+            shortcode,
+            source,
             isAdmin: true,
           },
-        },
-        { status: 200 },
-      );
+        });
+      }
     } else {
       // 1. Dapatkan semua shortcodes milik user yang sedang login
       const userLinks = await noRLS.links.findMany({
@@ -85,10 +75,15 @@ export async function GET(req: NextRequest) {
           {
             status: 'success',
             data: [],
-            filters: {
-              shortcode: filterShortcode,
-              source: filterSource,
+            meta: {
               total: 0,
+              page,
+              limit,
+              totalPages: 0,
+            },
+            filters: {
+              shortcode,
+              source,
               isAdmin: false,
             },
           },
@@ -96,53 +91,48 @@ export async function GET(req: NextRequest) {
         );
       }
 
-      // 2. Buat kondisi where untuk query form captures
-      const whereCondition: any = {
-        // Selalu filter berdasarkan shortcodes milik user
-        shortcode: {
-          in: userShortcodes,
-        },
-      };
-
-      // Tambahkan filter spesifik jika disediakan
-      if (filterShortcode && userShortcodes.includes(filterShortcode)) {
-        whereCondition.shortcode = filterShortcode;
-      }
-
-      // Tambahkan filter berdasarkan source jika tersedia
-      if (filterSource) {
-        whereCondition.source = filterSource;
-      }
-
-      // Ambil form captures berdasarkan filter
-      const formCaptures = await noRLS.formCapture.findMany({
-        where: whereCondition,
-        orderBy: {
-          created_at: 'desc',
-        },
-        // Batasi jumlah data yang diambil
-        take: 100,
+      // Gunakan fungsi db transaction hanya untuk shortcodes milik user
+      const result = await getFormCaptureData({
+        page,
+        limit,
+        source,
+        start_date: startDate,
+        end_date: endDate,
       });
 
-      return NextResponse.json(
-        {
+      if (result.success) {
+        // Filter hasil yang hanya milik user
+        const data = result.data || [];
+        const filteredData = data.filter(
+          (item) =>
+            item.shortcode && userShortcodes.includes(item.shortcode as string),
+        );
+
+        return NextResponse.json({
           status: 'success',
-          data: formCaptures,
+          data: filteredData,
+          meta: {
+            ...result.meta,
+            total: filteredData.length,
+          },
           filters: {
-            shortcode: filterShortcode,
-            source: filterSource,
-            total: formCaptures.length,
+            shortcode,
+            source,
             isAdmin: false,
           },
-        },
-        { status: 200 },
-      );
+        });
+      }
     }
-  } catch (error) {
-    console.error('Error fetching form captures:', error);
 
+    // Jika gagal, kirim pesan error
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: 'Failed to fetch form capture data' },
+      { status: 500 },
+    );
+  } catch (error) {
+    console.error('Error fetching form capture data:', error);
+    return NextResponse.json(
+      { message: 'Failed to fetch form capture data' },
       { status: 500 },
     );
   }

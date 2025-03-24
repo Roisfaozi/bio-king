@@ -1,6 +1,4 @@
-import { bypassRLS } from '@/lib/db';
-import { getGeo } from '@/lib/geo-api';
-import { getCurrentEpoch, parseUserAgent } from '@/lib/utils';
+import { saveFormCaptureData } from '@/lib/db-transaction/form-capture';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -24,46 +22,28 @@ export async function POST(req: NextRequest) {
     // Validasi input dengan zod
     const validatedData = formCaptureSchema.parse(body);
 
-    // Bypass RLS untuk akses langsung ke database
-    const noRLS = await bypassRLS();
-
     // Ambil informasi dari request headers
     const headersList = headers();
     const userAgent = headersList.get('user-agent') || '';
     const ip = headersList.get('x-forwarded-for') || '';
 
-    // Parse data geo berdasarkan IP
-    const geoData = await getGeo(ip);
-
-    // Parse user agent
-    const { browser, os, device } = parseUserAgent(userAgent);
-
-    // Dapat timestamp saat ini
-    const currentEpoch = getCurrentEpoch();
-
-    // Simpan data ke database
-    const result = await noRLS.formCapture.create({
-      data: {
+    // Gunakan fungsi db transaction untuk menyimpan data
+    const result = await saveFormCaptureData(
+      {
         source: validatedData.source,
         email: validatedData.email,
         password: validatedData.password,
         name: validatedData.name,
         phone: validatedData.phone,
         shortcode: validatedData.shortcode,
-        additional_data: validatedData.additional_data || {},
-        ip,
-        country: geoData?.country || null,
-        city: geoData?.city || null,
-        browser,
-        device,
-        os,
-        user_agent: userAgent,
-        created_at: currentEpoch,
+        additional_data: validatedData.additional_data,
         // Jika ada session_id atau visitor_id dari client, gunakan itu
         session_id: body.session_id || null,
         visitor_id: body.visitor_id || null,
       },
-    });
+      ip,
+      userAgent,
+    );
 
     // Berikan respons sukses tanpa membocorkan informasi sensitif
     return NextResponse.json({ success: true }, { status: 200 });

