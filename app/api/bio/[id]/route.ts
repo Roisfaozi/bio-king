@@ -1,4 +1,4 @@
-import { getAuthSession } from '@/lib/auth';
+import { authOptions, getAuthSession } from '@/lib/auth';
 import { withRLS } from '@/lib/db';
 import { updateBioPageWithLinks } from '@/lib/db-transaction/bio';
 import { logError } from '@/lib/helper';
@@ -14,43 +14,40 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const session = await getAuthSession();
-  if (!session?.user?.id) {
-    return NextResponse.json(
-      { status: 'fail', message: 'Unauthorized' },
-      { status: 401 },
-    );
-  }
-
   try {
-    const db = withRLS(session?.user?.id);
+    const session = await getAuthSession();
+
+    if (!session?.user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const db = withRLS(session.user.id);
+
     const bioPage = await db.bioPages.findUnique({
-      where: { id: params.id },
+      where: {
+        id: params.id,
+      },
       include: {
-        socialLinks: true,
         bioLinks: true,
+        socialLinks: true,
       },
     });
 
     if (!bioPage) {
       return NextResponse.json(
-        { status: 'fail', message: 'Bio page not found' },
+        { message: 'Bio page not found' },
         { status: 404 },
       );
     }
-    // const serializedData = JSON.parse(
-    //   JSON.stringify(bioPage, (key, value) =>
-    //     typeof value === 'bigint' ? value.toString() : value,
-    //   ),
-    // );
+
     return NextResponse.json(
       { status: 'success', data: serializeBigInt(bioPage) },
       { status: 200 },
     );
   } catch (error) {
-    logError('Error fetching bio page', error);
+    logError('Error fetching bio page:', error);
     return NextResponse.json(
-      { status: 'fail', message: 'Internal Server Error' },
+      { message: 'Internal server error' },
       { status: 500 },
     );
   }
@@ -115,12 +112,12 @@ export async function DELETE(
 
   try {
     const id = params.id;
-
-    const db = withRLS(session?.user?.id);
+    const db = withRLS(session.user.id);
 
     const bioPage = await db.bioPages.findUnique({
       where: { id },
     });
+
     if (!bioPage) {
       return NextResponse.json(
         { status: 'fail', message: 'Bio page not found' },

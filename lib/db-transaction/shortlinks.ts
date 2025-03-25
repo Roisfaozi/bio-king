@@ -27,9 +27,14 @@ async function createShortlinks(id: string, data: any) {
         title: data.title || null,
         created_at: now,
         updated_at: now,
+        type: data.type || 'shortlink',
+        page_type: data.page_type || null,
       },
     });
 
     return result;
-  } catch (error) {}
+  } catch (error) {
+    console.error('Error creating shortlink:', error);
+    throw error;
+  }
 }

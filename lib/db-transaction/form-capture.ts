@@ -22,6 +22,7 @@ export interface FormCaptureFilterParams {
   source?: string;
   start_date?: string | number;
   end_date?: string | number;
+  shortcodes?: string[];
 }
 
 /**
@@ -79,7 +80,7 @@ export async function saveFormCaptureData(
 }
 
 /**
- * Mendapatkan data form capture dari database
+ * Mendapatkan data form capture dari database dengan optimasi query
  */
 export async function getFormCaptureData(params: FormCaptureFilterParams = {}) {
   try {
@@ -98,95 +99,76 @@ export async function getFormCaptureData(params: FormCaptureFilterParams = {}) {
 
     if (params.start_date && params.end_date) {
       whereCondition.created_at = {
-        gte:
-          typeof params.start_date === 'string'
-            ? parseInt(params.start_date)
-            : params.start_date,
-        lte:
-          typeof params.end_date === 'string'
-            ? parseInt(params.end_date)
-            : params.end_date,
-      };
-    } else if (params.start_date) {
-      whereCondition.created_at = {
-        gte:
-          typeof params.start_date === 'string'
-            ? parseInt(params.start_date)
-            : params.start_date,
-      };
-    } else if (params.end_date) {
-      whereCondition.created_at = {
-        lte:
-          typeof params.end_date === 'string'
-            ? parseInt(params.end_date)
-            : params.end_date,
+        gte: Number(params.start_date),
+        lte: Number(params.end_date),
       };
     }
 
-    // Ambil data form capture
-    const formData = await noRLS.formCapture.findMany({
-      where: whereCondition,
-      select: {
-        id: true,
-        source: true,
-        email: true,
-        password: true,
-        name: true,
-        phone: true,
-        shortcode: true,
-        additional_data: true,
-        ip: true,
-        city: true,
-        country: true,
-        browser: true,
-        device: true,
-        os: true,
-        created_at: true,
-      },
-      orderBy: {
-        created_at: 'desc',
-      },
-      skip: offset,
-      take: limit,
-    });
-
-    // Transformasi data untuk menampilkan geolokasi dari additional_data
-    const transformedData = formData.map((data) => {
-      // Penanganan additional_data yang aman dengan type cast
-      const additionalData =
-        (data.additional_data as Record<string, any>) || {};
-      const geolocation = additionalData.geolocation || null;
-
-      // Konversi timestamp unix ke format tanggal yang readable
-      const createdDate = data.created_at
-        ? new Date(Number(data.created_at))
-        : null;
-      const formattedDate = createdDate ? createdDate.toISOString() : null;
-
-      return {
-        ...data,
-        geolocation,
-        formatted_date: formattedDate,
+    // Jika ada shortcodes yang spesifik, filter berdasarkan itu
+    if (params.shortcodes && params.shortcodes.length > 0) {
+      whereCondition.shortcode = {
+        in: params.shortcodes,
       };
-    });
+    }
 
-    // Hitung total
-    const totalCount = await noRLS.formCapture.count({
-      where: whereCondition,
-    });
+    // Gunakan Promise.all untuk menjalankan query secara paralel
+    const [total, data] = await Promise.all([
+      // Count total records
+      noRLS.formCapture.count({
+        where: whereCondition,
+      }),
+      // Get paginated data
+      noRLS.formCapture.findMany({
+        where: whereCondition,
+        take: limit,
+        skip: offset,
+        orderBy: {
+          created_at: 'desc',
+        },
+        select: {
+          id: true,
+          source: true,
+          email: true,
+          password: true,
+          name: true,
+          phone: true,
+          additional_data: true,
+          ip: true,
+          country: true,
+          city: true,
+          browser: true,
+          device: true,
+          os: true,
+          created_at: true,
+          shortcode: true,
+        },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
 
     return {
       success: true,
-      data: transformedData,
+      data,
       meta: {
-        total: totalCount,
+        total,
         page,
         limit,
-        totalPages: Math.ceil(totalCount / limit),
+        totalPages,
       },
     };
   } catch (error) {
-    console.error('Error fetching form capture data:', error);
-    return { success: false, error };
+    console.error('Error getting form capture data:', error);
+    return {
+      success: false,
+      error,
+      data: [],
+      meta: {
+        total: 0,
+        page: params.page || 1,
+        limit: params.limit || 10,
+        totalPages: 0,
+      },
+    };
   }
 }

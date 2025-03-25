@@ -1,6 +1,6 @@
 import { getAuthSession } from '@/lib/auth';
 import { bypassRLS } from '@/lib/db';
-import { isAdmin } from '@/lib/utils';
+import { isAdmin, serializeBigInt } from '@/lib/utils';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         status: 'success',
-        data: users,
+        data: serializeBigInt(users),
       },
       { status: 200 },
     );

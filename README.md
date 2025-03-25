@@ -89,3 +89,90 @@ Data disimpan dalam volume Docker:
 
 - `postgres-data`: Menyimpan data PostgreSQL
 - `app-data`: Menyimpan data aplikasi
+
+# Bio Shortlink - Tracking System
+
+## Cara Akses Fitur
+
+### Akses Dashboard
+
+1. Login ke aplikasi
+2. Klik menu "Dashboard" di navbar
+
+### Manajemen Link untuk Tinder atau VSCO
+
+Untuk membuat dan mengelola link yang mengarah ke halaman Tinder atau VSCO:
+
+1. Pergi ke Dashboard → Shortlinks
+2. Klik tombol "Create Link" di bagian atas halaman
+3. Isi form dengan:
+   - **Title**: Judul pendek untuk link (opsional)
+   - **Destination URL**: URL tujuan setelah tracking
+   - **Page Type**: Pilih salah satu:
+     - **Tinder**: Akan menampilkan halaman profil Tinder palsu
+     - **VSCO**: Akan menampilkan halaman profil VSCO palsu
+4. Klik "Create Link" untuk menyimpan
+
+Link yang telah dibuat dapat:
+
+- Dilihat di halaman dashboard Shortlinks
+- Diedit dengan mengklik ikon "Edit"
+- Dihapus dengan mengklik ikon "Delete"
+- Disalin ke clipboard dengan mengklik ikon "Copy"
+
+### Melihat Data Captures
+
+Data yang ditangkap dari pengunjung dapat dilihat di:
+
+1. Pergi ke Dashboard → Form Captures
+2. Halaman ini menampilkan semua data yang berhasil ditangkap, termasuk:
+   - Source (Tinder, VSCO, dll)
+   - Email dan password yang dimasukkan pengunjung
+   - Data tambahan seperti nama dan nomor telepon
+   - Informasi teknis seperti IP address, browser, dan device
+
+### Filter Data Captures
+
+Anda dapat memfilter data captures berdasarkan:
+
+1. **Source**: Memilih sumber data (Tinder, VSCO, dll)
+2. **Shortcode**: Mencari data berdasarkan kode singkat URL
+
+### Navigasi Dashboard
+
+Dashboard terbagi menjadi beberapa bagian utama:
+
+- **Home**: Ringkasan dan analytics
+- **Shortlinks**: Manajemen link tracking
+- **Form Captures**: Data yang berhasil ditangkap
+- **Analytics**: Statistik kunjungan
+
+## Fitur yang Tersedia
+
+### Manajemen Shortlink
+
+- Membuat, mengedit, dan menghapus shortlink
+- Menyesuaikan tipe halaman (Tinder/VSCO)
+- Melihat statistik klik
+
+### Form Captures
+
+- Melihat semua data yang ditangkap dari pengunjung
+- Memfilter berdasarkan source atau shortcode
+- Export data (jika tersedia)
+
+### Tracking
+
+- Pelacakan IP pengunjung
+- Capture GPS location (jika diizinkan)
+- Device fingerprinting
+- Capture data login yang dimasukkan pengunjung
+
+## Keamanan
+
+Pastikan untuk:
+
+- Selalu logout setelah menggunakan dashboard
+- Tidak membagikan credential akses
+- Menjaga kerahasiaan data yang ditangkap
+- Menggunakan fitur ini sesuai dengan ketentuan hukum yang berlaku

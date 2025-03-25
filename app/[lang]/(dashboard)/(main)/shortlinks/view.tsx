@@ -14,6 +14,8 @@ import DeleteDialog from './components/delete-dialog';
 import ShortlinksContent from './components/shortlinks-content';
 import ShortlinksFilter from './components/shortlinks-filter';
 import ShortlinksHeader from './components/shortlinks-header';
+import { z } from 'zod';
+import { createShortlinkSchema } from '@/validation/link';
 
 interface ShortlinksPageViewProps {
   trans: {
@@ -92,46 +94,29 @@ const ShortlinksPageView = ({
   };
 
   const handleTrapLinkSubmit = async (
-    pageType: 'tinder' | 'vsco',
+    type: 'tinder' | 'vsco',
     title: string,
   ) => {
-    setIsLoading(true);
-
     try {
-      // URL yang dikirim ke API harus berupa path relatif yang valid
-      const originalUrl = `/api/trap/${pageType}`;
-      console.log('Creating trap link with URL:', originalUrl);
+      const url = `/api/trap/${type}`;
+      console.log('Creating trap link with URL:', url);
 
       const response = await createShortlink({
-        original_url: originalUrl,
-        title:
-          title ||
-          `${pageType.charAt(0).toUpperCase() + pageType.slice(1)} Trap`,
-        page_type: pageType,
+        original_url: url,
         type: 'traplink',
+        title: title || `${type.charAt(0).toUpperCase() + type.slice(1)} Trap`,
+        page_type: type,
       });
 
-      console.log('Trap link creation response:', response);
-
-      if (response) {
-        if (response.code) {
-          // Jika berhasil, response akan memiliki code
-          toast.success(`${pageType.toUpperCase()} Trap link berhasil dibuat!`);
-
-          // Refresh data setelah berhasil membuat trap link
-          fetchShortlinks();
-        } else {
-          toast.error(response.detail || 'Gagal membuat trap link');
-        }
-        setIsCreateDialogOpen(false);
+      if (response.status === 'success') {
+        toast.success('Trap link created successfully');
+        router.refresh();
+      } else {
+        toast.error(response.message || 'Failed to create trap link');
       }
     } catch (error) {
       console.error('Error creating trap link:', error);
-      toast.error(
-        error instanceof Error ? error.message : 'Gagal membuat trap link',
-      );
-    } finally {
-      setIsLoading(false);
+      toast.error('Failed to create trap link');
     }
   };
 

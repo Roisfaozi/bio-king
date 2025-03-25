@@ -1,7 +1,7 @@
 import { getFormCaptureData } from '@/lib/db-transaction/form-capture';
 import { bypassRLS } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth';
-import { isAdmin } from '@/lib/utils';
+import { isAdmin, serializeBigInt } from '@/lib/utils';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -45,8 +45,8 @@ export async function GET(req: NextRequest) {
       if (result.success) {
         return NextResponse.json({
           status: 'success',
-          data: result.data,
-          meta: result.meta,
+          data: serializeBigInt(result.data),
+          meta: serializeBigInt(result.meta),
           filters: {
             shortcode,
             source,
@@ -75,12 +75,12 @@ export async function GET(req: NextRequest) {
           {
             status: 'success',
             data: [],
-            meta: {
+            meta: serializeBigInt({
               total: 0,
               page,
               limit,
               totalPages: 0,
-            },
+            }),
             filters: {
               shortcode,
               source,
@@ -91,30 +91,22 @@ export async function GET(req: NextRequest) {
         );
       }
 
-      // Gunakan fungsi db transaction hanya untuk shortcodes milik user
+      // Gunakan fungsi db transaction dengan optimasi untuk shortcodes milik user
       const result = await getFormCaptureData({
         page,
         limit,
         source,
         start_date: startDate,
         end_date: endDate,
+        shortcodes: userShortcodes,
       });
 
+      // Jika berhasil, kirim data
       if (result.success) {
-        // Filter hasil yang hanya milik user
-        const data = result.data || [];
-        const filteredData = data.filter(
-          (item) =>
-            item.shortcode && userShortcodes.includes(item.shortcode as string),
-        );
-
         return NextResponse.json({
           status: 'success',
-          data: filteredData,
-          meta: {
-            ...result.meta,
-            total: filteredData.length,
-          },
+          data: serializeBigInt(result.data),
+          meta: serializeBigInt(result.meta),
           filters: {
             shortcode,
             source,
@@ -124,15 +116,21 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Jika gagal, kirim pesan error
+    // Jika ada error, kirim response error
     return NextResponse.json(
-      { message: 'Failed to fetch form capture data' },
+      {
+        status: 'error',
+        message: 'Failed to fetch form captures',
+      },
       { status: 500 },
     );
   } catch (error) {
-    console.error('Error fetching form capture data:', error);
+    console.error('Error fetching form captures:', error);
     return NextResponse.json(
-      { message: 'Failed to fetch form capture data' },
+      {
+        status: 'error',
+        message: 'Internal server error',
+      },
       { status: 500 },
     );
   }

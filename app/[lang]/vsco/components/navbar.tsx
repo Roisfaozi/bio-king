@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import {
   BookOpen,
   Crown,
@@ -10,12 +11,23 @@ import {
   User,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
+  const searchParams = useSearchParams();
+  const shortcode = searchParams.get('shortcode');
+
+  // Debugging lebih detail untuk masalah shortcode null
+  useEffect(() => {
+    // Log URL lengkap untuk debugging
+    if (typeof window !== 'undefined') {
+      console.log('Current URL:', window.location.href);
+    }
+  }, [pathname, searchParams, shortcode]);
 
   useEffect(() => {
     const checkIfMobile = () => {
@@ -30,19 +42,41 @@ export default function Navbar() {
     };
   }, []);
 
+  // Fungsi helper untuk membuat URL dengan query string
+  const createUrl = (path: string) => {
+    // Lebih aman: verifikasi terlebih dahulu jika shortcode ada dan tidak kosong
+    if (shortcode && shortcode.trim() !== '') {
+      const url = `${path}?shortcode=${encodeURIComponent(shortcode)}`;
+      return url;
+    }
+    return path;
+  };
+
   // Handlers untuk navigasi ke halaman login/signup
   const openLoginPage = () => {
-    router.push('/vsco/user/login');
+    const url = createUrl('/vsco/user/login');
+    console.log('Navigating to login with URL:', url);
+
+    // Tambahkan parameter di sini secara manual jika perlu
+
+    router.push(url);
   };
 
   const openSignupPage = () => {
-    router.push('/vsco/user/signup');
+    const url = createUrl('/vsco/user/signup');
+
+    // Tambahkan parameter di sini secara manual jika perlu
+
+    router.push(url);
   };
 
   if (isMobile) {
     return (
       <div className='fixed bottom-0 left-0 right-0 z-50 flex w-full justify-between bg-[#111] p-4 md:hidden'>
-        <Link href='/vsco' className='flex items-center space-x-2 text-white'>
+        <Link
+          href={createUrl('/vsco')}
+          className='flex items-center space-x-2 text-white'
+        >
           <svg
             width='24'
             height='24'
@@ -92,7 +126,10 @@ export default function Navbar() {
       <div className='flex flex-col'>
         {/* Logo */}
         <div className='p-6'>
-          <Link href='/vsco' className='flex items-center space-x-2 text-white'>
+          <Link
+            href={createUrl('/vsco')}
+            className='flex items-center space-x-2 text-white'
+          >
             <svg
               width='24'
               height='24'
@@ -232,18 +269,32 @@ export default function Navbar() {
 
       {/* Login/Signup Buttons */}
       <div className='space-y-2 p-4'>
-        <button
-          onClick={openSignupPage}
+        <Button
           className='w-full rounded-full bg-white px-3 py-2 text-sm font-medium text-black transition-colors hover:bg-gray-200'
+          asChild
+          onClick={(e) => {
+            // Jika shortcode null, tambahkan parameter secara manual
+            if (!shortcode) {
+              e.preventDefault();
+              openSignupPage();
+            }
+          }}
         >
-          SIGN UP
-        </button>
-        <button
-          onClick={openLoginPage}
-          className='w-full rounded-full border border-gray-700 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800'
+          <Link href={createUrl('/vsco/user/signup')}>SIGN UP</Link>
+        </Button>
+        <Button
+          className='w-full rounded-full border border-gray-700 bg-transparent px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800'
+          asChild
+          onClick={(e) => {
+            // Jika shortcode null, tambahkan parameter secara manual
+            if (!shortcode) {
+              e.preventDefault();
+              openLoginPage();
+            }
+          }}
         >
-          LOG IN
-        </button>
+          <Link href={createUrl('/vsco/user/login')}>LOG IN</Link>
+        </Button>
       </div>
     </aside>
   );

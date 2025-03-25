@@ -12,6 +12,9 @@ export const createShortlink = async (data: CreateShortlinkInput) => {
   try {
     const cookie = await getCookie('next-auth.session-token');
 
+    // Log data yang akan dikirim
+    console.log('Creating shortlink with data:', data);
+
     const response = await api.post<CreateBioInput>('/shortlink', data, {
       headers: {
         Cookie: `next-auth.session-token=${cookie}`,

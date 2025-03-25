@@ -1,7 +1,7 @@
 import { authOptions } from '@/lib/auth';
 import { bypassRLS } from '@/lib/db';
 import { logError } from '@/lib/helper';
-import { isAdmin } from '@/lib/utils';
+import { isAdmin, serializeBigInt } from '@/lib/utils';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -607,10 +607,12 @@ export async function GET(request: NextRequest) {
 
           return {
             pageType,
-            visits: dailyVisits.map((item) => ({
-              date: getFormattedDate(item.created_at || BigInt(0), groupBy),
-              count: item._count,
-            })),
+            visits: dailyVisits.map(
+              (item: { created_at: bigint | null; _count: number }) => ({
+                date: getFormattedDate(item.created_at || BigInt(0), groupBy),
+                count: item._count,
+              }),
+            ),
           };
         }),
       );
@@ -624,7 +626,7 @@ export async function GET(request: NextRequest) {
 
         pageTrends.forEach((trend) => {
           const matchingData = trend.visits.find(
-            (v) => v.date === dateObj.date,
+            (v: { date: string; count: number }) => v.date === dateObj.date,
           );
           result[trend.pageType] = matchingData ? matchingData.count : 0;
         });
@@ -639,45 +641,44 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    return NextResponse.json(
-      {
-        status: 'success',
-        data: {
-          counts: {
-            shortlinks: shortlinksCount,
-            bioPages: bioPagesCount,
-            totalClicks: totalClicks,
-            shortlinkClicks: shortlinkClicks,
-            bioPageClicks: bioPageClicks,
-          },
-          recent: {
-            shortlinks: recentShortlinks,
-            bioPages: recentBioPages,
-            clicks: recentClicks,
-          },
-          top: {
-            shortlinks: topShortlinks,
-            bioPages: topBioPages,
-          },
-          charts: {
-            clicks: clicksDateArray,
-            created: createdItemsArray,
-          },
-          visitors: {
-            browsers: visitorDetails,
-            devices: deviceDetails,
-            os: osDetails,
-            countries: countryData,
-            recent: recentVisitors,
-          },
-          pages: pageTrackingData,
-          timeRange,
-          groupBy,
+    // Serialize semua data yang mengandung BigInt
+    const serializedData = serializeBigInt({
+      status: 'success',
+      data: {
+        counts: {
+          shortlinks: shortlinksCount,
+          bioPages: bioPagesCount,
+          totalClicks: totalClicks,
+          shortlinkClicks: shortlinkClicks,
+          bioPageClicks: bioPageClicks,
         },
+        recent: {
+          shortlinks: recentShortlinks,
+          bioPages: recentBioPages,
+          clicks: recentClicks,
+        },
+        top: {
+          shortlinks: topShortlinks,
+          bioPages: topBioPages,
+        },
+        charts: {
+          clicks: clicksDateArray,
+          created: createdItemsArray,
+        },
+        visitors: {
+          browsers: visitorDetails,
+          devices: deviceDetails,
+          os: osDetails,
+          countries: countryData,
+          recent: recentVisitors,
+        },
+        pages: pageTrackingData,
+        timeRange,
+        groupBy,
       },
+    });
 
-      { status: 200 },
-    );
+    return NextResponse.json(serializedData, { status: 200 });
   } catch (error) {
     logError('Error fetching analytics:', error);
     return NextResponse.json(

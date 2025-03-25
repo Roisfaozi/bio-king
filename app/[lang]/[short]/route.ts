@@ -41,11 +41,32 @@ export async function GET(
     },
   });
 
+  // Debug logging yang lebih detail
+  console.log('Link data:', {
+    shortCode,
+    link,
+    isActive: link?.is_active,
+    type: link?.type,
+    pageType: link?.page_type,
+    expiresAt: link?.expires_at,
+    currentEpoch: getCurrentEpoch(),
+    isTraplink: link?.type === 'traplink',
+    hasPageType: !!link?.page_type,
+    conditionMet: link?.type === 'traplink' && !!link?.page_type,
+    originalUrl: link?.original_url,
+  });
+
   if (
     !link ||
     !link.is_active ||
     (link.expires_at && link.expires_at < getCurrentEpoch())
   ) {
+    console.log('Link tidak valid:', {
+      linkExists: !!link,
+      isActive: link?.is_active,
+      expiresAt: link?.expires_at,
+      currentEpoch: getCurrentEpoch(),
+    });
     // Gunakan URL absolut untuk redirect ke 404
     return NextResponse.redirect(new URL('/404', baseUrl));
   }
@@ -55,11 +76,13 @@ export async function GET(
   // Cek apakah tipe link adalah traplink dan ada page_type
   if (link.type === 'traplink' && link.page_type) {
     // Jika ada page_type, redirect ke halaman yang sesuai
+
     if (link.page_type === 'tinder') {
       return NextResponse.redirect(
         new URL(`/${lang}/tinder?shortcode=${shortCode}`, baseUrl),
       );
     } else if (link.page_type === 'vsco') {
+      console.log('Redirecting to VSCO page with shortcode:', shortCode);
       return NextResponse.redirect(
         new URL(`/${lang}/vsco?shortcode=${shortCode}`, baseUrl),
       );

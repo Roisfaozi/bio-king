@@ -158,7 +158,6 @@ export const getAnalytics = async (params?: AnalyticsParams) => {
         Cookie: `next-auth.session-token=${cookie}`,
       },
     });
-    console.log(response.data);
     return response.data;
   } catch (error: any) {
     logError('Error fetching analytics:', error.response?.data || error);

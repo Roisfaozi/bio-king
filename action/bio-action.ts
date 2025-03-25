@@ -5,26 +5,29 @@ import { api } from '@/config/axios.config';
 import { cloudinaryUpload } from '@/lib/cloudinary';
 import { logError } from '@/lib/helper';
 import { CreateBioInput, EditBioInput } from '@/validation/bio';
-import { BioPages } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
+import { authOptions } from '@/lib/auth';
+import { getServerSession } from 'next-auth';
+import { BioPageResponse } from '@/models/bio-page-response';
+
 /**
  * Gets a bio page by ID
- * @param id - The ID of the bio page to get
- * @returns The bio page
- * @throws {Error} If there is a problem getting the bio page
+ * @param id The ID of the bio page to fetch
+ * @returns The bio page data
  */
 export const getBio = async (id: string) => {
   try {
     const cookie = await getCookie('next-auth.session-token');
-    const response = await api.get<BioPages>(`/bio/${id}`, {
+
+    const response = await api.get<BioPageResponse>(`/bio/${id}`, {
       headers: {
         Cookie: `next-auth.session-token=${cookie}`,
       },
     });
     return response.data;
   } catch (error: any) {
-    logError('Error fetching bio page:', error.response.data);
-    return error.response.data;
+    logError('Error fetching bio page:', error.response?.data || error);
+    return error.response?.data || { message: 'Failed to fetch bio page' };
   }
 };
 
@@ -36,7 +39,6 @@ export const getBio = async (id: string) => {
 export const getBiosWithClick = async (limit: number = 10) => {
   try {
     const cookie = await getCookie('next-auth.session-token');
-    console.log('cookie', cookie);
     const response = await api.get(`/bio`, {
       headers: {
         Cookie: `next-auth.session-token=${cookie}`,

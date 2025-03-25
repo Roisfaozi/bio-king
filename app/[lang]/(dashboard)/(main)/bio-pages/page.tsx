@@ -1,5 +1,4 @@
 import { getDictionary } from '@/app/dictionaries';
-import { credentialsConfig } from '@/config/credentials.config';
 import BioPagesView from './view';
 
 interface DashboardProps {
@@ -8,7 +7,7 @@ interface DashboardProps {
   };
 }
 const BioPages = async ({ params: { lang } }: DashboardProps) => {
-  console.log(credentialsConfig.postgres);
+  console.log('lele');
   const trans = await getDictionary(lang);
   return <BioPagesView trans={trans} />;
 };

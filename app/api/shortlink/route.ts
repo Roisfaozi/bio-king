@@ -57,7 +57,10 @@ export async function POST(req: NextRequest) {
         original_url: validatedData.original_url,
         title: validatedData.title || null,
         is_active: true,
-        type: 'shortlink',
+        type:
+          (validatedData.type as 'shortlink' | 'bio' | 'traplink') ||
+          'shortlink',
+        page_type: validatedData.page_type || null,
         status: 'active',
         visibility: 'public',
         created_at: now,

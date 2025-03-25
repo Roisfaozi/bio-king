@@ -20,8 +20,8 @@ const getBioEditPage = async (id: string): Promise<BioPageResponse | any> => {
     const bio = data.data;
     revalidatePath('/[lang]/(main)/bio-pages/[id]/edit', 'page');
     return bio as BioPageResponse;
-  } catch (error) {
-    console.error('Error fetching bio pages:', error);
+  } catch (error: any) {
+    console.error('Error fetching bio page:', error.response?.data || error);
   }
 };
 
