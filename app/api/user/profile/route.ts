@@ -1,5 +1,6 @@
 import { getAuthSession } from '@/lib/auth';
 import db from '@/lib/db';
+import { serializeBigInt } from '@/lib/utils';
 import { UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -30,7 +31,13 @@ export async function GET(request: NextRequest, response: NextResponse) {
       );
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json(
+      {
+        status: 'success',
+        data: serializeBigInt(user),
+      },
+      { status: 200 },
+    );
   } catch (error) {
     console.log('An error occurred:', error);
     return NextResponse.json(
