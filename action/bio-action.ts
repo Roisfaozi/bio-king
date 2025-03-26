@@ -2,26 +2,27 @@
 
 import { getCookie } from '@/action/action-utils';
 import { api } from '@/config/axios.config';
+import { credentialsConfig } from '@/config/credentials.config';
 import { cloudinaryUpload } from '@/lib/cloudinary';
 import { logError } from '@/lib/helper';
+import { BioPageResponse } from '@/models/bio-page-response';
 import { CreateBioInput, EditBioInput } from '@/validation/bio';
 import { revalidatePath } from 'next/cache';
-import { authOptions } from '@/lib/auth';
-import { getServerSession } from 'next-auth';
-import { BioPageResponse } from '@/models/bio-page-response';
 
 /**
  * Gets a bio page by ID
  * @param id The ID of the bio page to fetch
  * @returns The bio page data
  */
+
+const sessionCookies = credentialsConfig.sessionCookieName;
 export const getBio = async (id: string) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
 
     const response = await api.get<BioPageResponse>(`/bio/${id}`, {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${sessionCookies}=${cookie}`,
       },
     });
     return response.data;
@@ -38,10 +39,10 @@ export const getBio = async (id: string) => {
  */
 export const getBiosWithClick = async (limit: number = 10) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
     const response = await api.get(`/bio`, {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${sessionCookies}=${cookie}`,
       },
       params: {
         withclick: true,
@@ -58,10 +59,10 @@ export const getBiosWithClick = async (limit: number = 10) => {
 
 export const getAllBios = async (limit?: number) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
     const response = await api.get('/bio-pages', {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${sessionCookies}=${cookie}`,
       },
       params: {
         limit,
@@ -92,11 +93,11 @@ export const getAllBios = async (limit?: number) => {
  */
 export const createBio = async (data: CreateBioInput) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
 
     const response = await api.post<CreateBioInput>('/bio', data, {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${sessionCookies}=${cookie}`,
       },
     });
     revalidatePath('/[lang]/bio-pages');
@@ -171,10 +172,10 @@ export const updateBio = async (id: string, data: FormData) => {
       bioData.social_image_url = data.get('social_image_url');
     }
 
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
     const response = await api.patch<EditBioInput>(`/bio/${id}`, bioData, {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${sessionCookies}=${cookie}`,
       },
     });
     return response.data;
@@ -194,10 +195,10 @@ export const updateBio = async (id: string, data: FormData) => {
  */
 export const deleteBio = async (id: string) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
     const response = await api.delete(`/bio-pages/${id}`, {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${sessionCookies}=${cookie}`,
       },
     });
 
@@ -213,10 +214,10 @@ export const deleteBio = async (id: string) => {
 
 export const getBioById = async (id: string) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
     const response = await api.get(`/bio/${id}`, {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${sessionCookies}=${cookie}`,
       },
       params: {
         include: 'clicks,links,socialLinks',

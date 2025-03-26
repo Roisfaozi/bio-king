@@ -1,4 +1,5 @@
 import { api } from '@/config/axios.config';
+import { credentialsConfig } from '@/config/credentials.config';
 import { logError } from '@/lib/helper';
 import { ClicksApiResponse } from '@/models/click-resonse';
 import { cookies } from 'next/headers';
@@ -11,10 +12,10 @@ export const getRecentClicks = async (
   limit: number = 10,
 ): Promise<ClicksApiResponse> => {
   try {
-    const cookie = await getServerCookie('next-auth.session-token');
+    const cookie = await getServerCookie(credentialsConfig.sessionCookieName);
     const response = await api.get<ClicksApiResponse>(`/click/recent-click`, {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${credentialsConfig.sessionCookieName}=${cookie}`,
       },
       params: {
         limit: limit,

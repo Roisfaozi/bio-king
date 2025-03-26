@@ -2,6 +2,7 @@
 
 import { getCookie } from '@/action/action-utils';
 import { api } from '@/config/axios.config';
+import { credentialsConfig } from '@/config/credentials.config';
 import { logError } from '@/lib/helper';
 
 export interface AnalyticsResponse {
@@ -122,7 +123,7 @@ export interface AnalyticsParams {
 
 export const getAnalytics = async (params?: AnalyticsParams) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(credentialsConfig.sessionCookieName);
 
     // Siapkan parameter query
     const queryParams = new URLSearchParams();
@@ -155,7 +156,7 @@ export const getAnalytics = async (params?: AnalyticsParams) => {
 
     const response = await api.get<AnalyticsResponse>(url, {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${credentialsConfig.sessionCookieName}=${cookie}`,
       },
     });
     return response.data;

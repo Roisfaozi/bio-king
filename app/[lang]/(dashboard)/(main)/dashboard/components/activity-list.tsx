@@ -2,6 +2,7 @@
 import { getClientSideCookie } from '@/action/client-utils';
 import ListView from '@/app/[lang]/(dashboard)/(main)/dashboard/components/list-view';
 import { api } from '@/config/axios.config';
+import { credentialsConfig } from '@/config/credentials.config';
 import {
   ClickActivity,
   ClicksApiResponse,
@@ -31,10 +32,10 @@ export default function ActivityList({
       setIsRefreshing(true);
 
       // Menggunakan API fetch langsung tanpa server action
-      const cookie = getClientSideCookie('next-auth.session-token');
+      const cookie = getClientSideCookie(credentialsConfig.sessionCookieName);
       const response = await api.get<ClicksApiResponse>('/click/recent-click', {
         headers: {
-          Cookie: `next-auth.session-token=${cookie}`,
+          Cookie: `${credentialsConfig.sessionCookieName}=${cookie}`,
         },
         params: {
           limit: 10,

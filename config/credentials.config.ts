@@ -21,4 +21,8 @@ export const credentialsConfig = {
     secret: process.env.NEXTAUTH_SECRET || '',
   },
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || '',
+  sessionCookieName:
+    process.env.NODE_ENV === 'production'
+      ? '__Secure-next-auth.session-token'
+      : 'next-auth.session-token',
 };

@@ -2,22 +2,24 @@
 
 import { getCookie } from '@/action/action-utils';
 import { api } from '@/config/axios.config';
+import { credentialsConfig } from '@/config/credentials.config';
 import { logError } from '@/lib/helper';
 import { ShortlinkWithClicksResponse } from '@/models/shortlink-response';
 import { CreateBioInput } from '@/validation/bio';
 import { BulkShortlinkInput, CreateShortlinkInput } from '@/validation/link';
 import { Links } from '@prisma/client';
+const sessionCookies = credentialsConfig.sessionCookieName;
 
 export const createShortlink = async (data: CreateShortlinkInput) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
 
     // Log data yang akan dikirim
     console.log('Creating shortlink with data:', data);
 
     const response = await api.post<CreateBioInput>('/shortlink', data, {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${sessionCookies}=${cookie}`,
       },
     });
     console.log('response', response.data);
@@ -30,11 +32,11 @@ export const createShortlink = async (data: CreateShortlinkInput) => {
 
 export const getShortlinks = async (limit: number = 10) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
 
     const response = await api.get('/shortlink', {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${sessionCookies}=${cookie}`,
       },
       params: {
         limit: limit,
@@ -83,12 +85,12 @@ export async function createBulkShortlinks(data: BulkShortlinkInput) {
 
 export const getShortlinkByShortcode = async (shortcode: string) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
     const response = await api.get<ShortlinkWithClicksResponse>(
       `/shortlink/${shortcode}`,
       {
         headers: {
-          Cookie: `next-auth.session-token=${cookie}`,
+          Cookie: `${sessionCookies}=${cookie}`,
         },
       },
     );
@@ -109,7 +111,7 @@ export const updateShortlinkByShortcode = async ({
   is_active?: boolean;
 }) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
 
     const response = await api.patch<Links>(
       `/shortlink/${shortcode}`,
@@ -119,7 +121,7 @@ export const updateShortlinkByShortcode = async ({
       },
       {
         headers: {
-          Cookie: `next-auth.session-token=${cookie}`,
+          Cookie: `${sessionCookies}=${cookie}`,
         },
       },
     );
@@ -133,11 +135,11 @@ export const updateShortlinkByShortcode = async ({
 
 export const deleteShortlinkByShortcode = async (shortcode: string) => {
   try {
-    const cookie = await getCookie('next-auth.session-token');
+    const cookie = await getCookie(sessionCookies);
 
     const response = await api.delete<Links>(`/shortlink/${shortcode}`, {
       headers: {
-        Cookie: `next-auth.session-token=${cookie}`,
+        Cookie: `${sessionCookies}=${cookie}`,
       },
     });
 
