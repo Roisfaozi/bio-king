@@ -11,9 +11,8 @@ import {
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/components/ui/use-toast';
-import { copyToClipboard, epochToDate } from '@/lib/utils';
+import { copyToClipboard, formatEpochDate } from '@/lib/utils';
 import { RecentActivityType } from '@/models/click-resonse';
-import { format } from 'date-fns';
 import {
   Chrome,
   Clock,
@@ -126,8 +125,8 @@ export default function ListView({
                   </div>
                   <div className='flex items-center text-sm text-muted-foreground dark:text-gray-400'>
                     <Clock className='mr-1 h-4 w-4' />
-                    {format(
-                      epochToDate(Number(selectedItem?.visited_at)),
+                    {formatEpochDate(
+                      Number(item.visited_at),
                       'MMM d, yyyy HH:mm',
                     )}
                   </div>

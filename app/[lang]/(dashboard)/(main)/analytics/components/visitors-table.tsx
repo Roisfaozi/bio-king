@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { formatDate } from '@/lib/utils';
+import { formatEpochDate } from '@/lib/utils';
 import { Dna, Globe, Heart, Link as LinkIcon } from 'lucide-react';
 
 interface VisitorsTableProps {
@@ -74,6 +74,7 @@ const getSourceColor = (source: string | null, platform: string | null) => {
 };
 
 export function VisitorsTable({ visitors }: VisitorsTableProps) {
+  console.log('visitors', visitors);
   return (
     <div className='overflow-x-auto'>
       <Table>
@@ -93,7 +94,10 @@ export function VisitorsTable({ visitors }: VisitorsTableProps) {
             <TableRow key={visitor.id}>
               <TableCell className='font-medium'>
                 {visitor.created_at
-                  ? formatDate(visitor.created_at.toString())
+                  ? formatEpochDate(
+                      Number(visitor.created_at),
+                      'MMM d, yyyy HH:mm',
+                    )
                   : 'Unknown'}
               </TableCell>
               <TableCell>{visitor.ip || 'Unknown'}</TableCell>

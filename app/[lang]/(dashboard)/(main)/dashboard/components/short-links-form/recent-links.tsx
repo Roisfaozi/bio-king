@@ -23,7 +23,6 @@ interface RecentLinkProps {
 }
 
 const RecentLink = ({ recentLinks }: RecentLinkProps) => {
-  const router = useRouter();
   return (
     <Card>
       <CardHeader className='flex-row items-center justify-between border-none pb-0'>
