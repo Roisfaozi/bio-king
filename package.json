@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:ngrok": "set NEXT_PUBLIC_DEV_MODE=ngrok&& next dev",
     "prebuild": "pnpm lint:fix",
     "build": "next build",
     "start": "next start",
@@ -13,6 +14,7 @@
     "format": "prettier --write .",
     "format:check": "prettier -c -w .",
     "clean": "rm -rf node_modules && rm -rf .next && rm -rf pnpm-lock.yaml && pnpm store prune && pnpm install",
+    "ngrok": "ngrok http --url=polliwog-coherent-newly.ngrok-free.app 3000",
     "prepare": "husky",
     "postinstall": "prisma generate",
     "test": "jest",
