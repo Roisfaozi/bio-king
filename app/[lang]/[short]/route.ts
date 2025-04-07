@@ -1,3 +1,4 @@
+import { credentialsConfig } from '@/config/credentials.config';
 import { bypassRLS } from '@/lib/db';
 import { trackPageView } from '@/lib/tracking';
 import { getCurrentEpoch } from '@/lib/utils';
@@ -13,7 +14,7 @@ export async function GET(
   const pathname = req.headers.get('x-next-pathname') || '';
 
   // Ambil base URL untuk digunakan pada URL absolut
-  const baseUrl = new URL(req.url).origin;
+  const baseUrl = credentialsConfig.siteUrl || new URL(req.url).origin;
 
   // Menggunakan stealth tracking utility
   await trackPageView({
@@ -40,6 +41,7 @@ export async function GET(
       page_type: true,
     },
   });
+  console.log('Redirecting to trap:', baseUrl);
 
   // Debug logging yang lebih detail
   console.log('Link data:', {

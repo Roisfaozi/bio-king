@@ -1,124 +1,24 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
-import { useScroll, useTransform } from 'framer-motion';
 import { TrackPageView } from '@/components/tracking/track-page-view';
-import LoadingScreen from './components/loading-screen';
-import LoginModal from './components/login-modal';
-import LocationPermissionModal from './components/location-permision-modal';
-import TestimonialCarousel from './components/testimonial-carousel';
+import { useScroll, useTransform } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import LoadingScreen from './components/loading-screen';
+import LocationPermissionModal from './components/location-permision-modal';
+import LoginModal from './components/login-modal';
+import TestimonialCarousel from './components/testimonial-carousel';
 
 // Import komponen-komponen yang telah dibuat
-import TinderNavbar from './components/TinderNavbar';
 import BackgroundImage from './components/BackgroundImage';
-import ProfileCardSection from './components/ProfileCardSection';
-import LocationDeniedMessage from './components/LocationDeniedMessage';
-import TinderFooter from './components/TinderFooter';
-import MobileNavBar from './components/MobileNavBar';
 import CookieBanner from './components/CookieBanner';
+import LocationDeniedMessage from './components/LocationDeniedMessage';
+import ProfileCardSection from './components/ProfileCardSection';
+import TinderFooter from './components/TinderFooter';
+import TinderNavbar from './components/TinderNavbar';
 import useLocationTracking from './hooks/useLocationTracking';
 
-// Data profil masih dipertahankan untuk referensi meskipun saat ini tidak digunakan secara langsung
-const profiles = [
-  {
-    id: 1,
-    name: 'Stephen',
-    age: 22,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 2,
-    name: 'Rose',
-    age: 22,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 3,
-    name: 'Camille',
-    age: 24,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 4,
-    name: 'Devon',
-    age: 25,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 5,
-    name: 'Kevin',
-    age: 29,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 6,
-    name: 'Elizabeth',
-    age: 27,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 7,
-    name: 'Chance',
-    age: 22,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 8,
-    name: 'Carmarita',
-    age: 30,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 9,
-    name: 'Herman',
-    age: 24,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 10,
-    name: 'Kim',
-    age: 19,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 11,
-    name: 'Luna',
-    age: 23,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 12,
-    name: 'Helena',
-    age: 28,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-  {
-    id: 13,
-    name: 'Brooks',
-    age: 30,
-    image: '/placeholder.svg?height=400&width=300',
-  },
-];
-
 // Testimonials data digunakan oleh TestimonialCarousel
-const testimonials = [
-  {
-    id: 1,
-    names: 'Kenneth and Elliot',
-    text: 'I honestly had been on many Tinder dates and was absolutely sure I was meeting a fling to get a free meal and have some fun ... 3 years and sooo many dates and memories later, I am married to my Tinder guy, Kenny!',
-  },
-  {
-    id: 2,
-    names: 'Victoria & Louise ❤️',
-    text: 'THANK YOU for making it possible for me to meet my soulmate. Five minutes into our first conversation, my now-wife mentioned how we would have an amazing wedding.',
-  },
-  {
-    id: 3,
-    names: 'Ryan & Lindsey',
-    text: '... just had a bad break-up and created a Tinder account to keep my mind off the break-up. After about a week of talking, we decided to meet up at a local bar for drinks ... we decided to tie the knot in an 18-person ceremony in New Jersey on 27 June 2020.',
-  },
-];
 
 export default function HomePage() {
   // State untuk komponen
@@ -131,17 +31,27 @@ export default function HomePage() {
   const [navbarFixed, setNavbarFixed] = useState(false);
 
   // Menggunakan custom hook untuk location tracking
+  // Menggunakan custom hook untuk location tracking
   const {
-    locationEnabled,
-    locationError,
-    locationDenied,
-    profileVisible,
-    showLocationModal,
-    setShowLocationModal,
-    showAfterLocationPrompt,
-    checkLocationPermission,
-    handleLocationSuccess,
-  } = useLocationTracking();
+    location,
+    error: locationError,
+    permissionStatus,
+    requestLocation,
+    checkPermission,
+  } = useLocationTracking({
+    onSuccess: (position) => {
+      console.log('Location retrieved:', position);
+    },
+    onError: (err) => {
+      console.error('Error retrieving location:', err);
+    },
+    onPermissionDenied: () => {
+      console.warn('Location permission denied');
+    },
+  });
+
+  const locationDenied = permissionStatus === 'denied';
+  const locationEnabled = permissionStatus === 'granted';
 
   // Refs dan animasi
   const backgroundRef = useRef<HTMLDivElement>(null);
@@ -180,14 +90,14 @@ export default function HomePage() {
   // Show location modal after content is loaded
   useEffect(() => {
     if (contentLoaded) {
-      // Wait a short delay after content loads before checking location permission
+      // Tunggu sebentar setelah konten dimuat sebelum memeriksa izin lokasi
       const locationTimer = setTimeout(() => {
-        checkLocationPermission();
+        checkPermission();
       }, 1500);
 
       return () => clearTimeout(locationTimer);
     }
-  }, [contentLoaded, checkLocationPermission]);
+  }, [contentLoaded, checkPermission]);
 
   // Parallax effect for background and navbar position
   useEffect(() => {
@@ -254,7 +164,7 @@ export default function HomePage() {
       <TinderNavbar
         isFixed={navbarFixed}
         locationEnabled={locationEnabled}
-        locationError={locationError}
+        locationError={locationError ? locationError.message : null}
         onLoginClick={() => setShowLoginModal(true)}
       />
 
@@ -263,12 +173,12 @@ export default function HomePage() {
         {/* Section pesan lokasi ditolak */}
         <LocationDeniedMessage
           locationDenied={locationDenied}
-          onTryAgainClick={handleLocationSuccess}
+          onTryAgainClick={requestLocation}
         />
 
         {/* Hero section dengan profile card */}
         <ProfileCardSection
-          profileVisible={profileVisible}
+          profileVisible={locationEnabled}
           titleOpacity={titleOpacity}
           buttonOpacity={buttonOpacity}
           onLoginClick={() => setShowLoginModal(true)}
@@ -306,8 +216,8 @@ export default function HomePage() {
 
       {/* Location Permission Modal - Now non-dismissible */}
       <LocationPermissionModal
-        isOpen={showLocationModal}
-        onAllow={handleLocationSuccess}
+        isOpen={permissionStatus === 'prompt'}
+        onAllow={requestLocation}
       />
 
       {/* Bottom mobile navigation bar */}

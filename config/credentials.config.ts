@@ -20,7 +20,11 @@ export const credentialsConfig = {
   nextauth: {
     secret: process.env.NEXTAUTH_SECRET || '',
   },
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || '',
+  siteUrl:
+    process.env.NEXT_PUBLIC_DEV_MODE === 'ngrok'
+      ? 'https://polliwog-coherent-newly.ngrok-free.app'
+      : process.env.NEXT_PUBLIC_SITE_URL || '',
+
   sessionCookieName:
     process.env.NODE_ENV === 'production'
       ? '__Secure-next-auth.session-token'
