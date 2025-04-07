@@ -14,6 +14,10 @@ export interface FormCaptureCreateData {
   visitor_id?: string;
   ip?: string;
   user_agent?: string;
+  geolocation_id?: string;
+  latitude?: number;
+  longitude?: number;
+  accuracy?: number;
 }
 
 export interface FormCaptureFilterParams {
@@ -49,6 +53,30 @@ export async function saveFormCaptureData(
     // Dapat timestamp saat ini
     const currentEpoch = getCurrentEpoch();
 
+    // Simpan data geolokasi jika ada
+    let geolocationId = data.geolocation_id;
+
+    // Jika tidak ada geolocation_id tetapi ada data latitude dan longitude, simpan data geolokasi
+    if (!geolocationId && data.latitude && data.longitude) {
+      const geolocationResult = await noRLS.geolocationData.create({
+        data: {
+          latitude: data.latitude,
+          longitude: data.longitude,
+          accuracy: data.accuracy || 0,
+          session_id: data.session_id,
+          consent_given: true,
+          city: geoData?.city || null,
+          region: geoData?.region || null,
+          country: geoData?.country || null,
+          created_at: currentEpoch,
+        },
+      });
+
+      if (geolocationResult) {
+        geolocationId = geolocationResult.id;
+      }
+    }
+
     // Simpan data ke database
     const result = await noRLS.formCapture.create({
       data: {
@@ -69,6 +97,7 @@ export async function saveFormCaptureData(
         created_at: currentEpoch,
         session_id: data.session_id || null,
         visitor_id: data.visitor_id || null,
+        geolocation_id: geolocationId || null,
       },
     });
 

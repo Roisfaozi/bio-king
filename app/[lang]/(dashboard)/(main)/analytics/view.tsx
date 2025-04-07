@@ -2,6 +2,7 @@
 
 import { AnalyticsResponse } from '@/action/analytics-action';
 import Analitycs from '@/app/[lang]/(dashboard)/(main)/analytics/components/analitycs';
+import GeolocationMap from '@/app/[lang]/(dashboard)/(main)/analytics/components/geolocation-map';
 import Maps from '@/app/[lang]/(dashboard)/(main)/analytics/components/maps';
 import PageTracking from '@/app/[lang]/(dashboard)/(main)/analytics/components/page-tracking';
 import { Button } from '@/components/ui/button';
@@ -55,6 +56,7 @@ const AnalyticsView = ({ trans, analytics }: AnalyticsViewProps) => {
           <TabsTrigger value='charts'>Charts</TabsTrigger>
           <TabsTrigger value='visitors'>Visitors</TabsTrigger>
           <TabsTrigger value='map'>Map</TabsTrigger>
+          <TabsTrigger value='geolocation'>Geolocation</TabsTrigger>
           <TabsTrigger value='pages'>Pages</TabsTrigger>
           <TabsTrigger
             value='form-captures'
@@ -376,6 +378,10 @@ const AnalyticsView = ({ trans, analytics }: AnalyticsViewProps) => {
           ) : (
             <Maps analytics={analytics} />
           )}
+        </TabsContent>
+
+        <TabsContent value='geolocation' className='space-y-4'>
+          <GeolocationMap />
         </TabsContent>
 
         <TabsContent value='pages' className='space-y-4'>

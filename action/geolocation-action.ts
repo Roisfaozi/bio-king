@@ -5,6 +5,8 @@ import {
   getGeolocationData as dbGetGeolocationData,
   saveGeolocationData as dbSaveGeolocationData,
 } from '@/lib/db-transaction/geolocation';
+import prisma from '@/lib/prisma';
+import { GeolocationResponse } from '@/types/geolocation';
 
 export interface GeolocationData {
   latitude: number;
@@ -58,3 +60,72 @@ export const getGeolocationData = async (params: GeolocationFilterParams) => {
     throw error;
   }
 };
+
+/**
+ * Server action untuk mengambil data geolokasi
+ */
+export async function getGeolocationData(): Promise<GeolocationResponse> {
+  try {
+    const [countries, cities, recent, total] = await Promise.all([
+      // Get top countries
+      prisma.geolocation.groupBy({
+        by: ['country'],
+        _count: {
+          country: true,
+        },
+        orderBy: {
+          _count: {
+            country: 'desc',
+          },
+        },
+        take: 10,
+      }),
+
+      // Get top cities
+      prisma.geolocation.groupBy({
+        by: ['city'],
+        _count: {
+          city: true,
+        },
+        orderBy: {
+          _count: {
+            city: 'desc',
+          },
+        },
+        take: 10,
+      }),
+
+      // Get recent entries
+      prisma.geolocation.findMany({
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: 10,
+      }),
+
+      // Get total count
+      prisma.geolocation.count(),
+    ]);
+
+    return {
+      status: 'success',
+      data: {
+        total,
+        countries,
+        cities,
+        recent,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching geolocation data:', error);
+    return {
+      status: 'error',
+      data: {
+        total: 0,
+        countries: [],
+        cities: [],
+        recent: [],
+      },
+    };
+  }
+}

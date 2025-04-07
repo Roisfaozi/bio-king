@@ -11,6 +11,12 @@ export interface TrackingData {
   referer?: string;
   userAgent?: string;
   pathname?: string;
+  geolocation?: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    consent_given?: boolean;
+  };
 }
 
 /**
@@ -52,6 +58,27 @@ export async function trackPageView(
       searchParams = new URLSearchParams(url.search);
     }
 
+    // Cek jika ada data geolokasi, simpan terlebih dahulu
+    let geolocationId: string | null = null;
+    if (data.geolocation) {
+      const geolocationData = await noRLS.geolocationData.create({
+        data: {
+          latitude: data.geolocation.latitude,
+          longitude: data.geolocation.longitude,
+          accuracy: data.geolocation.accuracy,
+          consent_given: data.geolocation.consent_given ?? true,
+          city: geoData?.city || null,
+          region: geoData?.region || null,
+          country: geoData?.country || null,
+          created_at: currentEpoch,
+        },
+      });
+
+      if (geolocationData) {
+        geolocationId = geolocationData.id;
+      }
+    }
+
     // Buat data umum untuk tracking
     const commonData = {
       ip,
@@ -68,6 +95,7 @@ export async function trackPageView(
       utm_campaign: searchParams.get('utm_campaign'),
       created_at: currentEpoch,
       platform: data.pageType,
+      geolocation_id: geolocationId,
     };
 
     // Track berdasarkan jenis halaman
