@@ -2,7 +2,7 @@ import { getAuthSession } from '@/lib/auth';
 import db from '@/lib/db';
 import { saveGeolocationData } from '@/lib/db-transaction/geolocation';
 import { trackPageView } from '@/lib/db-transaction/tracking';
-import { getCurrentEpoch } from '@/lib/utils';
+import { getCurrentEpoch, serializeBigInt } from '@/lib/utils';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       status: 'success',
-      data: geolocationData,
+      data: serializeBigInt(geolocationData),
     });
   } catch (error) {
     console.error('Error fetching geolocation data:', error);
