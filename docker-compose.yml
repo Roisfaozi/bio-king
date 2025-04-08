@@ -2,22 +2,34 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: bio-king:latest
     restart: always
     ports:
-      - '3000:3000'
+      - '3007:3000'
     environment:
-      - DATABASE_URL=postgres://bio:biopassword@db:5432/bio_db?sslmode=disable
+      - DATABASE_URL=postgresql://neondb_owner:npg_rGZ4zpKLSE3k@ep-super-mountain-a5zs6wjj-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
       - AUTH_SECRET=44701d4cea71dda7a51cf998408533d1
       - NEXT_PUBLIC_SITE_URL=http://localhost:3000
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+      - ADMIN_REGISTRATION_TOKEN=dsfsadfsadf
+      - GOOGLE_SHEETS_API_KEY=${GOOGLE_SHEETS_API_KEY}
+      - CLOUDINARY_CLOUD_NAME=dfs7nermk
+      - CLOUDINARY_API_KEY=771656591269893
+      - CLOUDINARY_API_SECRET=_o-nmM8-ov8vQ7_E0_19Tr1f6ug
     volumes:
       - app-data:/app
+      - ./src:/app/src
+      - ./public:/app/public
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   db:
     image: postgres:16-alpine
@@ -28,10 +40,25 @@ services:
       - POSTGRES_USER=bio
       - POSTGRES_PASSWORD=biopassword
       - POSTGRES_DB=bio_db
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./prisma:/docker-entrypoint-initdb.d
     networks:
       - app-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bio -d bio_db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command:
+      - 'postgres'
+      - '-c'
+      - 'max_connections=100'
+      - '-c'
+      - 'shared_buffers=256MB'
+      - '-c'
+      - 'work_mem=16MB'
 
 networks:
   app-network:
@@ -39,4 +66,6 @@ networks:
 
 volumes:
   app-data:
+    driver: local
   postgres-data:
+    driver: local
