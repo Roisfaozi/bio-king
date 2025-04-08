@@ -13,7 +13,6 @@ const sessionCookies = credentialsConfig.sessionCookieName;
 export const createShortlink = async (data: CreateShortlinkInput) => {
   try {
     const cookie = await getCookie(sessionCookies);
-
     // Log data yang akan dikirim
     console.log('Creating shortlink with data:', data);
 
@@ -33,6 +32,7 @@ export const createShortlink = async (data: CreateShortlinkInput) => {
 export const getShortlinks = async (limit: number = 10) => {
   try {
     const cookie = await getCookie(sessionCookies);
+    console.log('cookie', cookie);
 
     const response = await api.get('/shortlink', {
       headers: {
