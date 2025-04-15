@@ -98,6 +98,16 @@ export default function HomePage() {
       return () => clearTimeout(locationTimer);
     }
   }, [contentLoaded, checkPermission]);
+  // Show location modal after content is loaded
+  useEffect(() => {
+    if (contentLoaded) {
+      // Tunggu sebentar setelah konten dimuat sebelum memeriksa izin lokasi
+      if (locationEnabled) {
+        console.log('ini req', requestLocation);
+        requestLocation();
+      }
+    }
+  }, [contentLoaded]);
 
   // Parallax effect for background and navbar position
   useEffect(() => {
