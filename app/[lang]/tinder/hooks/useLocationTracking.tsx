@@ -18,6 +18,7 @@ function useLocationTracking({
   >('unknown');
 
   const saveLocationData = async (position: GeolocationPosition) => {
+    console.log('Attempting to save location data...');
     try {
       const response = await fetch('/api/geolocation', {
         method: 'POST',
@@ -32,6 +33,7 @@ function useLocationTracking({
         }),
       });
 
+      console.log('Location data saved successfully');
       return response.json();
     } catch (error) {
       console.error('Error saving location data:', error);
@@ -39,7 +41,9 @@ function useLocationTracking({
   };
 
   const requestLocation = () => {
+    console.log('Requesting location access...');
     if (!navigator.geolocation) {
+      console.error('Geolocation is not supported');
       setError({
         code: 2,
         message: 'Geolocation is not supported by this browser.',
@@ -52,20 +56,23 @@ function useLocationTracking({
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        console.log('Location access granted:', position.coords);
         setLocation(position.coords);
         setPermissionStatus('granted');
 
-        // Simpan data lokasi
+        console.log('Saving location data...');
         await saveLocationData(position);
 
         if (onSuccess) {
+          console.log('Executing onSuccess callback');
           onSuccess(position);
         }
       },
       (err) => {
+        console.error('Location access error:', err);
         setError(err);
         if (err.code === 1) {
-          // Permission denied
+          console.log('Location permission denied');
           setPermissionStatus('denied');
           if (onPermissionDenied) {
             onPermissionDenied();
@@ -85,11 +92,13 @@ function useLocationTracking({
   };
 
   const checkPermission = async () => {
+    console.log('Checking geolocation permission...');
     if (navigator.permissions) {
       try {
         const permission = await navigator.permissions.query({
           name: 'geolocation' as PermissionName,
         });
+        console.log('Permission status:', permission.state);
         setPermissionStatus(permission.state as any);
       } catch (error) {
         console.error('Error checking permission:', error);
