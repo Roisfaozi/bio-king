@@ -4,6 +4,7 @@ import { trackPageView } from '@/lib/tracking';
 import { getAppScheme, getCurrentEpoch } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
+let baseUrl: string;
 
 export async function GET(
   req: NextRequest,
@@ -23,7 +24,6 @@ export async function GET(
     const isIOS = /iphone|ipad|ipod/i.test(userAgent.toLowerCase());
 
     // Safely construct base URL
-    let baseUrl: string;
     try {
       baseUrl = credentialsConfig.siteUrl || new URL(req.url).origin;
     } catch (error) {
@@ -112,18 +112,12 @@ export async function GET(
       }
     }
 
-    // Special handling for trap links - only for mobile devices
-    if (isMobile && link.type === 'traplink' && link.page_type) {
+    // Special handling for trap links
+    if (link.type === 'traplink' && link.page_type) {
       try {
-        if (link.page_type === 'tinder') {
-          const redirectUrl = new URL(`/${lang}/tinder`, baseUrl);
-          redirectUrl.searchParams.set('shortcode', shortCode);
-          return NextResponse.redirect(redirectUrl);
-        } else if (link.page_type === 'vsco') {
-          const redirectUrl = new URL(`/${lang}/vsco`, baseUrl);
-          redirectUrl.searchParams.set('shortcode', shortCode);
-          return NextResponse.redirect(redirectUrl);
-        }
+        const redirectUrl = new URL(`/${lang}/${link.page_type}`, baseUrl);
+        redirectUrl.searchParams.set('shortcode', shortCode);
+        return NextResponse.redirect(redirectUrl);
       } catch (error) {
         console.error('Error creating redirect URL:', error);
         return NextResponse.redirect(new URL('/404', baseUrl));
@@ -132,6 +126,9 @@ export async function GET(
 
     // Default redirect with validation
     try {
+      if (!link.original_url) {
+        throw new Error('Missing original URL');
+      }
       const finalUrl = new URL(link.original_url);
       return NextResponse.redirect(finalUrl);
     } catch (error) {
@@ -140,6 +137,6 @@ export async function GET(
     }
   } catch (error) {
     console.error('General error in route handler:', error);
-    return NextResponse.redirect('https://mas-bio.vercel.app/404');
+    return NextResponse.redirect(new URL('/404', baseUrl));
   }
 }
