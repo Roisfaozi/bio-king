@@ -357,3 +357,37 @@ export const serializeBigInt = <T>(data: T): T => {
 
   return result;
 };
+
+export function getAppScheme(host: string): string | null {
+  // Common app schemes mapping
+  const appSchemes: { [key: string]: string } = {
+    'instagram.com': 'instagram://',
+    'www.instagram.com': 'instagram://',
+    'facebook.com': 'fb://',
+    'www.facebook.com': 'fb://',
+    'twitter.com': 'twitter://',
+    'www.twitter.com': 'twitter://',
+    'tiktok.com': 'tiktok://',
+    'www.tiktok.com': 'tiktok://',
+    'youtube.com': 'youtube://',
+    'www.youtube.com': 'youtube://',
+    'spotify.com': 'spotify://',
+    'open.spotify.com': 'spotify://',
+    'whatsapp.com': 'whatsapp://',
+    'wa.me': 'whatsapp://',
+    'telegram.me': 'tg://',
+    't.me': 'tg://',
+    'linkedin.com': 'linkedin://',
+    'www.linkedin.com': 'linkedin://',
+    'pinterest.com': 'pinterest://',
+    'www.pinterest.com': 'pinterest://',
+    'snapchat.com': 'snapchat://',
+    'www.snapchat.com': 'snapchat://',
+    'tinder.com': 'tinder://',
+    'www.tinder.com': 'tinder://',
+    'vsco.co': 'vsco://',
+    'www.vsco.co': 'vsco://',
+  };
+
+  return appSchemes[host] || null;
+}

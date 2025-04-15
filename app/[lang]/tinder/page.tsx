@@ -63,7 +63,7 @@ export default function HomePage() {
 
   const searchParams = useSearchParams();
   const shortcode = searchParams.get('shortcode');
-  console.log('shortcode', shortcode);
+  console.log('location', location);
   // Deteksi client-side dan ukuran layar
   useEffect(() => {
     setIsClient(true);
